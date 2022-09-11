@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<?xml-model href="UA Model Design.xsd"?>
+<!--
+ * Copyright (c) 2005-2021 The OPC Foundation, Inc. All rights reserved.
+ *
+ * OPC Foundation MIT License 1.00
+ * 
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * The complete license agreement can be found here:
+ * http://opcfoundation.org/License/MIT/1.00/
+-->
+		
+
+<opc:ModelDesign
+  xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ua="http://opcfoundation.org/UA/"
+  xmlns:opc="http://opcfoundation.org/UA/ModelDesign.xsd"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.opcfoundation.org/MyModel/"
+  TargetNamespace="http://www.opcfoundation.org/MyModel/"
+  TargetXmlNamespace="http://www.opcfoundation.org/MyModel/"
+  TargetVersion="1.00"
+  TargetPublicationDate="2013-12-31T00:00:00Z">
+
+  <opc:Namespaces>
+    <opc:Namespace Name="MyModel" Prefix="MyModel" XmlPrefix="MyModel">http://www.opcfoundation.org/MyModel/</opc:Namespace>
+    <opc:Namespace Name="OpcUa" Version="1.04.11" PublicationDate="2022-03-29T00:00:00Z" Prefix="Opc.Ua" InternalPrefix="Opc.Ua.Server" XmlNamespace="http://opcfoundation.org/UA/2008/02/Types.xsd" XmlPrefix="OpcUa">http://opcfoundation.org/UA/</opc:Namespace>
+  </opc:Namespaces>
+
+
+  <opc:DataType SymbolicName="temperature_reading" BaseType="ua:Structure">
+    <opc:Fields>
+    <opc:Field Name="TemperatureValueC" DataType="ua:Double"></opc:Field>
+    <opc:Field Name="Unit" DataType="ua:String" ></opc:Field>
+    </opc:Fields>
+  </opc:DataType>
+  
+  <!-- These are some objectTypes which inherit from different basetype-->
+    <opc:ObjectType SymbolicName="temperatureSensor" BaseType="ua:BaseObjectType">
+        <opc:Children>
+            <opc:Method SymbolicName="Read" ModellingRule="OptionalPlaceholder"></opc:Method>
+            <opc:Property SymbolicName="sensorName" DataType="ua:String"></opc:Property>
+            <opc:Variable SymbolicName="temperatureValueC" DataType="temperature_reading"></opc:Variable>
+        </opc:Children>
+    </opc:ObjectType>
+    
+
+  <!-- These are some objects which instantiate previously defined objectTypes -->
+    <opc:Object SymbolicName="temperatureSensor1" TypeDefinition="temperatureSensor">
+        <opc:References>
+            <opc:Reference IsInverse="true">
+                <opc:ReferenceType>ua:Organizes</opc:ReferenceType>
+                <opc:TargetId>ua:ObjectsFolder</opc:TargetId>
+            </opc:Reference>
+        </opc:References>
+
+    </opc:Object>
+  
+ <!-- 
+  <opc:ObjectType SymbolicName="folderOPC" BaseType="ua:FolderType">
+  </opc:ObjectType>
+  
+  <opc:Object SymbolicName="tempSensor1" TypeDefinition="temperatureSensor">
+  </opc:Object>
+
+-->
+    
+</opc:ModelDesign>

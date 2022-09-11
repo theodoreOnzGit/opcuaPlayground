@@ -1,0 +1,25 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ua="http://opcfoundation.org/UA/2008/02/Types.xsd"
+  xmlns:tns="http://www.opcfoundation.org/MyModel/"
+  targetNamespace="http://www.opcfoundation.org/MyModel/"
+  elementFormDefault="qualified"
+>
+  <xs:import namespace="http://opcfoundation.org/UA/2008/02/Types.xsd" />
+
+  <xs:complexType name="temperature_reading">
+    <xs:sequence>
+      <xs:element name="TemperatureValueC" type="xs:double" minOccurs="0" />
+      <xs:element name="Unit" type="xs:string" minOccurs="0" nillable="true" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="temperature_reading" type="tns:temperature_reading" />
+
+  <xs:complexType name="ListOftemperature_reading">
+    <xs:sequence>
+      <xs:element name="temperature_reading" type="tns:temperature_reading" minOccurs="0" maxOccurs="unbounded" nillable="true" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListOftemperature_reading" type="tns:ListOftemperature_reading" nillable="true"></xs:element>
+
+</xs:schema>

@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" LastModified="2013-12-31T00:00:00Z" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>http://www.opcfoundation.org/MyModel/</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="http://www.opcfoundation.org/MyModel/" Version="1.00" PublicationDate="2013-12-31T00:00:00Z">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/" XmlSchemaUri="http://opcfoundation.org/UA/2008/02/Types.xsd" Version="1.04.11" PublicationDate="2022-03-29T00:00:00Z" />
+    </Model>
+  </Models>
+  <Aliases>
+    <Alias Alias="Boolean">i=1</Alias>
+    <Alias Alias="SByte">i=2</Alias>
+    <Alias Alias="Byte">i=3</Alias>
+    <Alias Alias="Int16">i=4</Alias>
+    <Alias Alias="UInt16">i=5</Alias>
+    <Alias Alias="Int32">i=6</Alias>
+    <Alias Alias="UInt32">i=7</Alias>
+    <Alias Alias="Int64">i=8</Alias>
+    <Alias Alias="UInt64">i=9</Alias>
+    <Alias Alias="Float">i=10</Alias>
+    <Alias Alias="Double">i=11</Alias>
+    <Alias Alias="DateTime">i=13</Alias>
+    <Alias Alias="String">i=12</Alias>
+    <Alias Alias="ByteString">i=15</Alias>
+    <Alias Alias="Guid">i=14</Alias>
+    <Alias Alias="XmlElement">i=16</Alias>
+    <Alias Alias="NodeId">i=17</Alias>
+    <Alias Alias="ExpandedNodeId">i=18</Alias>
+    <Alias Alias="QualifiedName">i=20</Alias>
+    <Alias Alias="LocalizedText">i=21</Alias>
+    <Alias Alias="StatusCode">i=19</Alias>
+    <Alias Alias="Structure">i=22</Alias>
+    <Alias Alias="Number">i=26</Alias>
+    <Alias Alias="Integer">i=27</Alias>
+    <Alias Alias="UInteger">i=28</Alias>
+    <Alias Alias="HasComponent">i=47</Alias>
+    <Alias Alias="HasProperty">i=46</Alias>
+    <Alias Alias="Organizes">i=35</Alias>
+    <Alias Alias="HasEventSource">i=36</Alias>
+    <Alias Alias="HasNotifier">i=48</Alias>
+    <Alias Alias="HasSubtype">i=45</Alias>
+    <Alias Alias="HasTypeDefinition">i=40</Alias>
+    <Alias Alias="HasModellingRule">i=37</Alias>
+    <Alias Alias="HasEncoding">i=38</Alias>
+    <Alias Alias="HasDescription">i=39</Alias>
+    <Alias Alias="HasCause">i=53</Alias>
+    <Alias Alias="ToState">i=52</Alias>
+    <Alias Alias="FromState">i=51</Alias>
+    <Alias Alias="HasEffect">i=54</Alias>
+    <Alias Alias="HasTrueSubState">i=9004</Alias>
+    <Alias Alias="HasFalseSubState">i=9005</Alias>
+    <Alias Alias="HasDictionaryEntry">i=17597</Alias>
+    <Alias Alias="HasCondition">i=9006</Alias>
+    <Alias Alias="HasGuard">i=15112</Alias>
+    <Alias Alias="HasAddIn">i=17604</Alias>
+    <Alias Alias="HasInterface">i=17603</Alias>
+  </Aliases>
+  <UADataType NodeId="ns=1;i=1" BrowseName="1:temperature_reading">
+    <DisplayName>temperature_reading</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
+    </References>
+    <Definition Name="1:temperature_reading">
+      <Field Name="TemperatureValueC" DataType="i=11" />
+      <Field Name="Unit" DataType="i=12" />
+    </Definition>
+  </UADataType>
+  <UAObjectType NodeId="ns=1;i=2" BrowseName="1:temperatureSensor">
+    <DisplayName>temperatureSensor</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=3</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=4</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=5</Reference>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
+    </References>
+  </UAObjectType>
+  <UAMethod NodeId="ns=1;i=3" BrowseName="1:Read" ParentNodeId="ns=1;i=2">
+    <DisplayName>Read</DisplayName>
+    <References>
+      <Reference ReferenceType="HasModellingRule">i=11508</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=2</Reference>
+    </References>
+  </UAMethod>
+  <UAVariable NodeId="ns=1;i=4" BrowseName="1:sensorName" ParentNodeId="ns=1;i=2" DataType="String">
+    <DisplayName>sensorName</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=2</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=5" BrowseName="1:temperatureValueC" ParentNodeId="ns=1;i=2" DataType="ns=1;i=1">
+    <DisplayName>temperatureValueC</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=2</Reference>
+    </References>
+  </UAVariable>
+  <UAObject NodeId="ns=1;i=6" BrowseName="1:temperatureSensor1">
+    <DisplayName>temperatureSensor1</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=8</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=9</Reference>
+      <Reference ReferenceType="Organizes" IsForward="false">i=85</Reference>
+      <Reference ReferenceType="HasTypeDefinition">ns=1;i=2</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=8" BrowseName="1:sensorName" ParentNodeId="ns=1;i=6" DataType="String">
+    <DisplayName>sensorName</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=6</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=9" BrowseName="1:temperatureValueC" ParentNodeId="ns=1;i=6" DataType="ns=1;i=1">
+    <DisplayName>temperatureValueC</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=6</Reference>
+    </References>
+  </UAVariable>
+  <UAObject NodeId="ns=1;i=10" BrowseName="Default Binary" SymbolicName="DefaultBinary">
+    <DisplayName>Default Binary</DisplayName>
+    <References>
+      <Reference ReferenceType="HasEncoding" IsForward="false">ns=1;i=1</Reference>
+      <Reference ReferenceType="HasDescription">ns=1;i=15</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=76</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=11" BrowseName="1:MyModel" SymbolicName="MyModel_BinarySchema" ReleaseStatus="Deprecated" DataType="ByteString">
+    <DisplayName>MyModel</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=13</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=14</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">i=93</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=72</Reference>
+    </References>
+    <Value>
+      <ByteString xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">PG9wYzpUeXBlRGljdGlvbmFyeQ0KICB4bWxuczpvcGM9Imh0dHA6Ly9vcGNmb3VuZGF0aW9uLm9y
+Zy9CaW5hcnlTY2hlbWEvIg0KICB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1M
+U2NoZW1hLWluc3RhbmNlIg0KICB4bWxuczp1YT0iaHR0cDovL29wY2ZvdW5kYXRpb24ub3JnL1VB
+LyINCiAgeG1sbnM6dG5zPSJodHRwOi8vd3d3Lm9wY2ZvdW5kYXRpb24ub3JnL015TW9kZWwvIg0K
+ICBEZWZhdWx0Qnl0ZU9yZGVyPSJMaXR0bGVFbmRpYW4iDQogIFRhcmdldE5hbWVzcGFjZT0iaHR0
+cDovL3d3dy5vcGNmb3VuZGF0aW9uLm9yZy9NeU1vZGVsLyINCj4NCiAgPG9wYzpJbXBvcnQgTmFt
+ZXNwYWNlPSJodHRwOi8vb3BjZm91bmRhdGlvbi5vcmcvVUEvIiBMb2NhdGlvbj0iT3BjLlVhLkJp
+bmFyeVNjaGVtYS5ic2QiLz4NCg0KICA8b3BjOlN0cnVjdHVyZWRUeXBlIE5hbWU9InRlbXBlcmF0
+dXJlX3JlYWRpbmciIEJhc2VUeXBlPSJ1YTpFeHRlbnNpb25PYmplY3QiPg0KICAgIDxvcGM6Rmll
+bGQgTmFtZT0iVGVtcGVyYXR1cmVWYWx1ZUMiIFR5cGVOYW1lPSJvcGM6RG91YmxlIiAvPg0KICAg
+IDxvcGM6RmllbGQgTmFtZT0iVW5pdCIgVHlwZU5hbWU9Im9wYzpTdHJpbmciIC8+DQogIDwvb3Bj
+OlN0cnVjdHVyZWRUeXBlPg0KDQo8L29wYzpUeXBlRGljdGlvbmFyeT4=</ByteString>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=13" BrowseName="NamespaceUri" ReleaseStatus="Deprecated" ParentNodeId="ns=1;i=11" DataType="String">
+    <DisplayName>NamespaceUri</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=11</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.opcfoundation.org/MyModel/</String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=14" BrowseName="Deprecated" ReleaseStatus="Deprecated" ParentNodeId="ns=1;i=11" DataType="Boolean">
+    <DisplayName>Deprecated</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=11</Reference>
+    </References>
+    <Value>
+      <Boolean xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">true</Boolean>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15" BrowseName="1:temperature_reading" ReleaseStatus="Deprecated" ParentNodeId="ns=1;i=11" DataType="String">
+    <DisplayName>temperature_reading</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=69</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=11</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">temperature_reading</String>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;i=18" BrowseName="Default XML" SymbolicName="DefaultXml">
+    <DisplayName>Default XML</DisplayName>
+    <References>
+      <Reference ReferenceType="HasEncoding" IsForward="false">ns=1;i=1</Reference>
+      <Reference ReferenceType="HasDescription">ns=1;i=23</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=76</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=19" BrowseName="1:MyModel" SymbolicName="MyModel_XmlSchema" ReleaseStatus="Deprecated" DataType="ByteString">
+    <DisplayName>MyModel</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=21</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=22</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=23</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">i=92</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=72</Reference>
+    </References>
+    <Value>
+      <ByteString xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">PHhzOnNjaGVtYQ0KICB4bWxuczp4cz0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEi
+DQogIHhtbG5zOnVhPSJodHRwOi8vb3BjZm91bmRhdGlvbi5vcmcvVUEvMjAwOC8wMi9UeXBlcy54
+c2QiDQogIHhtbG5zOnRucz0iaHR0cDovL3d3dy5vcGNmb3VuZGF0aW9uLm9yZy9NeU1vZGVsLyIN
+CiAgdGFyZ2V0TmFtZXNwYWNlPSJodHRwOi8vd3d3Lm9wY2ZvdW5kYXRpb24ub3JnL015TW9kZWwv
+Ig0KICBlbGVtZW50Rm9ybURlZmF1bHQ9InF1YWxpZmllZCINCj4NCiAgPHhzOmltcG9ydCBuYW1l
+c3BhY2U9Imh0dHA6Ly9vcGNmb3VuZGF0aW9uLm9yZy9VQS8yMDA4LzAyL1R5cGVzLnhzZCIgLz4N
+Cg0KICA8eHM6Y29tcGxleFR5cGUgbmFtZT0idGVtcGVyYXR1cmVfcmVhZGluZyI+DQogICAgPHhz
+OnNlcXVlbmNlPg0KICAgICAgPHhzOmVsZW1lbnQgbmFtZT0iVGVtcGVyYXR1cmVWYWx1ZUMiIHR5
+cGU9InhzOmRvdWJsZSIgbWluT2NjdXJzPSIwIiAvPg0KICAgICAgPHhzOmVsZW1lbnQgbmFtZT0i
+VW5pdCIgdHlwZT0ieHM6c3RyaW5nIiBtaW5PY2N1cnM9IjAiIG5pbGxhYmxlPSJ0cnVlIiAvPg0K
+ICAgIDwveHM6c2VxdWVuY2U+DQogIDwveHM6Y29tcGxleFR5cGU+DQogIDx4czplbGVtZW50IG5h
+bWU9InRlbXBlcmF0dXJlX3JlYWRpbmciIHR5cGU9InRuczp0ZW1wZXJhdHVyZV9yZWFkaW5nIiAv
+Pg0KDQogIDx4czpjb21wbGV4VHlwZSBuYW1lPSJMaXN0T2Z0ZW1wZXJhdHVyZV9yZWFkaW5nIj4N
+CiAgICA8eHM6c2VxdWVuY2U+DQogICAgICA8eHM6ZWxlbWVudCBuYW1lPSJ0ZW1wZXJhdHVyZV9y
+ZWFkaW5nIiB0eXBlPSJ0bnM6dGVtcGVyYXR1cmVfcmVhZGluZyIgbWluT2NjdXJzPSIwIiBtYXhP
+Y2N1cnM9InVuYm91bmRlZCIgbmlsbGFibGU9InRydWUiIC8+DQogICAgPC94czpzZXF1ZW5jZT4N
+CiAgPC94czpjb21wbGV4VHlwZT4NCiAgPHhzOmVsZW1lbnQgbmFtZT0iTGlzdE9mdGVtcGVyYXR1
+cmVfcmVhZGluZyIgdHlwZT0idG5zOkxpc3RPZnRlbXBlcmF0dXJlX3JlYWRpbmciIG5pbGxhYmxl
+PSJ0cnVlIj48L3hzOmVsZW1lbnQ+DQoNCjwveHM6c2NoZW1hPg==</ByteString>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=21" BrowseName="NamespaceUri" ReleaseStatus="Deprecated" ParentNodeId="ns=1;i=19" DataType="String">
+    <DisplayName>NamespaceUri</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=19</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.opcfoundation.org/MyModel/</String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=22" BrowseName="Deprecated" ReleaseStatus="Deprecated" ParentNodeId="ns=1;i=19" DataType="Boolean">
+    <DisplayName>Deprecated</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=19</Reference>
+    </References>
+    <Value>
+      <Boolean xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">true</Boolean>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=23" BrowseName="1:temperature_reading" ReleaseStatus="Deprecated" ParentNodeId="ns=1;i=19" DataType="String">
+    <DisplayName>temperature_reading</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=69</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=19</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='temperature_reading']</String>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;i=26" BrowseName="Default JSON" SymbolicName="DefaultJson">
+    <DisplayName>Default JSON</DisplayName>
+    <References>
+      <Reference ReferenceType="HasEncoding" IsForward="false">ns=1;i=1</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=76</Reference>
+    </References>
+  </UAObject>
+</UANodeSet>
