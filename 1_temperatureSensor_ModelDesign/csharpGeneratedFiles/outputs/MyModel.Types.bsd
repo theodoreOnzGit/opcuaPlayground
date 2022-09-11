@@ -1,0 +1,16 @@
+<opc:TypeDictionary
+  xmlns:opc="http://opcfoundation.org/BinarySchema/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ua="http://opcfoundation.org/UA/"
+  xmlns:tns="http://www.opcfoundation.org/MyModel/"
+  DefaultByteOrder="LittleEndian"
+  TargetNamespace="http://www.opcfoundation.org/MyModel/"
+>
+  <opc:Import Namespace="http://opcfoundation.org/UA/" Location="Opc.Ua.BinarySchema.bsd"/>
+
+  <opc:StructuredType Name="temperature_reading" BaseType="ua:ExtensionObject">
+    <opc:Field Name="TemperatureValueC" TypeName="opc:Double" />
+    <opc:Field Name="Unit" TypeName="opc:String" />
+  </opc:StructuredType>
+
+</opc:TypeDictionary>
