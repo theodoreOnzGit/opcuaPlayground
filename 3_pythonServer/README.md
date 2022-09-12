@@ -19,6 +19,13 @@ paru -S pyqt5
 pip3 install opcua-client numpy pyqtgraph
 ```
 
+if you don't have an aur helper, you can use:
+
+```zsh
+sudo pacman -S pyqt5
+pip3 install opcua-client numpy pyqtgraph
+```
+
 go to 
 ```zsh
 cd /home/$USER/.local/bin
