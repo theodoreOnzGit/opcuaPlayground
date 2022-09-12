@@ -1,5 +1,22 @@
 # python with rust code in server
 
+## Auto Detect Ip address
+
+Normally in OPCUA you'd have to specify ip address either by using
+ipconfig in windows or ip a in linux
+
+however, python has a way to auto detect ip address
+
+```python
+import socket
+# get ip address automatically
+def getIPAddress():
+    hostname = socket.gethostname()
+    IPaddr = socket.gethostbyname(hostname)
+    return IPaddr
+```
+
+This ip address can then be used to host the opcua server.
 
 ### virtual environment
 
