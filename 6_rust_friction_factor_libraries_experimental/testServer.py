@@ -48,6 +48,7 @@ async def main():
     server = Server()
     await server.init()
     server.set_endpoint('opc.tcp://'+getIPAddress()+':4840/freeopcua/server/')
+    server.set_endpoint('opc.tcp://192.168.10.177:4840/freeopcua/server/')
 
     # setup our own namespace, not really necessary but should as spec
     uri = 'http://examples.freeopcua.github.io'
@@ -69,10 +70,10 @@ async def main():
 
     ## here's where i add my reynolds number
     pipeObj = await server.nodes.objects.add_object(idx, 'pipeObj')
-    ReynoldsNumber = await pipeObj.add_variable(idx, 'Re',160)
+    ReynoldsNumber = await pipeObj.add_variable(idx, 'Re',160.01)
     await ReynoldsNumber.set_writable()
 
-    roughnessRatio = 0.15
+    roughnessRatio = 0.00015
 
     _logger.info('Starting server!')
     
