@@ -15,7 +15,6 @@ def getIPAddress():
     IPaddr = socket.gethostbyname(hostname)
     return IPaddr
 ```
-
 This ip address can then be used to host the opcua server.
 
 ### virtual environment

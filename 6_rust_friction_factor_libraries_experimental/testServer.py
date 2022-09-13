@@ -29,6 +29,11 @@ def add2(value):
 def rustAdd4(value):
     return rust_functions_in_python.add_four_rust(value)
 
+# frictionFactor in rust
+def rustDarcy(ReynoldsNumber,roughnessRatio):
+    return rust_functions_in_python.moody_rust(ReynoldsNumber,
+            roughnessRatio)
+
 # get ip address automatically
 def getIPAddress():
     hostname = socket.gethostname()
@@ -60,14 +65,30 @@ async def main():
             func, 
             [ua.VariantType.Int64], 
             [ua.VariantType.Int64])
+
+
+    ## here's where i add my reynolds number
+    pipeObj = await server.nodes.objects.add_object(idx, 'pipeObj')
+    ReynoldsNumber = await pipeObj.add_variable(idx, 'Re',160)
+    await ReynoldsNumber.set_writable()
+
+    roughnessRatio = 0.15
+
     _logger.info('Starting server!')
     
     # server loop
     async with server:
         while True:
             await asyncio.sleep(1)
-            new_val = await myvar.get_value()  + rustAdd4(0.1)
+            new_val = await myvar.get_value() + rustAdd4(0.1)
             _logger.info('Set value of %s to %.1f', myvar, new_val)
+            Re = await ReynoldsNumber.get_value()
+
+            darcyFrictionFactor = rustDarcy(Re,
+                    roughnessRatio)
+
+            _logger.info('reynolds number is %.1f, darcy = %.7f',Re,darcyFrictionFactor)
+
             await myvar.write_value(new_val)
 
 
