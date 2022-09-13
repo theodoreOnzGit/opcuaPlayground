@@ -31,6 +31,8 @@ fn moody_rust(reynolds_number: f64,
 fn rust_functions_in_python(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
     m.add_function(wrap_pyfunction!(add_four_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(fldk_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(moody_rust, m)?)?;
     Ok(())
 }
 
