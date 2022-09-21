@@ -34,6 +34,31 @@ def rustDarcy(ReynoldsNumber,roughnessRatio):
     return rust_functions_in_python.moody_rust(ReynoldsNumber,
             roughnessRatio)
 
+# Digital Twin Isothermal Ciet functions
+# implemented in rust
+def rust_get_heater_branch_pressure_change(
+        mass_rate_kg_per_s,
+        temperature_degrees_c):
+    return rust_functions_in_python.get_heater_branch_isothermal_pressure_change_pascals_rust(
+            mass_rate_kg_per_s,
+            temperature_degrees_c)
+
+
+def rust_get_ctah_branch_pressure_change(
+    mass_rate_kg_per_s,
+    temperature_degrees_c,
+    pump_pressure_pascals):
+    return rust_functions_in_python.get_ctah_branch_isothermal_pressure_change_pascals_rust(
+            mass_rate_kg_per_s,
+            temperature_degrees_c,
+            pump_pressure_pascals)
+
+def rust_get_heater_branch_hydrostatic_pressure(
+        temperature_degrees_c):
+    return rust_functions_in_python.get_heater_branch_isothermal_hydrostatic_pressure_pascals_rust(
+            temperature_degrees_c)
+
+
 # get ip address automatically
 def getIPAddress():
     hostname = socket.gethostname()
