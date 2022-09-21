@@ -36,6 +36,16 @@ fn get_ctah_branch_isothermal_pressure_loss_pascals_rust(
             pump_pressure_pascals));
 }
 
+#[pyfunction]
+fn get_heater_branch_isothermal_pressure_loss_pascals_rust(
+    mass_rate_kg_per_s: f64,
+    temperature_degrees_c: f64) -> PyResult<f64> {
+    return Ok(
+        get_heater_branch_isothermal_pressure_loss_pascals(
+            mass_rate_kg_per_s,
+            temperature_degrees_c
+            ));
+}
 
 /// A Python module implemented in Rust.
 #[pymodule]
@@ -47,6 +57,9 @@ fn rust_functions_in_python(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(
             get_ctah_branch_isothermal_pressure_loss_pascals_rust, 
             m)?)?;
+    m.add_function(wrap_pyfunction!(
+            get_heater_branch_isothermal_pressure_loss_pascals_rust, 
+            m)?)?;
     Ok(())
 }
 
@@ -55,7 +68,118 @@ fn rust_functions_in_python(_py: Python, m: &PyModule) -> PyResult<()> {
 // for fast prototyping and sandboxing don't really care too much
 //
 //
-/// code for digital twin
+/// code for ciet isothermal digital twin
+fn get_heater_branch_isothermal_pressure_loss_pascals(
+    mass_rate_kg_per_s: f64,
+    temperature_degrees_c: f64) -> f64 {
+    //import necessary things...
+    use fluid_mechanics_rust::therminol_component::factory;
+    use uom::si::mass_rate::kilogram_per_second;
+    use uom::si::thermodynamic_temperature::degree_celsius;
+    use uom::si::pressure::pascal;
+    use fluid_mechanics_rust::therminol_component::CalcPressureChange;
+
+    use uom::si::f64::*;
+    // fluid temp and pressure
+    let fluid_temp = ThermodynamicTemperature::new::<
+        degree_celsius>(temperature_degrees_c);
+    let mass_flowrate = MassRate::new::<
+        kilogram_per_second>(mass_rate_kg_per_s);
+
+    // let's get branch 5 and pipe 4
+    //
+    let branch_5 = factory::Branch5::get();
+    let pipe_4 = factory::Pipe4::get();
+
+    // lets get pipe 3 and static mixer 2 and pipe 2a
+    let pipe_3 = factory::Pipe3::get();
+    let mx10_2 = factory::StaticMixer10::get();
+    let pipe_2a = factory::Pipe2a::get();
+
+    // let's get the heater components 1a, 1 and 1b
+    let heater_top_head_1a = 
+        factory::HeaterTopHead1a::get();
+    let heater_version_1_1 = 
+        factory::CietHeaterVersion1::get();
+    let heater_bottom_head_label_1b = 
+        factory::HeaterBottomHead1b::get();
+
+    // now we'll get pipe 18
+
+    let pipe_18 = factory::Pipe18::get();
+
+    // now that we've gotten our items, we can
+    // then sum up the pressure change contributions
+    // given
+
+    let mut pressure_change_total = 
+        Pressure::new::<pascal>(0.0);
+
+    // branch5 and pipe4
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &branch_5,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_4,
+            mass_flowrate,
+            fluid_temp);
+
+    // pipe 3 and static mixer 2 and pipe 2a
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_3,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &mx10_2,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_2a,
+            mass_flowrate,
+            fluid_temp);
+
+    // heater 
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &heater_top_head_1a,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &heater_version_1_1,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &heater_bottom_head_label_1b,
+            mass_flowrate,
+            fluid_temp);
+
+    //pipe 18
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_18,
+            mass_flowrate,
+            fluid_temp);
+
+    // convert the object to f64 and return
+    return pressure_change_total.get::<pascal>();
+}
 
 fn get_ctah_branch_isothermal_pressure_loss_pascals(
     mass_rate_kg_per_s: f64,
