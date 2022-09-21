@@ -24,6 +24,18 @@ fn moody_rust(reynolds_number: f64,
     return Ok(moody(reynolds_number, roughness_ratio));
 }
 
+#[pyfunction]
+fn get_ctah_branch_isothermal_pressure_loss_pascals_rust(
+    mass_rate_kg_per_s: f64,
+    temperature_degrees_c: f64,
+    pump_pressure_pascals: f64) -> PyResult<f64> {
+    return Ok(
+        get_ctah_branch_isothermal_pressure_loss_pascals(
+            mass_rate_kg_per_s,
+            temperature_degrees_c,
+            pump_pressure_pascals));
+}
+
 
 /// A Python module implemented in Rust.
 #[pymodule]
@@ -32,6 +44,9 @@ fn rust_functions_in_python(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(add_four_rust, m)?)?;
     m.add_function(wrap_pyfunction!(fldk_rust, m)?)?;
     m.add_function(wrap_pyfunction!(moody_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(
+            get_ctah_branch_isothermal_pressure_loss_pascals_rust, 
+            m)?)?;
     Ok(())
 }
 
@@ -42,7 +57,7 @@ fn rust_functions_in_python(_py: Python, m: &PyModule) -> PyResult<()> {
 //
 /// code for digital twin
 
-fn get_ctah_branch_pressure_loss_pascals(
+fn get_ctah_branch_isothermal_pressure_loss_pascals(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64,
     pump_pressure_pascals: f64) -> f64 {
