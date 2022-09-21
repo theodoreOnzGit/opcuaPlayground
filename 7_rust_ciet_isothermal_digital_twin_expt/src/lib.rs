@@ -25,24 +25,34 @@ fn moody_rust(reynolds_number: f64,
 }
 
 #[pyfunction]
-fn get_ctah_branch_isothermal_pressure_loss_pascals_rust(
+fn get_ctah_branch_isothermal_pressure_change_pascals_rust(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64,
     pump_pressure_pascals: f64) -> PyResult<f64> {
     return Ok(
-        get_ctah_branch_isothermal_pressure_loss_pascals(
+        get_ctah_branch_isothermal_pressure_change_pascals(
             mass_rate_kg_per_s,
             temperature_degrees_c,
             pump_pressure_pascals));
 }
 
 #[pyfunction]
-fn get_heater_branch_isothermal_pressure_loss_pascals_rust(
+fn get_heater_branch_isothermal_pressure_change_pascals_rust(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64) -> PyResult<f64> {
     return Ok(
-        get_heater_branch_isothermal_pressure_loss_pascals(
+        get_heater_branch_isothermal_pressure_change_pascals(
             mass_rate_kg_per_s,
+            temperature_degrees_c
+            ));
+}
+
+#[pyfunction]
+fn get_heater_branch_isothermal_hydrostatic_pressure_pascals_rust(
+    temperature_degrees_c: f64) -> PyResult<f64> {
+
+    return Ok(
+        get_heater_branch_isothermal_hydrostatic_pressure_pascals(
             temperature_degrees_c
             ));
 }
@@ -55,10 +65,13 @@ fn rust_functions_in_python(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(fldk_rust, m)?)?;
     m.add_function(wrap_pyfunction!(moody_rust, m)?)?;
     m.add_function(wrap_pyfunction!(
-            get_ctah_branch_isothermal_pressure_loss_pascals_rust, 
+            get_ctah_branch_isothermal_pressure_change_pascals_rust, 
             m)?)?;
     m.add_function(wrap_pyfunction!(
-            get_heater_branch_isothermal_pressure_loss_pascals_rust, 
+            get_heater_branch_isothermal_pressure_change_pascals_rust, 
+            m)?)?;
+    m.add_function(wrap_pyfunction!(
+            get_heater_branch_isothermal_hydrostatic_pressure_pascals_rust, 
             m)?)?;
     Ok(())
 }
@@ -69,7 +82,7 @@ fn rust_functions_in_python(_py: Python, m: &PyModule) -> PyResult<()> {
 //
 //
 /// code for ciet isothermal digital twin
-fn get_heater_branch_isothermal_pressure_loss_pascals(
+fn get_heater_branch_isothermal_pressure_change_pascals(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64) -> f64 {
     //import necessary things...
@@ -181,7 +194,117 @@ fn get_heater_branch_isothermal_pressure_loss_pascals(
     return pressure_change_total.get::<pascal>();
 }
 
-fn get_ctah_branch_isothermal_pressure_loss_pascals(
+// get hydrostatic pressure change
+// for heater branch
+//
+//
+
+
+fn get_heater_branch_isothermal_hydrostatic_pressure_pascals(
+    temperature_degrees_c: f64) -> f64 {
+    //import necessary things...
+    use fluid_mechanics_rust::therminol_component::factory;
+    use uom::si::thermodynamic_temperature::degree_celsius;
+    use uom::si::pressure::pascal;
+    use fluid_mechanics_rust::therminol_component::
+        StandardCustomComponentProperties;
+    use fluid_mechanics_rust::therminol_component::
+        StandardPipeProperties;
+
+    use uom::si::f64::*;
+    // fluid temp and pressure
+    let fluid_temp = ThermodynamicTemperature::new::<
+        degree_celsius>(temperature_degrees_c);
+
+    // let's get branch 5 and pipe 4
+    //
+    let branch_5 = factory::Branch5::get();
+    let pipe_4 = factory::Pipe4::get();
+
+    // lets get pipe 3 and static mixer 2 and pipe 2a
+    let pipe_3 = factory::Pipe3::get();
+    let mx10_2 = factory::StaticMixer10::get();
+    let pipe_2a = factory::Pipe2a::get();
+
+    // let's get the heater components 1a, 1 and 1b
+    let heater_top_head_1a = 
+        factory::HeaterTopHead1a::get();
+    let heater_version_1_1 = 
+        factory::CietHeaterVersion1::get();
+    let heater_bottom_head_label_1b = 
+        factory::HeaterBottomHead1b::get();
+
+    // now we'll get pipe 18
+
+    let pipe_18 = factory::Pipe18::get();
+
+    // now that we've gotten our items, we can
+    // then sum up the pressure change contributions
+    // given
+
+    let mut hydrostatic_pressure_change_total = 
+        Pressure::new::<pascal>(0.0);
+
+    // branch5 and pipe4
+    //
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        branch_5.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        pipe_4.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    // pipe 3 and static mixer 2 and pipe 2a
+    //
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        pipe_3.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        mx10_2.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        pipe_2a.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    // heater 
+    //
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        heater_top_head_1a.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        heater_version_1_1.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        heater_bottom_head_label_1b.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    //pipe 18
+    //
+    hydrostatic_pressure_change_total = 
+        hydrostatic_pressure_change_total +
+        pipe_18.get_hydrostatic_pressure_change(
+            fluid_temp);
+
+    // convert the object to f64 and return
+    return hydrostatic_pressure_change_total.get::<pascal>();
+}
+
+// get ctah branch pressure
+
+fn get_ctah_branch_isothermal_pressure_change_pascals(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64,
     pump_pressure_pascals: f64) -> f64 {
