@@ -17,6 +17,9 @@ import socket
 import scipy
 import numpy
 
+# this is for timing
+import time
+
 
 # uamethods are methods meant for clients to invoke,
 # not necessarily on the server side
@@ -84,6 +87,8 @@ def get_heater_branch_mass_flowrate(
             heater_pressure_chg_root,
             -1.0,
             1.0)
+
+    return mass_flowrate_kg_per_s_solution
 
 
 def get_ctah_branch_mass_flowrate(
@@ -218,7 +223,10 @@ async def main():
     # server loop
     async with server:
         while True:
-            await asyncio.sleep(1)
+
+            start = time.time()
+
+
             new_val = await myvar.get_value() + rustAdd4(0.1)
             _logger.info('Set value of %s to %.1f', myvar, new_val)
             Re = await ReynoldsNumber.get_value()
@@ -239,10 +247,19 @@ async def main():
             await ctah_flowrate.write_value(mass_flowrate_kg_per_s)
 
             _logger.info('pump_pressure_pascals: %.1f',
-                    await pump_pressure_pascals.get_value())
+                    pump_pressure_pascals)
             _logger.info('ctah_mass_flowrate_kg_per_s: %.4f',
                     await ctah_flowrate.get_value())
 
+            end = time.time()
+
+            elapsed_loop_time_seconds = (end - start) 
+
+            _logger.info('elapsed_loop_time_seconds (ms) %.1f', 
+                    elapsed_loop_time_seconds *1000)
+
+
+            await asyncio.sleep(1 - elapsed_loop_time_seconds)
 
 
 

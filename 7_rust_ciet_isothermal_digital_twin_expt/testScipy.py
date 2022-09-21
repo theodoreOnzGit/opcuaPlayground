@@ -15,7 +15,7 @@ import socket
 
 # this is for iterative methods
 import scipy
-import numpy
+import numpy as np
 
 # this is for timing purposes
 
@@ -54,6 +54,7 @@ def rust_get_heater_branch_pressure_change(
     return rust_functions_in_python.get_heater_branch_isothermal_pressure_change_pascals_rust(
             mass_rate_kg_per_s,
             temperature_degrees_c)
+
 def rust_get_ctah_branch_pressure_change(
     mass_rate_kg_per_s,
     temperature_degrees_c,
@@ -88,6 +89,8 @@ def get_heater_branch_mass_flowrate(
             heater_pressure_chg_root,
             -1.0,
             1.0)
+
+    return mass_flowrate_kg_per_s_solution
 
 
 def get_ctah_branch_mass_flowrate(
@@ -220,6 +223,28 @@ async def main():
     end = time.time()
 
     elapsed = end - start
+
+    def root(x):
+        # the expression is x^2 + 2x + 1
+        # roots are at x = -1
+        square_term = np.power(x,2.0) 
+        linear_term = np.multiply(2.0,x)
+
+        total = np.add(square_term, linear_term)
+        total = np.add(total,1.0)
+
+        return total
+    x_root = scipy.optimize.brentq(root,-1.0, 2.0)
+    
+    print("root: ", x_root)
+    
+    heater_branch_mass_flowrate_kg_per_s = get_heater_branch_mass_flowrate(
+            hydrostaticPressureChg - 500.0,
+            tempC)
+
+    print("heater branch mass flowrate kg per s: ", 
+            heater_branch_mass_flowrate_kg_per_s)
+
     print("\n time taken: (ms)", elapsed*1000)
 
 
