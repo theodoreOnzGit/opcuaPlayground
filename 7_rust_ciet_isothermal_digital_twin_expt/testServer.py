@@ -254,12 +254,17 @@ async def main():
             end = time.time()
 
             elapsed_loop_time_seconds = (end - start) 
-
             _logger.info('elapsed_loop_time_seconds (ms) %.1f', 
                     elapsed_loop_time_seconds *1000)
 
+            wait_time = 1
 
-            await asyncio.sleep(1 - elapsed_loop_time_seconds)
+
+            sleep_time = wait_time - elapsed_loop_time_seconds
+
+
+
+            await asyncio.sleep(sleep_time)
 
 
 
