@@ -31,6 +31,21 @@ def func(parent, value):
 def add2(value):
     return value + 2.0
 
+def m42_height_meters(mass_flowrate_kg_per_s):
+    return -20.4218536540637* mass_flowrate_kg_per_s**2 - 0.874137365300828 * mass_flowrate_kg_per_s + 1
+
+def m43_height_meters(mass_flowrate_kg_per_s):
+    return 10.1573390552631* mass_flowrate_kg_per_s**2 + 2.33678270779408 * mass_flowrate_kg_per_s + 1
+
+def referenceDensity20C_kg_per_m3():
+    # this is in kg per m3
+    return 1061
+
+def pressure_loss_pascals(mass_rate_kg_per_s):
+    delta_h = (m43_height_meters - m42_height_meters)
+    rho = referenceDensity20C_kg_per_m3()
+    g = 9.81
+    return delta_h * rho * g
 
 # calling rust functions
 def rustAdd4(value):
