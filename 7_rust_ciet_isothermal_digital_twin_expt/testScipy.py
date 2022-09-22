@@ -133,7 +133,7 @@ def get_ciet_isothermal_mass_flowrate(
         # pressure change since they are in parallel
         return get_ctah_branch_mass_flowrate(pressure_change_pascals,
                 temperature_degrees_c, 
-                pump_pressure_pascals) - get_heater_branch_mass_flowrate(
+                pump_pressure_pascals) + get_heater_branch_mass_flowrate(
                         pressure_change_pascals,
                         temperature_degrees_c)
 

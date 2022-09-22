@@ -131,7 +131,7 @@ def get_ciet_isothermal_mass_flowrate(
         # pressure change since they are in parallel
         return get_ctah_branch_mass_flowrate(pressure_change_pascals,
                 temperature_degrees_c, 
-                pump_pressure_pascals) - get_heater_branch_mass_flowrate(
+                pump_pressure_pascals) + get_heater_branch_mass_flowrate(
                         pressure_change_pascals,
                         temperature_degrees_c)
 
@@ -206,7 +206,7 @@ async def main():
     await ReynoldsNumber.set_writable()
 
     ctah_pump_pressure = await pipeObj.add_variable(
-            idx, 'ctah_pump_pressure_pascal',0.0)
+            idx, 'ctah_pump_pressure_pascal',16000.0)
     await ctah_pump_pressure.set_writable()
 
     ciet_temperature_degC = await pipeObj.add_variable(
@@ -226,6 +226,12 @@ async def main():
 
             start = time.time()
 
+
+            _logger.info('\n \n \n')
+            _logger.info('to connect:')
+
+            _logger.info('opc.tcp://'+getIPAddress()+':4840/freeopcua/server/')
+            _logger.info('\n')
 
             new_val = await myvar.get_value() + rustAdd4(0.1)
             _logger.info('Set value of %s to %.1f', myvar, new_val)
