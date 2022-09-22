@@ -231,9 +231,9 @@ async def main():
     ctah_flowrate = await pipeObj.add_variable(
             idx,'ctah_mass_flowrate_kg_per_s',0.0)
 
-    ciet_expt_pressure_loss_pascals = await pipeObj.add_variable(
-            idx, 'ciet_expt_pressure_loss_pascals',0.0)
-    await ciet_expt_pressure_loss_pascals.set_writable()
+    ciet_pressure_loss_manometer_data = await pipeObj.add_variable(
+            idx, 'ciet_pressure_loss_manometer_data',0.0)
+    await ciet_pressure_loss_manometer_data.set_writable()
 
     roughnessRatio = 0.00015
 
@@ -281,10 +281,10 @@ async def main():
 
             pressure_loss_expt = expt_pressure_loss_pascals(
                     mass_flowrate_kg_per_s)
-            ciet_expt_pressure_loss_pascals.write_value(
+            await ciet_pressure_loss_manometer_data.write_value(
                     pressure_loss_expt)
             _logger.info('pressure_loss_expt (Pa): %.1f',
-                    pressure_loss_expt)
+                    await ciet_pressure_loss_manometer_data.get_value())
 
             end = time.time()
 
