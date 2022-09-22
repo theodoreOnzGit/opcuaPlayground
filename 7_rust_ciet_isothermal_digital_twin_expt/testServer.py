@@ -41,8 +41,8 @@ def referenceDensity20C_kg_per_m3():
     # this is in kg per m3
     return 1061
 
-def ciet_expt_pressure_loss_pascals(mass_rate_kg_per_s):
-    delta_h = (m43_height_meters - m42_height_meters)
+def expt_pressure_loss_pascals(mass_rate_kg_per_s):
+    delta_h = (m43_height_meters(mass_rate_kg_per_s) - m42_height_meters(mass_rate_kg_per_s))
     rho = referenceDensity20C_kg_per_m3()
     g = 9.81
     return delta_h * rho * g
@@ -279,10 +279,12 @@ async def main():
             # this is the experimental ciet pressure loss at
             # 20C
 
-            pressure_loss_expt = ciet_expt_pressure_loss_pascals(
+            pressure_loss_expt = expt_pressure_loss_pascals(
                     mass_flowrate_kg_per_s)
+            ciet_expt_pressure_loss_pascals.write_value(
+                    pressure_loss_expt)
             _logger.info('pressure_loss_expt (Pa): %.1f',
-                    pump_pressure_pascals)
+                    pressure_loss_expt)
 
             end = time.time()
 
