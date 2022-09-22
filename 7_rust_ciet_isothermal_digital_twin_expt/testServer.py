@@ -41,7 +41,7 @@ def referenceDensity20C_kg_per_m3():
     # this is in kg per m3
     return 1061
 
-def pressure_loss_pascals(mass_rate_kg_per_s):
+def ciet_expt_pressure_loss_pascals(mass_rate_kg_per_s):
     delta_h = (m43_height_meters - m42_height_meters)
     rho = referenceDensity20C_kg_per_m3()
     g = 9.81
@@ -231,6 +231,10 @@ async def main():
     ctah_flowrate = await pipeObj.add_variable(
             idx,'ctah_mass_flowrate_kg_per_s',0.0)
 
+    ciet_expt_pressure_loss_pascals = await pipeObj.add_variable(
+            idx, 'ciet_expt_pressure_loss_pascals',0.0)
+    await ciet_expt_pressure_loss_pascals.set_writable()
+
     roughnessRatio = 0.00015
 
     _logger.info('Starting server!')
@@ -271,6 +275,14 @@ async def main():
                     pump_pressure_pascals)
             _logger.info('ctah_mass_flowrate_kg_per_s: %.4f',
                     await ctah_flowrate.get_value())
+
+            # this is the experimental ciet pressure loss at
+            # 20C
+
+            pressure_loss_expt = ciet_expt_pressure_loss_pascals(
+                    mass_flowrate_kg_per_s)
+            _logger.info('pressure_loss_expt (Pa): %.1f',
+                    pump_pressure_pascals)
 
             end = time.time()
 
