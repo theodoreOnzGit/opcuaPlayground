@@ -140,6 +140,14 @@ def get_dhx_branch_mass_flowrate(
         pressure_change_pascals,
         temperature_degrees_c):
 
+    # first let's check for reverse flow and return 0
+    # flow if reverse, it's computationally cheaper
+    hydrostatic_pressure = rust_get_heater_branch_hydrostatic_pressure(
+            temperature_degrees_c)
+
+    if (pressure_change_pascals > hydrostatic_pressure ):
+        return 0.0
+
     # basically im solving for the mass rate which
     # returns the correct pressure change
     def dhx_pressure_chg_root(
