@@ -196,7 +196,8 @@ async def main():
     server = Server()
     await server.init()
     server.set_endpoint('opc.tcp://'+getIPAddress()+':4840/freeopcua/server/')
-    server.set_endpoint('opc.tcp://192.168.10.177:4840/freeopcua/server/')
+    ## this IP address is for lab
+    #server.set_endpoint('opc.tcp://192.168.10.177:4840/freeopcua/server/')
 
     # setup our own namespace, not really necessary but should as spec
     uri = 'http://examples.freeopcua.github.io'
@@ -293,7 +294,7 @@ async def main():
             _logger.info('elapsed_loop_time_seconds (ms) %.1f',
                     elapsed_loop_time_seconds *1000)
 
-            wait_time = 0.1
+            wait_time = 1.0
 
 
             sleep_time = wait_time - elapsed_loop_time_seconds
