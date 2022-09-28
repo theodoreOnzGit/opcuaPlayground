@@ -145,7 +145,7 @@ def get_ciet_isothermal_mass_flowrate(
         # both branches must be subject to the same
         # pressure change since they are in parallel
         return get_ctah_branch_mass_flowrate(pressure_change_pascals,
-                temperature_degrees_c, 
+                temperature_degrees_c,
                 pump_pressure_pascals) + get_heater_branch_mass_flowrate(
                         pressure_change_pascals,
                         temperature_degrees_c)
@@ -196,6 +196,7 @@ async def main():
     server = Server()
     await server.init()
     server.set_endpoint('opc.tcp://'+getIPAddress()+':4840/freeopcua/server/')
+    server.set_endpoint('opc.tcp://192.168.10.177:4840/freeopcua/server/')
 
     # setup our own namespace, not really necessary but should as spec
     uri = 'http://examples.freeopcua.github.io'
@@ -208,10 +209,10 @@ async def main():
     # Set MyVariable to be writable by clients
     await myvar.set_writable()
     await server.nodes.objects.add_method(
-            ua.NodeId('ServerMethod', 2), 
-            ua.QualifiedName('ServerMethod', 2), 
-            func, 
-            [ua.VariantType.Int64], 
+            ua.NodeId('ServerMethod', 2),
+            ua.QualifiedName('ServerMethod', 2),
+            func,
+            [ua.VariantType.Int64],
             [ua.VariantType.Int64])
 
 
@@ -238,7 +239,7 @@ async def main():
     roughnessRatio = 0.00015
 
     _logger.info('Starting server!')
-    
+
     # server loop
     async with server:
         while True:
@@ -288,11 +289,11 @@ async def main():
 
             end = time.time()
 
-            elapsed_loop_time_seconds = (end - start) 
-            _logger.info('elapsed_loop_time_seconds (ms) %.1f', 
+            elapsed_loop_time_seconds = (end - start)
+            _logger.info('elapsed_loop_time_seconds (ms) %.1f',
                     elapsed_loop_time_seconds *1000)
 
-            wait_time = 1
+            wait_time = 0.1
 
 
             sleep_time = wait_time - elapsed_loop_time_seconds
