@@ -68,6 +68,7 @@ def rust_get_heater_branch_pressure_change(
     return rust_functions_in_python.get_heater_branch_isothermal_pressure_change_pascals_rust(
             mass_rate_kg_per_s,
             temperature_degrees_c)
+
 def rust_get_ctah_branch_pressure_change(
     mass_rate_kg_per_s,
     temperature_degrees_c,
@@ -76,6 +77,13 @@ def rust_get_ctah_branch_pressure_change(
             mass_rate_kg_per_s,
             temperature_degrees_c,
             pump_pressure_pascals)
+
+def rust_get_dhx_branch_pressure_change(
+    mass_rate_kg_per_s,
+    temperature_degrees_c):
+    return rust_functions_in_python.get_dhx_branch_isothermal_pressure_change_pascals_rust(
+            mass_rate_kg_per_s,
+            temperature_degrees_c)
 
 def rust_get_heater_branch_hydrostatic_pressure(
         temperature_degrees_c):
@@ -127,6 +135,26 @@ def get_ctah_branch_mass_flowrate(
 
     return mass_flowrate_kg_per_s_solution
 
+
+def get_dhx_branch_mass_flowrate(
+        pressure_change_pascals,
+        temperature_degrees_c):
+
+    # basically im solving for the mass rate which
+    # returns the correct pressure change
+    def dhx_pressure_chg_root(
+            mass_rate_kg_per_s):
+        return rust_get_dhx_branch_pressure_change(
+                mass_rate_kg_per_s,
+                temperature_degrees_c) - pressure_change_pascals
+
+    mass_flowrate_kg_per_s_solution = scipy.optimize.brentq(
+            dhx_pressure_chg_root,
+            -1.0,
+            1.0)
+
+    return mass_flowrate_kg_per_s_solution
+
 # these methods solve for mass flowrate given a pump pressure
 # and system temperature
 
@@ -144,12 +172,25 @@ def get_ciet_isothermal_mass_flowrate(
     def pressure_change_root(pressure_change_pascals):
         # both branches must be subject to the same
         # pressure change since they are in parallel
-        return get_ctah_branch_mass_flowrate(pressure_change_pascals,
+        ctah_branch_flowrate = get_ctah_branch_mass_flowrate(pressure_change_pascals,
                 temperature_degrees_c,
-                pump_pressure_pascals) + get_heater_branch_mass_flowrate(
+                pump_pressure_pascals)
+
+        heater_branch_mass_flowrate = get_heater_branch_mass_flowrate(
                         pressure_change_pascals,
                         temperature_degrees_c)
 
+        dhx_branch_mass_flowrate = get_dhx_branch_mass_flowrate(
+                        pressure_change_pascals,
+                        temperature_degrees_c)
+
+        dhx_and_heater_flowrate = numpy.add(dhx_branch_mass_flowrate,
+                heater_branch_mass_flowrate)
+
+        total_mass_flowrate = numpy.add(dhx_and_heater_flowrate,
+                ctah_branch_flowrate)
+
+        return total_mass_flowrate
 
     # this scipy module will solve for the correct pressure change
     # given the mass flowrate
@@ -219,8 +260,6 @@ async def main():
 
     ## here's where i add my reynolds number
     pipeObj = await server.nodes.objects.add_object(idx, 'pipeObj')
-    ReynoldsNumber = await pipeObj.add_variable(idx, 'Re',160.01)
-    await ReynoldsNumber.set_writable()
 
     ctah_pump_pressure = await pipeObj.add_variable(
             idx, 'ctah_pump_pressure_pascal',16000.0)
@@ -233,9 +272,12 @@ async def main():
     ctah_flowrate = await pipeObj.add_variable(
             idx,'ctah_mass_flowrate_kg_per_s',0.0)
 
-    ciet_pressure_loss_manometer_data = await pipeObj.add_variable(
-            idx, 'ciet_pressure_loss_manometer_data',0.0)
-    await ciet_pressure_loss_manometer_data.set_writable()
+
+    # i want to add a simulation time variable
+    simulation_time_ms = await pipeObj.add_variable(
+            idx, 'simulation_time_ms',
+            0.0)
+
 
     roughnessRatio = 0.00015
 
@@ -254,15 +296,6 @@ async def main():
             _logger.info('opc.tcp://'+getIPAddress()+':4840/freeopcua/server/')
             _logger.info('\n')
 
-            new_val = await myvar.get_value() + rustAdd4(0.1)
-            _logger.info('Set value of %s to %.1f', myvar, new_val)
-            Re = await ReynoldsNumber.get_value()
-
-            darcyFrictionFactor = rustDarcy(Re,
-                    roughnessRatio)
-            _logger.info('reynolds number is %.1f, darcy = %.7f',Re,darcyFrictionFactor)
-
-            await myvar.write_value(new_val)
 
             # this is the main ciet digital twin calculation
             pump_pressure_pascals = await ctah_pump_pressure.get_value()
@@ -280,19 +313,13 @@ async def main():
 
             # this is the experimental ciet pressure loss at
             # 20C
-
-            pressure_loss_expt = expt_pressure_loss_pascals(
-                    mass_flowrate_kg_per_s)
-            await ciet_pressure_loss_manometer_data.write_value(
-                    pressure_loss_expt)
-            _logger.info('pressure_loss_expt (Pa): %.1f',
-                    await ciet_pressure_loss_manometer_data.get_value())
-
             end = time.time()
 
             elapsed_loop_time_seconds = (end - start)
+            await simulation_time_ms.write_value(
+                    elapsed_loop_time_seconds*1000)
             _logger.info('elapsed_loop_time_seconds (ms) %.1f',
-                    elapsed_loop_time_seconds *1000)
+                    await simulation_time_ms.get_value())
 
             wait_time = 1.0
 
