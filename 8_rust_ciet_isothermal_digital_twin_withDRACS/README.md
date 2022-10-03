@@ -55,6 +55,12 @@ use pyO3...
 credit to:
 https://www.youtube.com/watch?v=DpUlfWP_gtg
 
+For this we will also need scipy
+
+```zsh
+pip install scipy
+```
+
 
 ### building rust code
 
