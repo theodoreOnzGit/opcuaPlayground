@@ -1,0 +1,14 @@
+[package]
+name = "rust_functions_in_python"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "rust_functions_in_python"
+crate-type = ["cdylib"]
+
+[dependencies]
+fluid_mechanics_rust = { git = "https://github.com/theodoreOnzGit/fluid_mechanics_rust.git", version = "0.1.0" }
+pyo3 = { version = "0.16.5", features = ["extension-module"] }
+uom = { git = "https://github.com/iliekturtles/uom", version = "0.33.0" }

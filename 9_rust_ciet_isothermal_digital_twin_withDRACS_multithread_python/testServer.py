@@ -20,6 +20,10 @@ import numpy
 # this is for timing
 import time
 
+# this is for threading
+import concurrent.futures
+import threading
+
 
 # uamethods are methods meant for clients to invoke,
 # not necessarily on the server side
@@ -177,22 +181,41 @@ def get_ciet_isothermal_mass_flowrate(
     # the convention is positive flowrate leaving the
     # top and negative flowrate entering the top
 
+        # here is where we want to introduce multithreading
+        # we shall calculate heater and dhx branch on one
+        # thread, and 
+        # ctah branch on the other
+        # credit to Ramarao Amara
+        # on Stackoverflow
+        # https://stackoverflow.com/questions/6893968/how-to-get-the-return-value-from-a-thread-in-python
+    executor = concurrent.futures.ThreadPoolExecutor(
+            max_workers=2)
+
     def pressure_change_root(pressure_change_pascals):
         # both branches must be subject to the same
         # pressure change since they are in parallel
 
-        heater_branch_mass_flowrate = get_heater_branch_mass_flowrate(
-                        pressure_change_pascals,
-                        temperature_degrees_c)
 
-        dhx_branch_mass_flowrate = get_dhx_branch_mass_flowrate(
-                        pressure_change_pascals,
-                        temperature_degrees_c)
 
-        ctah_branch_flowrate = get_ctah_branch_mass_flowrate(
-                pressure_change_pascals,
+        future = executor.submit(get_heater_branch_mass_flowrate,
+                                 pressure_change_pascals,
+                                 temperature_degrees_c)
+
+        future2 = executor.submit(get_dhx_branch_mass_flowrate,
+                                   pressure_change_pascals,
+                                   temperature_degrees_c)
+
+        ctah_branch_flowrate = get_ctah_branch_mass_flowrate(pressure_change_pascals,
                 temperature_degrees_c,
                 pump_pressure_pascals)
+
+        
+
+
+        heater_branch_mass_flowrate = future.result()
+
+        dhx_branch_mass_flowrate = future2.result()
+
 
         dhx_and_heater_flowrate = numpy.add(dhx_branch_mass_flowrate,
                 heater_branch_mass_flowrate)
