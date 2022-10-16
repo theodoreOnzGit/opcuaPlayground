@@ -237,9 +237,8 @@ fn get_heater_branch_isothermal_pressure_change_pascals(
     let mass_flowrate = MassRate::new::<
         kilogram_per_second>(mass_rate_kg_per_s);
 
-    // let's get branch 5 and pipe 4
+    // let's get and pipe 4
     //
-    let branch_5 = factory::Branch5::get();
     let pipe_4 = factory::Pipe4::get();
 
     // lets get pipe 3 and static mixer 2 and pipe 2a
@@ -266,13 +265,8 @@ fn get_heater_branch_isothermal_pressure_change_pascals(
     let mut pressure_change_total =
         Pressure::new::<pascal>(0.0);
 
-    // branch5 and pipe4
+    // pipe4
     //
-    pressure_change_total = pressure_change_total +
-        CalcPressureChange::from_mass_rate(
-            &branch_5,
-            mass_flowrate,
-            fluid_temp);
 
     pressure_change_total = pressure_change_total +
         CalcPressureChange::from_mass_rate(
@@ -354,9 +348,8 @@ fn get_heater_branch_isothermal_hydrostatic_pressure_pascals(
     let fluid_temp = ThermodynamicTemperature::new::<
         degree_celsius>(temperature_degrees_c);
 
-    // let's get branch 5 and pipe 4
+    // let's get pipe 4
     //
-    let branch_5 = factory::Branch5::get();
     let pipe_4 = factory::Pipe4::get();
 
     // lets get pipe 3 and static mixer 2 and pipe 2a
@@ -384,11 +377,6 @@ fn get_heater_branch_isothermal_hydrostatic_pressure_pascals(
         Pressure::new::<pascal>(0.0);
 
     // branch5 and pipe4
-    //
-    hydrostatic_pressure_change_total =
-        hydrostatic_pressure_change_total +
-        branch_5.get_hydrostatic_pressure_change(
-            fluid_temp);
 
     hydrostatic_pressure_change_total =
         hydrostatic_pressure_change_total +
@@ -462,9 +450,10 @@ fn get_ctah_branch_isothermal_pressure_change_pascals(
         kilogram_per_second>(mass_rate_kg_per_s);
 
 
-    // let's get pipe 6a and static mixer 41
+    // let's get branch 5 and pipe 6a and static mixer 41
     // which is pipe 6 on diagram
     //
+    let branch_5 = factory::Branch5::get();
     let pipe_6a = factory::Pipe6a::get();
     let static_mixer_41_6 = factory::StaticMixer41::get();
 
@@ -509,8 +498,14 @@ fn get_ctah_branch_isothermal_pressure_change_pascals(
     let mut pressure_change_total =
         Pressure::new::<pascal>(0.0);
 
-    // pipe 6a, static mixer 6,
+    // branch 5 pipe 6a, static mixer 6,
     // ctah 7a, 7b and static mixer 8 and pipe 8a
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &branch_5,
+            mass_flowrate,
+            fluid_temp);
+
     pressure_change_total = pressure_change_total +
         CalcPressureChange::from_mass_rate(
             &pipe_6a,
