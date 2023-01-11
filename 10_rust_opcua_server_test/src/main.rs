@@ -1,18 +1,26 @@
 use opcua::server::prelude::*;
+use local_ip_address::local_ip;
 
 fn main() {
     println!("Hello, world!");
 
 
-    // step 3: when you finish configuring the server, tasks and etc
-    // run the server
-    //
-    // the server should run, but it does not really allow connections
-    //
-    let run_server = true;
+    let run_server = false;
 
     example_1_timer_server_no_connection(run_server);
 
+    // now i want to auto get ip addresses
+    // i use the local ip address crate
+
+    let my_local_ip = local_ip().unwrap();
+
+    println!("This is my local IP address: {:?}", my_local_ip);
+
+    // i can convert it to a string
+
+    let ip_add_str : String = my_local_ip.to_string();
+
+    println!("{}",ip_add_str);
 
     
 
@@ -174,6 +182,11 @@ fn example_1_timer_server_no_connection(run_server: bool){
 
     server.add_polling_action(2000, timer);
 
+    // step 3: when you finish configuring the server, tasks and etc
+    // run the server
+    //
+    // the server should run, but it does not really allow connections
+    //
 
     // runs server if the user wants to
     if run_server == true {
