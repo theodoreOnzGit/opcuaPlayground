@@ -3,6 +3,23 @@ use opcua::server::prelude::*;
 fn main() {
     println!("Hello, world!");
 
+
+    // step 3: when you finish configuring the server, tasks and etc
+    // run the server
+    //
+    // the server should run, but it does not really allow connections
+    //
+    let run_server = true;
+
+    example_1_timer_server_no_connection(run_server);
+
+
+    
+
+}
+
+fn example_1_timer_server_no_connection(run_server: bool){
+
     // let's build a new server
     // step 1 is to congifure the server builder
 
@@ -158,17 +175,9 @@ fn main() {
     server.add_polling_action(2000, timer);
 
 
-    // step 3: when you finish configuring the server, tasks and etc
-    // run the server
-    //
-    // the server should run, but it does not really allow connections
-    //
-    let run_server = true;
-
+    // runs server if the user wants to
     if run_server == true {
         server.run();
     }
-
-    
 
 }
