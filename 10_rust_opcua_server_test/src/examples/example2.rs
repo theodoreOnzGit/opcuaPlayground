@@ -1,72 +1,52 @@
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
+use opcua::server::state::ServerState;
 
 pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
 
-    // let's build a new server
-    // step 1 is to congifure the server builder
+    // now we build off example 1
+    // in example 1, we needed to manually specify our ip address, 
+    // This is not quite desirable,
+    // hence, we are going to use a new function for our ip address
+    // 
+    // i'm going to repeat the same steps as before
 
     let server_builder = ServerBuilder::new();
 
-    // server_builder construction
-    // note that each time we use one of these methods,
-    // it consumes self and returns self
-    // so we need to keep binding the output back to server builder
     let server_builder = 
         server_builder.application_name("test server_builder");
 
-    // set the application uri, note that
-    // it is NOT the discovery endpoint
-    // also it consumes
     let server_builder =
         server_builder.application_uri("urn:OPC UA Sample Server");
 
+    // previously we couldn't connect to this address, plus the port 
+    // at this place was often used, i'll probably get a better endpoint
+    // like /my_rust_opcua_server
 
-    // next, discovery urls, here is the default value used
-    // you will need to state the opc address like so:
-    // "opc.tcp://ip-address:port-number/"
-    //
-    // so a localhost endpoint at port 4840 using IPv4 is as follows:
+
     const EXAMPLE_ENDPOINT_PATH: &str = "opc.tcp://127.0.0.1:4840/";
-
-    // the second way to create a discovery url is just to leave it as a default
-    // value, which is a forward slash
-    // and the server builder will configure it for you
     const DEFAULT_ENDPOINT_PATH: &str = "/";
+    const CUSTOM_ENDPOINT_PATH: &str = "/my_rust_opcua_server";
 
-    // the only things you need here are host and port address
+    // and i'll use a function to automatically get my local ip address
+    // (ipv4)
+    let ip_address = get_ip_as_str();
 
     let server_builder = 
-        server_builder.host_and_port("192.168.10.177", 4840);
+        server_builder.host_and_port(&ip_address, 4840);
 
 
     let server_builder =
         server_builder.discovery_urls(
             vec![
             EXAMPLE_ENDPOINT_PATH.into(),
-            DEFAULT_ENDPOINT_PATH.into()]);
+            DEFAULT_ENDPOINT_PATH.into(),
+            CUSTOM_ENDPOINT_PATH.into(),
+            ]);
 
-    // some other config stuff for security i don't want to dive into
-    // it's a boolean here
-    //
-    // you don't really need these for a valid server builder config
-    // https://github.com/locka99/opcua/blob/master/lib/src/server/config.rs
-    //
 
-    //let server_builder = 
-    //    server_builder.create_sample_keypair(true);
-
-    //let server_builder = 
-    //    server_builder.pki_dir("./pki-server");
-
-    //let server_builder = 
-    //    server_builder.discovery_server_url(None);
-
-    // lastly (optional) we can check if the server config is valid
-
-    // we can configure username and password
-    // the first way is kinda complex
+    // username and password
 
     let user_id_1 = "my_user";
 
@@ -80,7 +60,6 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
     let server_builder = 
         server_builder.user_token(user_id_1, user_token);
 
-    // of course, there is an easier way
 
     let user_id_2 = "hello_user";
     let user_token = ServerUserToken::user_pass("hello", "hellow2");
@@ -88,17 +67,6 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
     let server_builder = 
         server_builder.user_token(user_id_2, user_token);
 
-    // now i have two users added
-    // hello with password hellow2 and
-    // my_user with password my_password
-    // 
-    // the last step is to make server endpoints
-    //
-    // for now i ignore security
-    // the endpoint needs a list of all users
-    //
-    // which basically, we convert all the string slices
-    // into String types
 
     let user_id_vector = 
         vec![user_id_1, user_id_1]
@@ -106,16 +74,21 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
         .map(|u| u.to_string())
         .collect::<Vec<String>>();
 
-    // we'll use the user_id_vector and endpoint path
-    // to add it to our list of endpoints
+    let server_builder = 
+        server_builder.create_sample_keypair(true);
+
+    // previously we couldn't connect to this address, plus the port 
+    // at this place was often used, i'll probably get a better endpoint
 
     let path = DEFAULT_ENDPOINT_PATH;
+    let custom_path = DEFAULT_ENDPOINT_PATH;
 
     // for learning purposes, i am only making ONE endpoint with
     // no security
 
     let my_endpoints = vec![
-        ("none", ServerEndpoint::new_none(path,&user_id_vector))
+        ("custom_path", ServerEndpoint::new_none(custom_path,&user_id_vector)),
+        ("custom_path_security", ServerEndpoint::new_basic256_sign(custom_path,&user_id_vector))
     ];
 
 
@@ -158,6 +131,24 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
 
     server.add_polling_action(2000, timer);
 
+
+    let print_endpoint = || {
+
+        let server_state = 
+            server.server_state();
+
+        let server_state_read = server_state.try_read().unwrap();
+
+        let endpoint: &str = &server_state_read.base_endpoint;
+
+        println!("\n connect at this endpoint \n");
+        println!("{}",endpoint);
+
+
+    };
+
+    server.add_polling_action(5000, print_endpoint);
+
     // step 3: when you finish configuring the server, tasks and etc
     // run the server
     //
@@ -169,9 +160,12 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
         server.run();
     }
 
+    // let's also have something to print the endpoint
+
+
 }
 
-fn get_ip_as_str() -> &str {
+fn get_ip_as_str() -> String {
 
     let my_local_ip = local_ip().unwrap();
 
@@ -179,8 +173,10 @@ fn get_ip_as_str() -> &str {
 
     // i can convert it to a string
 
-    let ip_add_str : String = my_local_ip.to_string();
+    let ip_add_string : String = my_local_ip.to_string();
 
-    println!("{}",ip_add_str);
+    println!("{}",ip_add_string);
+
+    return ip_add_string;
 
 }

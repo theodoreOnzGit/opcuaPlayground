@@ -2,6 +2,8 @@
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
 
+
+
 pub fn example_1_timer_server_no_connection(run_server: bool){
 
     // let's build a new server
@@ -167,6 +169,19 @@ pub fn example_1_timer_server_no_connection(run_server: bool){
     // runs server if the user wants to
     if run_server == true {
         server.run();
+    }
+
+}
+
+#[cfg(test)]
+mod test_example_1 {
+
+    pub fn test_eg_1() {
+
+        let run_server = false;
+
+        example_1_timer_server_no_connection(run_server);
+
     }
 
 }
