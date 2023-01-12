@@ -3,7 +3,7 @@ use opcua::server::prelude::*;
 use local_ip_address::local_ip;
 use opcua::server::{state::ServerState, config};
 
-pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
+pub fn example_2_timer_server_auto_ip_addr(run_server: bool){
 
     // now we build off example 1
     // in example 1, we needed to manually specify our ip address, 
