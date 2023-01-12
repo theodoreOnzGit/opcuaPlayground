@@ -1,7 +1,7 @@
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
-use opcua::server::state::ServerState;
+use opcua::server::{state::ServerState, config};
 
 pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
 
@@ -67,15 +67,19 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
     let server_builder = 
         server_builder.user_token(user_id_2, user_token);
 
+    let user_id_anonymous = config::ANONYMOUS_USER_TOKEN_ID;
+
 
     let user_id_vector = 
-        vec![user_id_1, user_id_1]
+        vec![user_id_1, user_id_1, user_id_anonymous]
         .iter()
         .map(|u| u.to_string())
         .collect::<Vec<String>>();
 
     let server_builder = 
         server_builder.create_sample_keypair(true);
+
+
 
     // previously we couldn't connect to this address, plus the port 
     // at this place was often used, i'll probably get a better endpoint
