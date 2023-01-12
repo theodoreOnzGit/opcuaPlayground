@@ -81,7 +81,7 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
     // at this place was often used, i'll probably get a better endpoint
 
     let path = DEFAULT_ENDPOINT_PATH;
-    let custom_path = DEFAULT_ENDPOINT_PATH;
+    let custom_path = CUSTOM_ENDPOINT_PATH;
 
     // for learning purposes, i am only making ONE endpoint with
     // no security
@@ -147,7 +147,14 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
 
     };
 
-    server.add_polling_action(5000, print_endpoint);
+    let print_endpoint_simple = || {
+        let ip_add = get_ip_as_str();
+
+        println!("\n opc.tcp://{}:{}{} \n",ip_add,4840,CUSTOM_ENDPOINT_PATH);
+    };
+
+    //server.add_polling_action(5000, print_endpoint);
+    server.add_polling_action(5000, print_endpoint_simple);
 
     // step 3: when you finish configuring the server, tasks and etc
     // run the server
