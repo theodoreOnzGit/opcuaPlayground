@@ -76,8 +76,8 @@ pub fn example_2_timer_server_auto_ip_addr_no_connection(run_server: bool){
         .map(|u| u.to_string())
         .collect::<Vec<String>>();
 
-    let server_builder = 
-        server_builder.create_sample_keypair(true);
+    //let server_builder = 
+    //    server_builder.create_sample_keypair(true);
 
 
 
