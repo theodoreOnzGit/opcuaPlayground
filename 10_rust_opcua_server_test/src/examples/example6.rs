@@ -3,12 +3,12 @@ use opcua::server::prelude::*;
 use local_ip_address::local_ip;
 use opcua::server::{state::ServerState, config};
 
-pub fn example_5_read_and_write_variables(run_server: bool){
+pub fn example_6_read_and_write_variables(run_server: bool){
 
-    // in example 5, we add two variables to the server, 
+    // in example 6, we are making a kg to lbs converter
     //
-    // one is read only,
-    // one is write only
+    // 1lb is 0.454 kg approx
+    // this will be done using read and write variables
 
     let server_builder = ServerBuilder::new();
 
@@ -85,6 +85,7 @@ pub fn example_5_read_and_write_variables(run_server: bool){
     let address_space = server.address_space();
 
     // this is a piece of code to write the readonly variable
+    // i will store value in kg here
     {
         let mut address_space = address_space.write();
 
@@ -97,7 +98,7 @@ pub fn example_5_read_and_write_variables(run_server: bool){
         let _ = address_space.add_variables(
             vec![
                 Variable::new(&readonly_variable_node, 
-                              "readonly_variable", "readonly_variable", 0 as f64),
+                              "mass_kg", "mass_kg", 0 as f64),
             ],
             &sample_folder_id,
         );
@@ -111,8 +112,9 @@ pub fn example_5_read_and_write_variables(run_server: bool){
             .add_folder("Writeable", "Writeable", &NodeId::objects_folder_id())
             .unwrap();
 
+
         VariableBuilder::new(&writeable_variable_node, 
-                             "writeable_variable", "writeable_variable")
+                             "mass_in_lbm", "mass_in_lbm")
             .data_type(DataTypeId::Float)
             .value(0 as f64)
             .writable()
@@ -156,6 +158,52 @@ pub fn example_5_read_and_write_variables(run_server: bool){
 
     //server.add_polling_action(5000, print_endpoint);
     server.add_polling_action(5000, print_endpoint_simple);
+
+    // i will add some conversion function here
+    // it is a polling action that reads the value of the mass in lbm variable
+    // and writes it to the kg variable
+    //
+
+
+    let convert_lbm_to_kg = move || {
+        // first let's get the address space
+        let mut address_space = address_space.write();
+
+        // we first find a variable by nodeID
+        // i'm trying to find the lbm node and return its value
+        //
+        
+        // step 1, find the correct node object
+        let lbm_node = writeable_variable_node.clone();
+
+        // step 2, find the variable using this node object
+        let lbm_variable_value = address_space.
+            get_variable_value(lbm_node).unwrap();
+
+        // step 3, convert variable value into f64
+        let lbm_variable_value: f64 = lbm_variable_value.
+            value.unwrap().as_f64().unwrap();
+
+        // step 4 convert lbm to kg
+        let kg_value = lbm_variable_value * 0.454_f64;
+
+        // step 5 set the kg variable
+        let now = DateTime::now();
+        let _ = address_space.set_variable_value(
+            readonly_variable_node.clone(), 
+            kg_value as f64,
+            &now, 
+            &now);
+
+        // i think we are done!
+
+
+
+
+    };
+
+    server.add_polling_action(300, convert_lbm_to_kg);
+
 
     // step 3: when you finish configuring the server, tasks and etc
     // run the server
