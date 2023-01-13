@@ -78,6 +78,7 @@ pub fn example_6_read_and_write_variables(run_server: bool){
     };
 
     // i'll then make a read only and write only node
+    // note that each variable needs a separate node ID
 
     let readonly_variable_node = NodeId::new(ns, "readonly_variable");
     let writeable_variable_node = NodeId::new(ns, "writeable_variable");
