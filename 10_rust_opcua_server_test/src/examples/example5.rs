@@ -3,10 +3,12 @@ use opcua::server::prelude::*;
 use local_ip_address::local_ip;
 use opcua::server::{state::ServerState, config};
 
-pub fn example_4_timer_server_auto_ip_addr(run_server: bool){
+pub fn example_5_read_and_write_variables(run_server: bool){
 
-    // in example 4, we add a variable to 
-    // the server, it is read only
+    // in example 4, we add two variables to the server, 
+    //
+    // one is read only,
+    // one is write only
 
     let server_builder = ServerBuilder::new();
 
@@ -75,29 +77,51 @@ pub fn example_4_timer_server_auto_ip_addr(run_server: bool){
             .unwrap()
     };
 
-    let v1_node = NodeId::new(ns, "v1");
+    // i'll then make a read only and write only node
+
+    let readonly_variable_node = NodeId::new(ns, "readonly_variable");
+    let writeable_variable_node = NodeId::new(ns, "writeable_variable");
 
     let address_space = server.address_space();
 
-    // The address space is guarded so obtain a lock to change it
+    // this is a piece of code to write the readonly variable
     {
         let mut address_space = address_space.write();
 
         // Create a sample folder under objects folder
         let sample_folder_id = address_space
-            .add_folder("Sample", "Sample", &NodeId::objects_folder_id())
+            .add_folder("readonly", "readonly", &NodeId::objects_folder_id())
             .unwrap();
 
         // Add some variables to our sample folder. Values will be overwritten by the timer
         let _ = address_space.add_variables(
             vec![
-                Variable::new(&v1_node, "v1", "v1", 0 as f64),
+                Variable::new(&readonly_variable_node, 
+                              "readonly_variable", "readonly_variable", 0 as f64),
             ],
             &sample_folder_id,
         );
     }
 
+    // this is the piece of code for the writeonly variable
+    // we can use booleans or floats
+    {
+        let mut address_space = address_space.write();
+        let folder_id = address_space
+            .add_folder("Writeable", "Writeable", &NodeId::objects_folder_id())
+            .unwrap();
 
+        VariableBuilder::new(&writeable_variable_node, 
+                             "writeable_variable", "writeable_variable")
+            .data_type(DataTypeId::Float)
+            .value(0 as f64)
+            .writable()
+            .organized_by(&folder_id)
+            .insert(&mut address_space);
+    }
+
+    // this is the writeonly variable
+    //
 
 
     // step 3: when you finish configuring the server, tasks and etc
@@ -154,13 +178,9 @@ fn get_ip_as_str() -> String {
 
     let my_local_ip = local_ip().unwrap();
 
-    println!("This is my local IP address: {:?}", my_local_ip);
-
     // i can convert it to a string
 
     let ip_add_string : String = my_local_ip.to_string();
-
-    println!("{}",ip_add_string);
 
     return ip_add_string;
 

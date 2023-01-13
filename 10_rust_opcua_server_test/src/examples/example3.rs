@@ -11,22 +11,11 @@ pub fn example_3_timer_server_auto_ip_addr(run_server: bool){
     let server_builder =
         server_builder.application_uri("urn:OPC UA Sample Server");
 
-    // previously we couldn't connect to this address, plus the port 
-    // at this place was often used, i'll probably get a better endpoint
-    // like /my_rust_opcua_server
-
-
-
-    // and i'll use a function to automatically get my local ip address
-    // (ipv4)
+    // here's where i have a function to get my ip address
     let ip_address = get_ip_as_str();
 
     let server_builder = 
         server_builder.host_and_port(&ip_address, 4840);
-
-
-
-
 
     let is_server_valid = 
         server_builder.is_valid();
@@ -42,6 +31,7 @@ pub fn example_3_timer_server_auto_ip_addr(run_server: bool){
     let mut server = server_builder.server().unwrap();
     
     // step 2, u can add variables or nodes
+    // which now i am not adding
     //
     // step 3 is to add closures (functions) which you want to do
     // every second

@@ -7,3 +7,5 @@ pub mod example3;
 pub use example3::*;
 pub mod example4;
 pub use example4::*;
+pub mod example5;
+pub use example5::*;
