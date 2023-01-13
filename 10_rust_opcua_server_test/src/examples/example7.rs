@@ -234,7 +234,10 @@ pub fn example_7_check_polling_action_delays(run_server: bool){
     // see the outputs, we can see that if the duration of the
     // code exceeds the polling action wait time, the
     // code starts immediately
-    // however, it runs synchronously, not asynchronously
+    // however, it runs synchronously with itself, 
+    // not asynchronously
+    //
+    // but it runs asynchronously with other polling actions!
     server.add_polling_action(1000, sleep_10s);
 
     // runs server if the user wants to
