@@ -15,6 +15,7 @@ pub use livedemo::new_barebones_server::*;
 pub use livedemo::print_ip_address::*;
 pub use livedemo::read_and_write_variables::*;
 pub use livedemo::read_and_write_with_closures::*;
+pub use livedemo::polling_action_time_test::*;
 
 fn main() {
     println!("Hello, world!");
@@ -28,12 +29,13 @@ fn main() {
     //example_5_read_and_write_variables(run_server);
     //example_6_read_and_write_variables(run_server);
     //example_7_check_polling_action_delays(run_server);
-    example_8_check_polling_action_delays_two(run_server);
+    //example_8_check_polling_action_delays_two(run_server);
 
     demo_1_barebones_server(dont_run_server);
     demo_2_print_ip_address(dont_run_server);
     demo_3_read_and_write_varibles(dont_run_server);
     demo_4_read_and_write_variables_with_closures(dont_run_server);
+    demo_5_polling_action_time(run_server);
 
 
     
