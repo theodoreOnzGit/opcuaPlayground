@@ -26,7 +26,7 @@ impl<'pipe_lifetime> Pipe6a{
     }
 
 
-    pub fn get(&'pipe_lifetime mut self) -> TherminolPipe<'pipe_lifetime> {
+    pub fn get(&self) -> TherminolPipe{
 
 
         let name = "pipe_6a";
@@ -52,5 +52,88 @@ impl<'pipe_lifetime> Pipe6a{
             &self.therminol_properties);
 
         return pipe_6a;
+    }
+}
+
+/// static mixer 41
+/// label component 6 
+/// in Compact Integral Effects Test (CIET)
+/// CTAH branch 
+///
+pub struct StaticMixer41 {
+    // static mixer 41 (MX-41) on CIET diagram
+    // in the pump and CTAH branch
+    // just before CTAH (AKA IHX)
+    // from top to bottom
+    //
+    // label 6 on diagram
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl StaticMixer41 {
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+
+    /// custom darcy friction factor is 0
+    /// MX-41 does not depend on L/D
+    /// for friction factor
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// custom K value for static mixer 41
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            21.0 + 4000.0/reynolds_number;
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of MX-41
+    /// or component no.6
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "static_mixer_41_label_6";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.1526);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(51.526384);
+        let form_loss_k = 5.05;
+
+        let static_mixer_41: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name,
+                fluid_temp,
+                2.79e-2, // component diameter in meters
+                6.11e-4, //component area in sq meters
+                0.33, // component length in meters
+                0.015, // estimated component wall roughness (doesn't matter here,
+                       // but i need to fill in
+                51.526384, //incline angle in degrees
+                &StaticMixer41::custom_darcy,
+                &StaticMixer41::custom_k);
+
+        return static_mixer_41;
     }
 }

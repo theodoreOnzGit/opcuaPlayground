@@ -560,17 +560,18 @@ for TherminolCustomComponent<'pipe_lifetime>{
 impl<'pipe_lifetime> TherminolCustomComponent<'pipe_lifetime>{
 
     // let's implement a generic constructor
-    pub fn new(fluid_temp: ThermodynamicTemperature,
-           incline_angle: Angle,
-           component_length: Length,
-           hydraulic_diameter: Length,
-           absolute_roughness: Length,
-           therminol_properties_reference: &'pipe_lifetime TherminolVP1Properties,
-           custom_k: &'pipe_lifetime dyn Fn(f64)-> f64 ,
-           custom_darcy: &'pipe_lifetime dyn Fn(f64,f64) -> f64 ) -> Self {
+    pub fn new(name: &str,
+               fluid_temp: ThermodynamicTemperature,
+               incline_angle: Angle,
+               component_length: Length,
+               hydraulic_diameter: Length,
+               absolute_roughness: Length,
+               therminol_properties_reference: &'pipe_lifetime TherminolVP1Properties,
+               custom_k: &'pipe_lifetime dyn Fn(f64)-> f64 ,
+               custom_darcy: &'pipe_lifetime dyn Fn(f64,f64) -> f64 ) -> Self {
 
         return Self { 
-            name: "pipe_1".to_string(),
+            name: name.to_string(),
             therminol_properties_reference: therminol_properties_reference,
             fluid_temp: fluid_temp, 
             fluid_mass_flowrate: MassRate::new::<kilogram_per_second>(0.0), 
