@@ -2516,3 +2516,94 @@ impl Pipe19 {
     }
 
 }
+
+
+// these components are for bypass flow branch
+//
+//
+//
+//
+//
+// list is currently incomplete due to lack of data
+
+pub struct Flowmeter30 {
+    // not labelled on diagram
+    // we use the convention of top of bypass branch to bottom
+    // hence degree is a 180-90 degrees = -90 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+impl Flowmeter30 {
+
+    // let's import everything necessary:
+
+    /// darcy = 0
+    /// 
+    /// as fldk is empirical and indpendent of L/D
+    /// in that correlation
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// custom K = 18 + 93000/(Re^1.35)
+    ///
+    /// because
+    /// fldk = 18 + 93000/(Re^1.35)
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            18.0 + 93000.0/reynolds_number.powf(1.35);
+        // coriolis flowmeter
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of FM-30
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "flowmeter_30";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.36);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 - 180.0);
+
+        let flowmeter_30: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return flowmeter_30;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
