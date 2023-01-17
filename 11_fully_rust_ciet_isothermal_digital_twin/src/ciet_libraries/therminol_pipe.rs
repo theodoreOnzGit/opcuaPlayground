@@ -6,6 +6,8 @@ use fluid_mechanics_rust::prelude::*;
 // supertrait
 // This makes it easy to see what traits are being implemented here
 
+/// This supertrait combines the necessary traits
+/// for an isothermal therminol pipe
 pub trait TherminolPipeTraits<'trait_lifetime> :
 ConstantCompositionSinglePhaseFluidPropertiesAssociatedFunctions<'trait_lifetime>
 + FluidComponent
@@ -15,6 +17,9 @@ ConstantCompositionSinglePhaseFluidPropertiesAssociatedFunctions<'trait_lifetime
 
 // first we create an therminol pipe struct
 // and start implementing it
+// 
+/// this struct or class is to be instantiated into an object
+/// which can represent therminol pipes
 pub struct TherminolPipe<'pipe_lifetime> {
 
     therminol_properties_reference: &'pipe_lifetime dyn FluidProperties,
@@ -416,6 +421,8 @@ for TherminolPipe<'pipe_lifetime>{
 
 impl<'pipe_lifetime> TherminolPipe<'pipe_lifetime>{
 
+
+    /// constructor for therminol pipes
     // let's implement a generic constructor
     pub fn new(name: &str,
            fluid_temp: ThermodynamicTemperature,
@@ -443,10 +450,11 @@ impl<'pipe_lifetime> TherminolPipe<'pipe_lifetime>{
 
 
     }
+    /// gets the name of the therminol pipe as a string slice
     pub fn get_name(&self) -> &str {
         return &self.name;
     }
-
+    /// sets the name for the therminol pipe as a string slice
     pub fn set_name(&mut self, name: &str) {
 
         self.name = name.to_string();
