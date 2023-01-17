@@ -1037,3 +1037,658 @@ impl Branch17 {
 
     }
 }
+
+
+// heater branch items start here (from top to bottom)
+
+
+/// Branch 5 in the Heater Branch (top to bottom perspective)
+/// 
+/// Approximations were made for this branch though,
+/// technically branch 5a is part of DHX branch
+/// while 5b is part of the DHX branch,
+/// I combined both for convenience
+///
+/// This is treated as a single pipe though
+///
+/// Now I'd probably made a mistake putting branch 5 in
+/// the heater branch, it's probably better put inside the
+/// CTAH branch, (as of Oct 2022)
+/// I'll probably put this in the CTAH branch in future
+///
+/// But for forced isothermal circulation tests with only
+/// the heater branch and CTAH branch, it doesn't really matter
+/// since there are only two branches
+///
+/// So no matter which branch you put branch or pipe 5 in,
+/// it is still the same set of pipes in series
+/// calculations will still be the same numerically
+///
+/// 
+// this is reverse order compared to table A-1 in
+// the Zweibaum nodalised relap model
+pub struct Branch5 {
+    // pipe 5 on the diagram in Nico Zweibaum nodalisation
+    // and from a top to bottom direction from pipe 5
+    // to pipe 5, the incline angle is also
+    // 0 degrees
+    // i add 180 degrees so that it is
+    // properly reversed in
+    // inclination angle from top to bottom
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Branch5 {
+
+    /// returns an instance of branch5
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "branch_5";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.7493);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(0.0 + 180.0);
+        let form_loss_k = 0.0;
+
+
+        let branch_5 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return branch_5;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+
+/// pipe 4 within the heater branch
+pub struct Pipe4 {
+    // pipe 4 on the diagram in Nico Zweibaum nodalisation
+    // probably corresponds of V11 and F12
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is also
+    // 49.743387 +180.0 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe4 {
+
+    /// returns an instance of pipe4
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_4";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.2413);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(49.743387 + 180.0);
+        let form_loss_k = 2.4;
+
+
+        let pipe_4 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_4;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// pipe3 within the heater branch
+pub struct Pipe3 {
+    // pipe 3 on the diagram in Nico Zweibaum nodalisation
+    // probably corresponds of V11 and F12
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is also
+    // 90.0 +180.0 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe3 {
+
+    /// returns an instance of pipe 3
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_3";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(1.2827);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 + 180.0);
+        let form_loss_k = 3.15;
+
+
+        let pipe_3 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_3;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// MX-10 within the heater branch
+/// labelled as component 2
+///
+///
+pub struct StaticMixer10 {
+    // static mixer 10 (MX-10) on CIET diagram
+    // just before the heater in the heater branch
+    // from top to bottom
+    // label 2 on diagram (fig A-1 on Nico Zweibaum thesis)
+    // pg 125 on pdf viewer, pg 110 on printed page number on bottom right
+    //
+    // though in reality flow goes from bottom to
+    // top in forced convection
+    // so from a flow perspective it is before the
+    // heater
+    //
+    therminol_properties: TherminolVP1Properties,
+}
+impl StaticMixer10 {
+
+
+    /// darcy friction factor is 0
+    ///
+    /// This is because the MX-10 friction factor
+    /// doesn't depend on L/D
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// custom k for MX-10
+    ///
+    /// fldk = 21 + 4000/Re
+    ///
+    /// this is done by setting 
+    /// K = 21 + 4000/Re
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            21.0 + 4000.0/reynolds_number;
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of MX-10
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "static_mixer_10_label_2";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.33);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0-180.0);
+
+        let static_mixer_10: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return static_mixer_10;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// static mixer pipe2a in heater branch
+///
+/// adjacent to MX-10
+pub struct Pipe2a {
+    // pipe 2a on the diagram in Nico Zweibaum nodalisation
+    // probably corresponds of V11 and F12
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is also
+    // 90.0 +180.0 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe2a {
+
+    /// returns an instance of pipe2a
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_2a_static_mixer";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.149425);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 + 180.0);
+        let form_loss_k = 1.8;
+
+
+        let pipe_2a_static_mixer = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_2a_static_mixer;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// heater top head 1a of heater branch in CIET
+pub struct HeaterTopHead1a {
+
+    // heater top head
+    // diagram label 1a
+    //
+    // inclined at 90 degrees bottom to top
+    // or 90 degrees + 180 top to bottom orientation
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl HeaterTopHead1a {
+
+
+    /// custom darcy is taken from churchill friction factor
+    ///
+    /// Actually a dowtherm pipe would do,
+    /// but I just copied and pasted the custom fldk component
+    /// template
+    pub fn custom_darcy(mut reynolds_number: f64, roughness_ratio: f64) -> f64 {
+
+        if roughness_ratio < 0.0 {
+            panic!("roughness_ratio < 0.0");
+        }
+
+        use fluid_mechanics_rust::churchill_friction_factor;
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let darcy = churchill_friction_factor::darcy(reynolds_number,
+                                                     roughness_ratio);
+
+        if reverse_flow {
+            return -darcy;
+        }
+        return darcy;
+    }
+
+    /// custom K is fixed at 3.75
+    ///
+    /// reverse flow logic means K is -3.75
+    pub fn custom_k(reynolds_number: f64) -> f64 {
+
+        let custom_k_value = 3.75;
+
+        if reynolds_number < 0.0 {
+            return -custom_k_value
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of heater top head 1a
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "heater_top_head_label_1a";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(6.60e-3);
+        let component_length = Length::new::<meter>(0.0889);
+        let cross_sectional_area = Area::new::<square_meter>(3.64e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 + 180.0);
+
+        let heater_top_head_label_1a: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return heater_top_head_label_1a;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// This is the first version of CIET's heater
+/// 
+/// It is found in CIET's heater branch;
+/// It has hydrodynamic losses similar to a pipe
+pub struct CietHeaterVersion1 {
+
+    // this is the first version of the ciet heater
+    // without any insert within the heater
+    // the heater behaves like a pipe
+    //
+    // inclined at 90 degrees bottom to top
+    // or 90 degrees + 180 top to bottom orientation
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl CietHeaterVersion1 {
+
+
+    /// custom darcy here is the same as churchill friction factor
+    pub fn custom_darcy(mut reynolds_number: f64, roughness_ratio: f64) -> f64 {
+
+        if roughness_ratio < 0.0 {
+            panic!("roughness_ratio < 0.0");
+        }
+
+        use fluid_mechanics_rust::churchill_friction_factor;
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let darcy = churchill_friction_factor::darcy(reynolds_number,
+                                                     roughness_ratio);
+
+        if reverse_flow {
+            return -darcy;
+        }
+        return darcy;
+    }
+
+    /// K = 0 for CIET's heater version 1
+    pub fn custom_k(reynolds_number: f64) -> f64 {
+
+        let custom_k_value = 0.0;
+
+        if reynolds_number < 0.0 {
+            return -custom_k_value
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of CIET heater version 1
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "heater_version_1_label_1";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(6.60e-3);
+        let component_length = Length::new::<meter>(1.6383);
+        let cross_sectional_area = Area::new::<square_meter>(3.64e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 + 180.0);
+
+        let heater_version_1_label_1: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return heater_version_1_label_1;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// heater bottom head 1b within CIET's heater branch
+pub struct HeaterBottomHead1b {
+
+    // heater top head
+    // diagram label 1b
+    //
+    // inclined at 90 degrees bottom to top
+    // or 90 degrees + 180 top to bottom orientation
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl HeaterBottomHead1b {
+
+
+    /// custom darcy here is the same as churchill friction factor
+    pub fn custom_darcy(mut reynolds_number: f64, roughness_ratio: f64) -> f64 {
+
+        if roughness_ratio < 0.0 {
+            panic!("roughness_ratio < 0.0");
+        }
+
+        use fluid_mechanics_rust::churchill_friction_factor;
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let darcy = churchill_friction_factor::darcy(reynolds_number,
+                                                     roughness_ratio);
+
+        if reverse_flow {
+            return -darcy;
+        }
+        return darcy;
+    }
+
+    /// custom K is fixed at 3.95
+    ///
+    /// reverse flow logic means K is -3.95
+    pub fn custom_k(reynolds_number: f64) -> f64 {
+
+        let custom_k_value = 3.95;
+
+        if reynolds_number < 0.0 {
+            return -custom_k_value
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of heater bottom head 1b
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "heater_bottom_head_label_1b";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(6.60e-3);
+        let component_length = Length::new::<meter>(0.19685);
+        let cross_sectional_area = Area::new::<square_meter>(3.64e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 + 180.0);
+
+        let heater_bottom_head_label_1b: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return heater_bottom_head_label_1b;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// pipe 18 within CIET's heater branch
+pub struct Pipe18 {
+    // pipe 18 on the diagram in Nico Zweibaum nodalisation
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is also
+    // -40.00520 +180.0 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe18 {
+
+    /// returns an instance of pipe 18
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_18";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.1778);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-40.00520 + 180.0);
+        let form_loss_k = 5.15;
+
+
+        let pipe_18 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_18;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
