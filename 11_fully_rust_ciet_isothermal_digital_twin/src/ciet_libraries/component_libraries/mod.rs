@@ -4,6 +4,13 @@ use fluid_mechanics_rust::prelude::*;
 use super::therminol_pipe::*;
 use super::therminol_component::*;
 
+
+/// contains a class for the ctah branch
+pub mod ctah_branch;
+pub use ctah_branch::*;
+
+
+
 /// Pipe6a in Compact Integral Effects Test (CIET)
 /// CTAH branch 
 ///
