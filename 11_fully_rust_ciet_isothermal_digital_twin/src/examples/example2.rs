@@ -1,8 +1,10 @@
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
-use opcua::server::{state::ServerState, config};
+use opcua::server::{config};
 
+/// example with anonymous server connection
+/// and automatic ip address
 pub fn example_2_timer_server_auto_ip_addr(run_server: bool){
 
     // now we build off example 1
@@ -84,7 +86,7 @@ pub fn example_2_timer_server_auto_ip_addr(run_server: bool){
     // previously we couldn't connect to this address, plus the port 
     // at this place was often used, i'll probably get a better endpoint
 
-    let path = DEFAULT_ENDPOINT_PATH;
+    let _path = DEFAULT_ENDPOINT_PATH;
     let custom_path = CUSTOM_ENDPOINT_PATH;
 
     // for learning purposes, i am only making ONE endpoint with
@@ -136,7 +138,7 @@ pub fn example_2_timer_server_auto_ip_addr(run_server: bool){
     server.add_polling_action(2000, timer);
 
 
-    let print_endpoint = || {
+    let _print_endpoint = || {
 
         let server_state = 
             server.server_state();

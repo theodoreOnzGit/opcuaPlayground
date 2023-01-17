@@ -4,13 +4,13 @@ use std::time;
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
-use opcua::server::{state::ServerState, config};
+use opcua::server::{config};
 
+/// in example 7,     
+/// we want to check if the server runs polling actions synchronously 
+/// or asynchronously
 pub fn example_7_check_polling_action_delays(run_server: bool){
 
-    // in example 7,     
-    // we want to check if the server runs polling actions synchronously 
-    // or asynchronously
     let server_builder = ServerBuilder::new();
 
     let server_builder = 
@@ -138,7 +138,7 @@ pub fn example_7_check_polling_action_delays(run_server: bool){
 
     // lets have a closure that activates every 2s
 
-    let timer = || {
+    let _timer = || {
 
         println!("\n hello there!, the time in utc now is : \n");
 

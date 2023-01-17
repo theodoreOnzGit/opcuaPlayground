@@ -1,8 +1,12 @@
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
-use opcua::server::{state::ServerState, config};
+use opcua::server::{config};
 
+/// in example 5, we add two variables to the server, 
+///
+/// one is read only,
+/// one is write only
 pub fn example_5_read_and_write_variables(run_server: bool){
 
     // in example 5, we add two variables to the server, 

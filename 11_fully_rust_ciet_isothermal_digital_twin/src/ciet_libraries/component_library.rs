@@ -112,27 +112,28 @@ impl StaticMixer41 {
 
         let name = "static_mixer_41_label_6";
 
+        let therminol_properties_reference = &self.therminol_properties;
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
         let component_length = Length::new::<meter>(0.1526);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
         // note that aboslute roughness doesn't matter here really
         // because we are having laminar flow in the experimental data range
         let absolute_roughness = Length::new::<millimeter>(0.015);
         let incline_angle = Angle::new::<degree>(51.526384);
-        let form_loss_k = 5.05;
 
         let static_mixer_41: TherminolCustomComponent
             = TherminolCustomComponent::new(
-                name,
-                fluid_temp,
-                2.79e-2, // component diameter in meters
-                6.11e-4, //component area in sq meters
-                0.33, // component length in meters
-                0.015, // estimated component wall roughness (doesn't matter here,
-                       // but i need to fill in
-                51.526384, //incline angle in degrees
-                &StaticMixer41::custom_darcy,
-                &StaticMixer41::custom_k);
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
 
         return static_mixer_41;
     }

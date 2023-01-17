@@ -1,8 +1,10 @@
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
-use opcua::server::{state::ServerState, config};
+use opcua::server::{config};
 
+/// in example 4, we add a variable to 
+/// the server, it is read only
 pub fn example_4_timer_server_auto_ip_addr(run_server: bool){
 
     // in example 4, we add a variable to 

@@ -1,8 +1,11 @@
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
-use opcua::server::{state::ServerState, config};
 
+/// for example 3, we don't even need to configure user ids and passwords
+/// we use the new_anonymous function to construct a server with no need for login
+/// is quite similar to example 2, but uses
+/// the new_anonymous associated function
 pub fn example_3_timer_server_auto_ip_addr(run_server: bool){
 
     // for example 3, we don't even need to configure user ids and passwords

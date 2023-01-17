@@ -27,6 +27,7 @@ pub struct TherminolCustomComponent<'pipe_lifetime> {
     internal_pressure: Pressure,
     incline_angle: Angle,
     component_length: Length,
+    cross_sectional_area: Area,
     hydraulic_diameter: Length,
 
     pressure_loss: Pressure,
@@ -381,28 +382,21 @@ FluidComponent for TherminolCustomComponent<'pipe_lifetime>{
     }
 
     fn get_cross_sectional_area(&mut self) -> Area {
-        return self.get_hydraulic_diameter()*
-            self.get_hydraulic_diameter()*
-            PI/4.0_f64;
+        return self.cross_sectional_area;
     }
 
     fn get_cross_sectional_area_immutable(&self) -> Area {
-        return self.get_hydraulic_diameter_immutable()*
-            self.get_hydraulic_diameter_immutable()*
-            PI/4.0_f64;
+        return self.cross_sectional_area;
     }
 
     fn get_hydraulic_diameter(&mut self) -> Length {
 
         return self.hydraulic_diameter;
-
     }
 
     fn get_hydraulic_diameter_immutable(&self) -> Length {
 
-
         return self.hydraulic_diameter;
-
     }
 
 
@@ -564,6 +558,7 @@ impl<'pipe_lifetime> TherminolCustomComponent<'pipe_lifetime>{
                fluid_temp: ThermodynamicTemperature,
                incline_angle: Angle,
                component_length: Length,
+               cross_sectional_area: Area,
                hydraulic_diameter: Length,
                absolute_roughness: Length,
                therminol_properties_reference: &'pipe_lifetime TherminolVP1Properties,
@@ -578,7 +573,8 @@ impl<'pipe_lifetime> TherminolCustomComponent<'pipe_lifetime>{
             internal_pressure: Pressure::new::<pascal>(0.0), 
             incline_angle: incline_angle, 
             component_length: component_length ,
-            hydraulic_diameter: hydraulic_diameter ,
+            hydraulic_diameter: hydraulic_diameter,
+            cross_sectional_area: cross_sectional_area,
             pressure_loss: Pressure::new::<pascal>(0.0),
             absolute_roughness: absolute_roughness,
             custom_k: custom_k,

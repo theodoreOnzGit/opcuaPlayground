@@ -1,9 +1,8 @@
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
-use local_ip_address::local_ip;
 
 
-
+/// example 1, read source code for more info
 pub fn example_1_timer_server_no_connection(run_server: bool){
 
     // let's build a new server

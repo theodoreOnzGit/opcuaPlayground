@@ -1,5 +1,7 @@
 #[warn(missing_docs)]
-use local_ip_address::local_ip;
+
+/// this module holds some examples for basic opcua servers
+/// no ciet or anything there
 pub mod examples;
 pub use examples::example1::*;
 pub use examples::example2::*;
