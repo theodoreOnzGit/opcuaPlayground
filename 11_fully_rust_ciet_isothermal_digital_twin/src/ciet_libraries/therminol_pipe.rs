@@ -15,7 +15,7 @@ ConstantCompositionSinglePhaseFluidPropertiesAssociatedFunctions<'trait_lifetime
 
 // first we create an therminol pipe struct
 // and start implementing it
-struct TherminolPipe<'pipe_lifetime> {
+pub struct TherminolPipe<'pipe_lifetime> {
 
     therminol_properties_reference: &'pipe_lifetime dyn FluidProperties,
     fluid_temp: ThermodynamicTemperature,
@@ -417,7 +417,7 @@ for TherminolPipe<'pipe_lifetime>{
 impl<'pipe_lifetime> TherminolPipe<'pipe_lifetime>{
 
     // let's implement a generic constructor
-    fn new(name: &str,
+    pub fn new(name: &str,
            fluid_temp: ThermodynamicTemperature,
            incline_angle: Angle,
            component_length: Length,
@@ -443,15 +443,13 @@ impl<'pipe_lifetime> TherminolPipe<'pipe_lifetime>{
 
 
     }
-    fn get_name(&self) -> &str {
+    pub fn get_name(&self) -> &str {
         return &self.name;
     }
 
-    fn set_name(&mut self, name: &str) {
+    pub fn set_name(&mut self, name: &str) {
 
         self.name = name.to_string();
     }
 }
-
-// now to use this code, we need to define a few things
 
