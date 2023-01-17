@@ -9,13 +9,15 @@ use fluid_mechanics_rust::prelude::*;
 /// temperature is assumed to be 21C all round
 ///
 /// no heat transfer equations are solved
-pub struct CIETIsothermalFacility {
+pub struct CIETIsothermalFacility<'ciet_object_lifetime> {
 
     ctah_pump_pressure: Pressure,
     ctah_branch_mass_flowrate: MassRate,
     dhx_branch_mass_flowrate: MassRate,
     heater_branch_mass_flowrate: MassRate,
 
+    super_collection_vector_immutable: 
+        Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>
 
 }
 
@@ -47,7 +49,7 @@ FluidComponentSuperCollectionParallelAssociatedFunctions {}
 /// and would take quite some effort
 ///
 ///
-impl CIETIsothermalFacility {
+impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime> {
 
 
     pub fn get_ctah_pump_pressure(&self) -> Pressure {
@@ -112,13 +114,13 @@ impl CIETIsothermalFacility {
 /// the CIET isothermal facility must implement the parallel super
 /// collection supertrait i just defined
 impl<'ciet_object_lifetime> 
-ParallelSuperCollection<'ciet_object_lifetime> for CIETIsothermalFacility {}
+ParallelSuperCollection<'ciet_object_lifetime> for CIETIsothermalFacility<'ciet_object_lifetime> {}
 
-impl FluidComponentSuperCollectionParallelAssociatedFunctions for 
-CIETIsothermalFacility {}
+impl<'ciet_object_lifetime> FluidComponentSuperCollectionParallelAssociatedFunctions for 
+CIETIsothermalFacility<'ciet_object_lifetime> {}
 
 impl<'ciet_object_lifetime> FluidComponentSuperCollection<'ciet_object_lifetime> 
-for CIETIsothermalFacility {
+for CIETIsothermalFacility<'ciet_object_lifetime> {
 
     fn get_immutable_vector(&self) 
         -> &Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>{
@@ -136,7 +138,8 @@ for CIETIsothermalFacility {
 
 }
 
-impl FluidComponentCollectionMethods for CIETIsothermalFacility {
+impl<'ciet_object_lifetime> 
+FluidComponentCollectionMethods for CIETIsothermalFacility<'ciet_object_lifetime> {
 
 
     /// calculates pressure change when given a mass flowrate
