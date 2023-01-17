@@ -16,8 +16,14 @@ pub struct CIETIsothermalFacility<'ciet_object_lifetime> {
     dhx_branch_mass_flowrate: MassRate,
     heater_branch_mass_flowrate: MassRate,
 
-    super_collection_vector_immutable: 
-        Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>
+    super_collection_vector_immutable: Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>,
+
+    ctah_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
+    heater_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
+    dhx_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
+
+
+
 
 }
 
@@ -87,18 +93,50 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         // feed in a mass flowrate of zero
         // and solve the equation for pressure change
 
+        
+
+        // (a) set the internal pressure of the ctah pump
+
+        unimplemented!();
+
+        // (b) set the mass flowrate over the entire parallel super collection to be
+        // zero and obtain the pressure change
+        //
+        // i'm basically treating ciet's branches as one parallel collection of three
+        // branches
+        // and i'm saying the net flowrate through the branches is zero
+        
+        let zero_mass_flow = MassRate::new::<kilogram_per_second>(0.0);
+
+        let pressure_change = self.get_pressure_change(zero_mass_flow);
+
 
         // second, using the pressure change we found,
         // find the individual branch flowrates
         // so i want concrete branch objects here 
         // to calcualte pressure change and set the flowrates accordingly
         // and pretty much we are done
+        //
+        // so i will be getting my branch objects and invoking the
+        // get mass flowrate function from them
+
+        let ctah_branch_flowrate = self.ctah_branch.
+            get_mass_flowrate_from_pressure_change(pressure_change);
+
+        let heater_branch_flowrate = self.heater_branch.
+            get_mass_flowrate_from_pressure_change(pressure_change);
+
+        let dhx_branch_flowrate = self.dhx_branch.
+            get_mass_flowrate_from_pressure_change(pressure_change);
+
+        self.ctah_branch_mass_flowrate = ctah_branch_flowrate;
+        self.heater_branch_mass_flowrate = heater_branch_flowrate;
+        self.dhx_branch_mass_flowrate = dhx_branch_flowrate;
 
 
 
-
-
-        // i'll feed this into the loop somehow
+        // now that i've gotten all the calculations, i can return the
+        // elapsed time to the environment
 
         let elapsed_time: Duration= start.elapsed();
 
