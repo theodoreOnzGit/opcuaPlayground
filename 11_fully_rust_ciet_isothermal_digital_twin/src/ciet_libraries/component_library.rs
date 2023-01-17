@@ -456,3 +456,49 @@ impl StaticMixer40 {
     }
 }
 
+
+/// pipe number 9 in CIET's CTAH branch
+pub struct Pipe9 {
+    // pipe 9
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe9 {
+
+    /// returns instance of pipe 9
+    /// returns and instance of pipe 8a
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_9";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.7112);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-42.73211);
+        let form_loss_k = 0.8;
+
+
+        let pipe_9 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_9;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+
+}
