@@ -10,7 +10,7 @@ pub mod therminol_component;
 /// heater branch
 /// and 
 /// DHX branch
-pub mod component_library;
-pub use component_library::*;
+pub mod component_libraries;
+pub use component_libraries::*;
 
 
