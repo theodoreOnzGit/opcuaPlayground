@@ -502,3 +502,140 @@ impl Pipe9 {
     }
 
 }
+
+/// pipe number 10 in CIET's CTAH branch
+pub struct Pipe10 {
+    // pipe 10
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe10 {
+
+    /// returns instance of pipe 10
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_10";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(2.4511);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-90.0);
+        let form_loss_k = 0.45;
+
+
+        let pipe_10 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_10;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+
+}
+
+
+/// pipe number 11 in CIET's CTAH branch
+pub struct Pipe11 {
+    // pipe 11
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe11 {
+
+    /// returns instance of pipe 11
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_11";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.4826);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-63.47465);
+        let form_loss_k = 2.4;
+
+
+        let pipe_11 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_11;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+
+}
+
+/// pipe number 12 in CIET's CTAH branch
+pub struct Pipe12 {
+    // pipe 12
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe12 {
+
+    /// returns instance of pipe 12
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_12";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.333375);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(0.0);
+        let form_loss_k = 21.65;
+
+
+        let pipe_12 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_12;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+
+}
+
