@@ -639,3 +639,66 @@ impl Pipe12 {
 
 }
 
+/// ctah pump is a custom therminol component with
+/// ie no friction factor losses
+/// but it provides a source pressure
+///
+/// it is located between pipe 12 and 13
+pub struct CTAHPump {
+    therminol_properties: TherminolVP1Properties,
+}
+impl CTAHPump {
+
+    // let's import everything necessary:
+
+    /// pump has no internal pressure loss
+    /// so custom darcy friction factor is 0
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// pump has no internal pressure loss
+    /// so custom k is 0
+    pub fn custom_k(_reynolds_number: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// returns an instance of the pump with an internal
+    /// pressure term set by the user in the get method
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "ctah_pump";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.36);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(0.0);
+
+        let ctah_pump: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return ctah_pump;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
