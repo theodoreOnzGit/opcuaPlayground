@@ -702,3 +702,338 @@ impl CTAHPump {
 
     }
 }
+
+/// pipe number 13 in CIET's CTAH branch
+/// just after the pump
+pub struct Pipe13 {
+    // pipe 13 on the diagram in Nico Zweibaum nodalisation
+    // probably some combination of V-42,
+    // F-40 and F-41 on CIET diagram
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe13 {
+
+    /// returns an instance of pipe13
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_13";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(1.273175);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(0.0);
+        let form_loss_k = 12.95;
+
+
+        let pipe_13 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_13;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+
+}
+
+/// pipe number 14 in CIET's CTAH branch
+pub struct Pipe14 {
+    // pipe 14 on the diagram in Nico Zweibaum nodalisation
+    // probably some combination of V-42,
+    // F-40 and F-41 on CIET diagram
+    // it is inclined 90 degrees upwards in direction
+    // of flow
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is also 90 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe14 {
+
+    /// returns an instance of pipe14
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_14";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.6687);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0);
+        let form_loss_k = 2.4;
+
+
+        let pipe_14 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_14;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// FM-40 Coriolis Flowmeter in CIET's CTAH branch
+/// labelled 14a in simulation schmeatic
+pub struct Flowmeter40 {
+    // ctah line flowmeter 40
+    // label 14a on simulation diagram
+    // fldk = 18.0+93000/Re
+    therminol_properties: TherminolVP1Properties,
+}
+impl Flowmeter40 {
+
+    // let's import everything necessary:
+
+    /// custom darcy is 0 because
+    /// fldk does not depend on L/D
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// fldk = 18.0+93000/Re
+    /// this is implemented by setting 
+    /// K = = 18.0+93000/Re
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            18.0 + 93000.0/reynolds_number.powf(1.35);
+        // coriolis flowmeter
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of FM-40 (14a)
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "flowmeter_40_14a";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.36);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0);
+
+        let flowmeter_40_14a: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return flowmeter_40_14a;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+
+/// pipe number 15 in CIET's CTAH branch
+pub struct Pipe15 {
+    // pipe 15 on the diagram in Nico Zweibaum nodalisation
+    // probably corresponds of F30 on CIET's P&ID
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is also
+    // -49.36983 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe15 {
+
+    /// returns an instance of pipe 15
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_15";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.3556);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-49.36983);
+        let form_loss_k = 0.8;
+
+
+        let pipe_15 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_15;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// pipe number 16 in CIET's CTAH branch
+pub struct Pipe16 {
+    // pipe 16 on the diagram in Nico Zweibaum nodalisation
+    // probably corresponds of F30 on CIET's P&ID
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is also
+    // -49.36983 degrees
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe16 {
+
+    /// returns an instance of pipe 16
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "pipe_16";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.644525);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-90.0);
+        let form_loss_k = 1.9;
+
+
+        let pipe_16 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_16;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// Branch (or pipe 17) in CIET's CTAH branch
+///
+/// Approximations were made for this branch though,
+/// technically branch 17a is part of CTAH branch
+/// while 17b is part of the DHX branch,
+/// I combined both for convenience
+///
+/// This is treated as a single pipe though
+pub struct Branch17 {
+    // pipe 17 on the diagram in Nico Zweibaum nodalisation
+    // probably corresponds of F30 on CIET's P&ID
+    //
+    // and from a top to bottom direction from pipe 5
+    // to pipe 17, the incline angle is 0 degrees
+    //
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Branch17 {
+
+    /// returns an instance of Branch 17
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "branch_17";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.473075);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(0.0);
+        let form_loss_k = 0.0;
+
+
+        let branch_17 = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return branch_17;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
