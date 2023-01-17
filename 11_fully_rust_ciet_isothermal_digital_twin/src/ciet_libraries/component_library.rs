@@ -2607,3 +2607,291 @@ impl Flowmeter30 {
 
     }
 }
+
+
+// DRACS Loop (secondary loop for natural convection) 
+// components are here
+//
+//
+//
+//
+//
+//
+
+/// DRACS loop flow flowmeter 60
+/// natural convection heat exchanger in DRACS loop
+/// this is the secondary loop equivalent for
+/// decay heat removal
+///
+/// diagram label 37a on simulation model
+pub struct Flowmeter60 {
+    // we use the convention of top of bypass branch to bottom (Tank 2)
+    // hence degree is -90
+    therminol_properties: TherminolVP1Properties,
+}
+impl Flowmeter60 {
+
+    // let's import everything necessary:
+
+    /// darcy = 0
+    /// 
+    /// as fldk is empirical and indpendent of L/D
+    /// in that correlation
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// custom K = 18 + 93000/(Re^1.35)
+    ///
+    /// because
+    /// fldk = 18 + 93000/(Re^1.35)
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            18.0 + 93000.0/reynolds_number.powf(1.35);
+        // coriolis flowmeter
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of FM-60 within DRACS loop
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "flowmeter_60_label_37a";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.36);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 - 180.0);
+
+        let flowmeter_60_label_37a: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return flowmeter_60_label_37a;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+
+/// static mixer MX-60 within DRACS loop
+///
+/// label 36 on diagram
+pub struct StaticMixer60 {
+    // static mixer 60 (MX-60) on CIET diagram
+    // in the NDHX branch in secondary DRACS loop
+    // just after the NDHX heat exchanger
+    // from top to bottom
+    // ie this is where hot fluid gets cooled by a fan
+    // label 36
+    //
+    // in reality flow goes from top to
+    // bottom in natural convection
+    //
+    therminol_properties: TherminolVP1Properties,
+}
+impl StaticMixer60 {
+
+
+    /// darcy = 0
+    /// 
+    /// as fldk is empirical and indpendent of L/D
+    /// in that correlation
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// custom K = 21.0 + 4000/Re
+    ///
+    /// This is because fldk = = 21.0 + 4000/Re
+    /// And we don't have L/D dependence
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            21.0 + 4000.0/reynolds_number;
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of MX-60
+    /// static mixer 
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "static_mixer_60_label_36";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.33);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-58.99728);
+
+        let static_mixer_60_label_36: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return static_mixer_60_label_36;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+/// static mixer MX-61 within DRACS loop
+pub struct StaticMixer61 {
+    // static mixer 61 (MX-61) on CIET diagram
+    // in the DHX branch in secondary DRACS loop
+    // just before the DHX heat exchanger
+    // from top to bottom
+    // ie this is where cool fluid gets heated by the
+    // primary loop heat exchanger
+    // label 31
+    //
+    // in reality flow goes from bottom to
+    // top in natural convection
+    // so it is actually after the DHX from perspective of flow
+    //
+    therminol_properties: TherminolVP1Properties,
+}
+impl StaticMixer61 {
+
+
+    /// darcy = 0
+    /// 
+    /// as fldk is empirical and indpendent of L/D
+    /// in that correlation
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    /// custom K = 21.0 + 4000/Re
+    ///
+    /// This is because fldk = = 21.0 + 4000/Re
+    /// And we don't have L/D dependence
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            21.0 + 4000.0/reynolds_number;
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of static mixer 61
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "static_mixer_61_label_31";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.33);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(90.0 - 180.0);
+
+        let static_mixer_61_label_31: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return static_mixer_61_label_31;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
+// miscellaneous items are here
+//
+//
+//
+//
+// list is currently empty
+
+
