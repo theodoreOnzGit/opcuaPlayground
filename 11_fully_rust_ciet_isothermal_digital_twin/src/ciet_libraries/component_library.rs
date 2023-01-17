@@ -330,3 +330,49 @@ impl CTAHHorizontal {
     }
 }
 
+/// Static mixer pipe 8a
+/// adjacent to MX-40 in the CTAH branch
+pub struct Pipe8a {
+    // pipe 8a
+    // otherwise known as the static mixer pipe 8a
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl Pipe8a {
+
+    /// returns and instance of pipe 8a
+    pub fn get(&self) -> TherminolPipe{
+
+
+        let name = "static_mixer_pipe_8a";
+
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.22245);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-90.0);
+        let form_loss_k = 3.75;
+
+
+        let pipe_8a = TherminolPipe::new(
+            name, 
+            fluid_temp, 
+            incline_angle, 
+            component_length, 
+            hydraulic_diameter, 
+            form_loss_k, 
+            absolute_roughness, 
+            &self.therminol_properties);
+
+        return pipe_8a;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
