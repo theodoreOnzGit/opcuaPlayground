@@ -376,3 +376,83 @@ impl Pipe8a {
     }
 }
 
+/// static mixer 40 (MX-40) on CIET diagram
+/// just after CTAH (AKA IHX)
+/// from top to bottom
+/// label 8 on diagram
+///
+/// forced convection flow direction is same as top to bottom
+/// has a fldk of 21+4000/Re
+pub struct StaticMixer40 {
+    therminol_properties: TherminolVP1Properties,
+}
+impl StaticMixer40 {
+
+    /// custom darcy is 0
+    /// because fldk does not depend on L/D
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+    
+    /// has a fldk of 21+4000/Re
+    /// it comes from the custom_k value
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            21.0 + 4000.0/reynolds_number;
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of MX-40
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "static_mixer_40_label_8";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(2.79e-2);
+        let component_length = Length::new::<meter>(0.33);
+        let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-90.0);
+
+        let static_mixer_40: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return static_mixer_40;
+    }
+
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
+}
+
