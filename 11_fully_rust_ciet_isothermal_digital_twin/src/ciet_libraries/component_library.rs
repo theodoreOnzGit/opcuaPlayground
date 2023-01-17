@@ -233,3 +233,89 @@ impl CTAHVertical {
         return ctah_vertical;
     }
 }
+
+/// Horizontal part of Coiled Tube Air Heater (CTAH)
+/// label component 7b
+/// in Compact Integral Effects Test (CIET)
+/// CTAH branch 
+pub struct CTAHHorizontal {
+
+    // coiled tube air heater
+    // has fldk = 400 + 52,000/Re
+    //
+    // label is 7b
+    // empirical data in page 48 on pdf viewer in Dr
+    // Zweibaum thesis shows reverse flow has same
+    // pressure drop characteristics as forward flow
+    therminol_properties: TherminolVP1Properties,
+}
+
+impl CTAHHorizontal {
+
+
+    /// custom darcy friction factor is 0
+    /// the horizontal CTAH correlation does not depend on L/D
+    /// for friction factor
+    pub fn custom_darcy(_reynolds_number: f64, _roughness_ratio: f64) -> f64 {
+        return 0.0;
+    }
+
+
+    /// coiled tube air heater (CTAH) horizontal component
+    /// has fldk = 400 + 52,000/Re
+    pub fn custom_k(mut reynolds_number: f64) -> f64 {
+
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let custom_k_value =
+            400.0 + 52000.0/reynolds_number;
+
+        if reverse_flow {
+            return -custom_k_value;
+        }
+
+        return custom_k_value;
+
+    }
+
+    /// returns an instance of the
+    /// horizontal portion of CTAH
+
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "ctah_horizontal_label_7b";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(1.19e-2);
+        let component_length = Length::new::<meter>(1.2342);
+        let cross_sectional_area = Area::new::<square_meter>(1.33e-3);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(0.0);
+
+        let ctah_horizontal: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return ctah_horizontal;
+    }
+}
+
