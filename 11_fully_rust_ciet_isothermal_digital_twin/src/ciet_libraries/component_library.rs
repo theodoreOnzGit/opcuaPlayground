@@ -138,3 +138,98 @@ impl StaticMixer41 {
         return static_mixer_41;
     }
 }
+
+/// Vertical part of Coiled Tube Air Heater (CTAH)
+/// label component 7a
+/// in Compact Integral Effects Test (CIET)
+/// CTAH branch 
+///
+pub struct CTAHVertical {
+
+    // coiled tube air heater,
+    // uses pipe friction factors but has a constant K value
+    // also pipe isn't circular
+    // so we'll have to use custom fldk to help
+    // label 7a
+    therminol_properties: TherminolVP1Properties,
+}
+
+/// CTAH vertical is actually an fldk type pipe
+///
+/// but because I was quickly copying templates from
+/// other fldk components, it became easy just
+/// to force the vertical CTAH to be a custom fldk component
+///
+impl CTAHVertical {
+
+
+    /// CTAH has a darcy friction factor from churchill
+    /// correlation
+    pub fn custom_darcy(mut reynolds_number: f64, roughness_ratio: f64) -> f64 {
+
+        if roughness_ratio < 0.0 {
+            panic!("roughness_ratio < 0.0");
+        }
+
+        use fluid_mechanics_rust::churchill_friction_factor;
+        let mut reverse_flow = false;
+
+        // the user account for reverse flow scenarios...
+        if reynolds_number < 0.0 {
+            reverse_flow = true;
+            reynolds_number = reynolds_number * -1.0;
+        }
+
+        let darcy = churchill_friction_factor::darcy(reynolds_number,
+                                                     roughness_ratio);
+
+        if reverse_flow {
+            return -darcy;
+        }
+        return darcy;
+    }
+
+    /// CTAH has a fixed K value of 3.9 
+    pub fn custom_k(reynolds_number: f64) -> f64 {
+
+        let custom_k_value = 3.9;
+
+        if reynolds_number < 0.0 {
+            return -custom_k_value
+        }
+
+        return custom_k_value;
+
+    }
+
+    pub fn get(&self) -> TherminolCustomComponent {
+
+        let name = "ctah_vertical_label_7a";
+
+        let therminol_properties_reference = &self.therminol_properties;
+        let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
+
+        let hydraulic_diameter = Length::new::<meter>(1.19e-2);
+        let component_length = Length::new::<meter>(0.3302);
+        let cross_sectional_area = Area::new::<square_meter>(1.33e-3);
+        // note that aboslute roughness doesn't matter here really
+        // because we are having laminar flow in the experimental data range
+        let absolute_roughness = Length::new::<millimeter>(0.015);
+        let incline_angle = Angle::new::<degree>(-90.0);
+
+        let ctah_vertical: TherminolCustomComponent
+            = TherminolCustomComponent::new(
+                name, 
+                fluid_temp, 
+                incline_angle, 
+                component_length, 
+                cross_sectional_area, 
+                hydraulic_diameter, 
+                absolute_roughness, 
+                therminol_properties_reference, 
+                &Self::custom_k, 
+                &Self::custom_darcy);
+
+        return ctah_vertical;
+    }
+}

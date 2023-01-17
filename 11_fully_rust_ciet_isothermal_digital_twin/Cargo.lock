@@ -185,8 +185,8 @@ dependencies = [
 
 [[package]]
 name = "fluid_mechanics_rust"
-version = "0.0.9"
-source = "git+https://github.com/theodoreOnzGit/fluid_mechanics_rust/#53921f4e3bce78dd4c8efc2de79b85a57fd41d0b"
+version = "0.0.10"
+source = "git+https://github.com/theodoreOnzGit/fluid_mechanics_rust/#bbb29ee3123ea47782a0d8d2c6a8af376b124f3b"
 dependencies = [
  "approx",
  "peroxide",
