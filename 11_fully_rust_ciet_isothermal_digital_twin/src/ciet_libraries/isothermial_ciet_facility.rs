@@ -9,7 +9,27 @@ use fluid_mechanics_rust::prelude::*;
 /// temperature is assumed to be 21C all round
 ///
 /// no heat transfer equations are solved
-pub struct CIETIsothermalFacility {}
+pub struct CIETIsothermalFacility {
+
+    ctah_pump_pressure: Pressure,
+    ctah_branch_mass_flowrate: MassRate,
+    dhx_branch_mass_flowrate: MassRate,
+    heater_branch_mass_flowrate: MassRate,
+
+
+}
+
+
+/// i also "inherit" traits from my supercollection from
+/// fluid_mechanics_rust
+///
+/// basically i need CIETIsothermalFacility to act a as a super
+/// collection of components
+/// the reason why this is here is so that i can get the 
+/// pressure change of the branch given a mass flowrate
+pub trait ParallelSuperCollection<'trait_lifetime> : 
+FluidComponentSuperCollection<'trait_lifetime> +
+FluidComponentSuperCollectionParallelAssociatedFunctions {}
 
 
 /// for this object,
@@ -27,28 +47,28 @@ pub struct CIETIsothermalFacility {}
 /// and would take quite some effort
 ///
 ///
-/// One simple implementation is to 
 impl CIETIsothermalFacility {
 
 
     pub fn get_ctah_pump_pressure(&self) -> Pressure {
-        unimplemented!();
+        return self.ctah_pump_pressure;
     }
 
-    pub fn set_ctah_pump_pressure(&mut self){
-        unimplemented!();
+    pub fn set_ctah_pump_pressure(
+        &mut self, user_specified_pressure: Pressure){
+        self.ctah_pump_pressure = user_specified_pressure;
     }
 
     pub fn get_ctah_branch_mass_flowrate(&self) -> MassRate {
-        unimplemented!();
+        return self.ctah_branch_mass_flowrate;
     }
 
     pub fn get_dhx_branch_mass_flowrate(&self) -> MassRate {
-        unimplemented!();
+        return self.dhx_branch_mass_flowrate;
     }
 
     pub fn get_heater_branch_mass_flowrate(&self) -> MassRate {
-        unimplemented!();
+        return self.heater_branch_mass_flowrate;
     }
 
     pub fn calculate(&mut self) -> Duration {
@@ -57,10 +77,87 @@ impl CIETIsothermalFacility {
 
         // run function here to calculate ciet
 
+        // firstly get a function to calculate mass flowrate given the
+        // internal pressure of ctah pump
+        //
+        // we use a super collection of fluid components
+        // ie a parallel collection of three branches
+        // feed in a mass flowrate of zero
+        // and solve the equation for pressure change
+
+
+        // second, using the pressure change we found,
+        // find the individual branch flowrates
+        // so i want concrete branch objects here 
+        // to calcualte pressure change and set the flowrates accordingly
+        // and pretty much we are done
+
+
+
+
+
+        // i'll feed this into the loop somehow
+
         let elapsed_time: Duration= start.elapsed();
 
         return elapsed_time;
 
     }
 
+
+    
+
 }
+
+/// the CIET isothermal facility must implement the parallel super
+/// collection supertrait i just defined
+impl<'ciet_object_lifetime> 
+ParallelSuperCollection<'ciet_object_lifetime> for CIETIsothermalFacility {}
+
+impl FluidComponentSuperCollectionParallelAssociatedFunctions for 
+CIETIsothermalFacility {}
+
+impl<'ciet_object_lifetime> FluidComponentSuperCollection<'ciet_object_lifetime> 
+for CIETIsothermalFacility {
+
+    fn get_immutable_vector(&self) 
+        -> &Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>{
+
+            unimplemented!();
+        }
+
+    fn set_vector(
+        &mut self,
+        fluid_component_super_vector: 
+        Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>){
+        unimplemented!();
+
+    }
+
+}
+
+impl FluidComponentCollectionMethods for CIETIsothermalFacility {
+
+
+    /// calculates pressure change when given a mass flowrate
+    fn get_pressure_change(
+        &self, 
+        fluid_mass_flowrate: MassRate) -> Pressure{
+        unimplemented!();
+    }
+
+    /// calculates mass flowrate from pressure change
+
+    fn get_mass_flowrate_from_pressure_change(
+        &self,
+        pressure_change: Pressure) -> MassRate{
+
+        unimplemented!();
+    }
+
+}
+
+
+
+
+
