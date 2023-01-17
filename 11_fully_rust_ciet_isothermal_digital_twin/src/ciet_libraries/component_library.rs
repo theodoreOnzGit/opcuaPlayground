@@ -137,6 +137,7 @@ impl StaticMixer41 {
 
         return static_mixer_41;
     }
+
 }
 
 /// Vertical part of Coiled Tube Air Heater (CTAH)
@@ -232,6 +233,11 @@ impl CTAHVertical {
 
         return ctah_vertical;
     }
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
+    }
 }
 
 /// Horizontal part of Coiled Tube Air Heater (CTAH)
@@ -316,6 +322,11 @@ impl CTAHHorizontal {
                 &Self::custom_darcy);
 
         return ctah_horizontal;
+    }
+    pub fn new() -> Self {
+
+        return Self { therminol_properties: TherminolVP1Properties::new() }
+
     }
 }
 
