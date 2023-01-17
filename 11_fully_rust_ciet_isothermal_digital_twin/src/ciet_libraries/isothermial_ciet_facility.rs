@@ -96,6 +96,7 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         
 
         // (a) set the internal pressure of the ctah pump
+        // use some specialised set method to get this done
 
         unimplemented!();
 
@@ -145,7 +146,14 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
     }
 
 
-    
+    // constructor
+
+    pub fn new() -> Self {
+
+        unimplemented!();
+
+    }
+   
 
 }
 
