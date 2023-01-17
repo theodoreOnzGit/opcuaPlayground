@@ -125,14 +125,14 @@ for CIETIsothermalFacility<'ciet_object_lifetime> {
     fn get_immutable_vector(&self) 
         -> &Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>{
 
-            unimplemented!();
+            return &self.super_collection_vector_immutable;
         }
 
     fn set_vector(
         &mut self,
         fluid_component_super_vector: 
         Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>){
-        unimplemented!();
+        self.super_collection_vector_immutable = fluid_component_super_vector;
 
     }
 
@@ -146,7 +146,16 @@ FluidComponentCollectionMethods for CIETIsothermalFacility<'ciet_object_lifetime
     fn get_pressure_change(
         &self, 
         fluid_mass_flowrate: MassRate) -> Pressure{
-        unimplemented!();
+        let fluid_component_collection_vector = 
+            self.get_immutable_vector();
+
+        let pressure_change = 
+            <Self as FluidComponentSuperCollectionParallelAssociatedFunctions>
+            ::calculate_pressure_change_from_mass_flowrate(
+                fluid_mass_flowrate, 
+                fluid_component_collection_vector);
+
+        return pressure_change;
     }
 
     /// calculates mass flowrate from pressure change
@@ -155,7 +164,17 @@ FluidComponentCollectionMethods for CIETIsothermalFacility<'ciet_object_lifetime
         &self,
         pressure_change: Pressure) -> MassRate{
 
-        unimplemented!();
+
+        let fluid_component_collection_vector = 
+            self.get_immutable_vector();
+
+        let mass_flowrate = 
+            <Self as FluidComponentSuperCollectionParallelAssociatedFunctions>
+            ::calculate_mass_flowrate_from_pressure_change(
+                pressure_change, 
+                fluid_component_collection_vector);
+
+        return mass_flowrate;
     }
 
 }
