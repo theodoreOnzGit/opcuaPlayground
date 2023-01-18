@@ -1,3 +1,5 @@
+use std::sync::Arc;
+use std::sync::Mutex;
 use std::sync::mpsc;
 use std::thread;
 use std::time;
@@ -249,15 +251,29 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
     //let (tx, rx) = mpsc::channel();
 
+    let mutex_locked_a = Arc::new(Mutex::new(1));
+
+    let mutex_locked_ciet = Arc::new(Mutex::new(ciet_isothermal_facility));
+
+    let mutex_locked_pipe26 = Arc::new(Mutex::new(pipe26));
+
     let calculate_flowrate_and_pressure_loss = move || {
         // first let's get the address space
         // i want to first set my ciet ctah branch pressure to the user specified
         // value
         let mut address_space = address_space.write();
 
+        let mut a = *mutex_locked_a.lock().unwrap();
+        a = 2;
+
+        //let mut ciet_isothermal_facility = 
+        //    *mutex_locked_ciet.lock().unwrap();
+
+        //let pipe26 = mutex_locked_pipe26.lock().unwrap();
+
         // we first find a variable by nodeID
         // i'm trying to find the lbm node and return its value
-        //
+     
         
         // step 1, find the correct node object
         let ctah_pump_node = ctah_pump_pressure_node.clone();
