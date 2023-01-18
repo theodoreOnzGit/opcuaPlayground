@@ -71,15 +71,25 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
 
 
     /// sets the ctah pump pressure to whatever value the user specifies
-    pub fn set_ctah_pump_pressure(user_specified_pressure: Pressure,
-                                  mut ctah_pump: TherminolCustomComponent){
+    ///
+    /// it basically deletes the existing ctah pump and instantiates a
+    /// new one at the correct position
+    ///
+    pub fn set_ctah_pump_pressure(&mut self,
+                                  user_specified_pressure: Pressure,
+                                  ctah_pump: &'ctah_branch_lifetime mut 
+                                  TherminolCustomComponent){
 
         // should we do max/min pressure??? IDK
         // i'll just have an actual ctah pump object
         
+        // the ctah pump will be usually at 10th element of the vector starting
+        // from 0
+
 
         ctah_pump.set_internal_pressure_source(user_specified_pressure);
 
+        self.fluid_component_vector_immutable[10] = ctah_pump;
         // inside the CTAH branch i should have all my components
         // so for ease of use and readability, i may want to nest the 
         // actual component objects within the ctah branch

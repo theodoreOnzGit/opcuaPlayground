@@ -6,15 +6,16 @@ use opcua::server::prelude::*;
 use local_ip_address::local_ip;
 use opcua::server::{config};
 
+use fluid_mechanics_rust::prelude::*;
+
+use crate::CTAHBranch;
+
 /// in example 8,     
 /// we want to check if the server runs polling actions synchronously 
 /// or asynchronously
 pub fn construct_and_run_ciet_server(run_server: bool){
 
     let mut server = build_standard_server();
-    // step 2, u can add variables or nodes
-
-    // i just copied and pasted these codes from the simple_server
 
     let ns = {
         let address_space = server.address_space();
@@ -26,6 +27,8 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
     // I'll have 4 variables here
     // note that each variable needs a separate node ID
+    // this is how the user will interact with ciet: through these
+    // flowrates and the pump pressure
 
     let ctah_branch_mass_flowrate_node = NodeId::new(ns, "ctah_branch_mass_flowrate");
     let heater_branch_mass_flowrate_node = NodeId::new(ns, "heater_branch_flowrate");
@@ -35,8 +38,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
     let address_space = server.address_space();
 
-    // this is a piece of code to write the readonly variable
-    // i will store value in kg here
+    // this part is responsible for sensor data
     {
         let mut address_space = address_space.write();
 
@@ -83,33 +85,13 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             .insert(&mut address_space);
     }
 
-    // this is the writeonly variable
+
+
+
+    // adding functions to ciet's server now...
     //
-
-
-    // step 3: when you finish configuring the server, tasks and etc
-    // run the server
-    // step 3 is to add closures (functions) which you want to do
-    // every second
-    // use the server.add_polling_action(interval in ms, closure);
-    // in order to define an action that is done every second
-    //
-
-    // lets have a closure that activates every 2s
-
-    let _timer = || {
-
-        println!("\n hello there!, the time in utc now is : \n");
-
-        use chrono::Utc;
-        println!("{}",Utc::now());
-        println!("{}",DateTime::now());
-
-    };
-
-    //server.add_polling_action(2000, timer);
-
-
+    // this one prints the endpoint every 5s so the user knows
+    // how to connect to ciet
 
     let print_endpoint_simple = || {
         let ip_add = get_ip_as_str();
@@ -120,10 +102,73 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     //server.add_polling_action(5000, print_endpoint);
     server.add_polling_action(5000, print_endpoint_simple);
 
-    // i will add some conversion function here
-    // it is a polling action that reads the value of the mass in lbm variable
-    // and writes it to the kg variable
+    // here i will start storing all of ciet's component objects
+    // and constructing them into vectors
     //
+    // firstly, the ctah branch
+
+    let ctah_branch_factory = CTAHBranch::new();
+    let pipe6a = ctah_branch_factory.get_pipe6a();
+    let static_mixer_41 = ctah_branch_factory.get_static_mixer_41();
+    let ctah_vertical = ctah_branch_factory.get_ctah_vertical();
+    let ctah_horizontal = ctah_branch_factory.get_ctah_horizontal();
+    let pipe_8a = ctah_branch_factory.get_pipe_8a();
+    let static_mixer_40 = ctah_branch_factory.get_static_mixer_40();
+    let pipe_9 = ctah_branch_factory.get_pipe_9();
+    let pipe_10 = ctah_branch_factory.get_pipe_10();
+    let pipe_11 = ctah_branch_factory.get_pipe_11();
+    let pipe_12 = ctah_branch_factory.get_pipe_12();
+    let ctah_pump = ctah_branch_factory.get_ctah_pump();
+    let pipe_13 = ctah_branch_factory.get_pipe_13();
+    let pipe_14 = ctah_branch_factory.get_pipe_14();
+
+    // now push them into a vector
+
+    let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+    // element number: 0 
+    ctah_branch_vector.push(&pipe6a); 
+    // 1
+    ctah_branch_vector.push(&static_mixer_41);
+    // 2
+    ctah_branch_vector.push(&ctah_vertical);
+    // 3
+    ctah_branch_vector.push(&ctah_horizontal);
+    // 4
+    ctah_branch_vector.push(&pipe_8a);
+    // 5
+    ctah_branch_vector.push(&static_mixer_40);
+    // 6
+    ctah_branch_vector.push(&pipe_9);
+    // 7
+    ctah_branch_vector.push(&pipe_10);
+    // 8
+    ctah_branch_vector.push(&pipe_11);
+    // 9
+    ctah_branch_vector.push(&pipe_12);
+    // 10
+    ctah_branch_vector.push(&ctah_pump);
+    // 11
+    ctah_branch_vector.push(&pipe_13);
+    // 12
+    ctah_branch_vector.push(&pipe_14);
+
+    // now set the vector in the CTAHBranch Object
+
+    let mut ctah_branch = CTAHBranch::new();
+    ctah_branch.set_fluid_component_vector(ctah_branch_vector);
+
+    // let's try setting ctah branch pressure to about 500 Pa
+    //
+    // This is basically how you set ctah pump pressure... kind of cumbersome
+    // but oh well
+
+    let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
+    
+    ctah_branch.set_ctah_pump_pressure(
+        Pressure::new::<pascal>(500_f64), 
+        &mut mutable_ctah_pump);
+
 
 
     let convert_lbm_to_kg = move || {
@@ -201,7 +246,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
 }
 
-const CUSTOM_ENDPOINT_PATH: &str = "/my_rust_opcua_server";
+const CUSTOM_ENDPOINT_PATH: &str = "/rust_ciet_opcua_server";
 fn build_standard_server() -> Server {
 
     let server_builder = ServerBuilder::new();
