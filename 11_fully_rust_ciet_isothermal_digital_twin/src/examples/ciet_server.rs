@@ -174,6 +174,32 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
     let heater_branch_factory = HeaterBranch::new();
 
+    let branch5 = heater_branch_factory.get_branch5();
+    let pipe4 = heater_branch_factory.get_pipe4();
+    let pipe3 = heater_branch_factory.get_pipe3();
+    let mixer10 = heater_branch_factory.get_mixer10();
+    let pipe2a = heater_branch_factory.get_pipe2a();
+    let heater_top_head_1a = heater_branch_factory.get_heater_top_head_1a();
+    let ciet_heater = heater_branch_factory.get_ciet_heater();
+    let heater_bottom_head_1b = heater_branch_factory.get_heater_bottom_head_1b();
+    let pipe18 = heater_branch_factory.get_pipe18();
+
+    let mut heater_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+    heater_branch_vector.push(&branch5);
+    heater_branch_vector.push(&pipe4);
+    heater_branch_vector.push(&pipe3);
+    heater_branch_vector.push(&mixer10);
+    heater_branch_vector.push(&pipe2a);
+    heater_branch_vector.push(&heater_top_head_1a);
+    heater_branch_vector.push(&ciet_heater);
+    heater_branch_vector.push(&heater_bottom_head_1b);
+    heater_branch_vector.push(&pipe18);
+
+    let mut heater_branch = HeaterBranch::new();
+    heater_branch.set_fluid_component_vector(heater_branch_vector);
+
+    // last but not least the dracs
 
 
     let convert_lbm_to_kg = move || {

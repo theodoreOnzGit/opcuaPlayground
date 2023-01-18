@@ -25,7 +25,7 @@ pub struct HeaterBranch<'heater_branch_lifetime> {
 
 impl<'heater_branch_lifetime> HeaterBranch<'heater_branch_lifetime> {
 
-    /// constructor, returns an instance of the ctah branch
+    /// constructor, returns an instance of the heater branch
     pub fn new() -> Self {
 
         let empty_vec: Vec<&'heater_branch_lifetime dyn FluidComponent> = vec![];

@@ -1,6 +1,6 @@
 extern crate fluid_mechanics_rust;
 use std::time::{Instant, Duration};
-use crate::{ctah_branch::*, therminol_component::TherminolCustomComponent};
+use crate::{ctah_branch::*, therminol_component::TherminolCustomComponent, HeaterBranch};
 
 use fluid_mechanics_rust::prelude::*;
 
@@ -20,7 +20,7 @@ pub struct CIETIsothermalFacility<'ciet_object_lifetime> {
     super_collection_vector_immutable: Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>,
 
     ctah_branch: CTAHBranch<'ciet_object_lifetime>,
-    heater_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
+    heater_branch: HeaterBranch<'ciet_object_lifetime>,
     dhx_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
 
 
