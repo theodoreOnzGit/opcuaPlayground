@@ -40,8 +40,10 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     let ctah_branch_mass_flowrate_node = NodeId::new(ns, "ctah_branch_mass_flowrate");
     let heater_branch_mass_flowrate_node = NodeId::new(ns, "heater_branch_flowrate");
     let dhx_branch_mass_flowrate_node = NodeId::new(ns, "dhx_branch_flowrate");
-    let calculation_time_node = NodeId::new(ns, "calculation_time");
     let ctah_pump_pressure_node = NodeId::new(ns, "ctah_pump_pressure");
+    let calculation_time_node = NodeId::new(ns, "calculation_time");
+    let initiation_time_node = NodeId::new(ns, "ciet_obj_construction_time");
+    let total_calc_time_node = NodeId::new(ns, "construction_time_plus_calc_time");
 
     let address_space = server.address_space();
 
@@ -69,6 +71,12 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                 Variable::new(&calculation_time_node, 
                               "calculation_time_s", 
                               "calculation_time_s", 0 as u16),
+                Variable::new(&initiation_time_node, 
+                              "ciet_obj_construction_time", 
+                              "ciet_obj_construction_time", 0 as u16),
+                Variable::new(&total_calc_time_node, 
+                              "construction_time_plus_calc_time", 
+                              "construction_time_plus_calc_time", 0 as u16),
             ],
             &sample_folder_id,
         );
@@ -109,168 +117,161 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     //server.add_polling_action(5000, print_endpoint);
     server.add_polling_action(5000, print_endpoint_simple);
 
-    // here i will start storing all of ciet's component objects
-    // and constructing them into vectors
-    //
-    // firstly, the ctah branch
-
-    let ctah_branch_factory = CTAHBranch::new();
-    let pipe6a = ctah_branch_factory.get_pipe6a();
-    let static_mixer_41 = ctah_branch_factory.get_static_mixer_41();
-    let ctah_vertical = ctah_branch_factory.get_ctah_vertical();
-    let ctah_horizontal = ctah_branch_factory.get_ctah_horizontal();
-    let pipe_8a = ctah_branch_factory.get_pipe_8a();
-    let static_mixer_40 = ctah_branch_factory.get_static_mixer_40();
-    let pipe_9 = ctah_branch_factory.get_pipe_9();
-    let pipe_10 = ctah_branch_factory.get_pipe_10();
-    let pipe_11 = ctah_branch_factory.get_pipe_11();
-    let pipe_12 = ctah_branch_factory.get_pipe_12();
-    let ctah_pump = ctah_branch_factory.get_ctah_pump();
-    let pipe_13 = ctah_branch_factory.get_pipe_13();
-    let pipe_14 = ctah_branch_factory.get_pipe_14();
-
-    // now push them into a vector
-
-    let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
-
-    // element number: 0 
-    ctah_branch_vector.push(&pipe6a); 
-    // 1
-    ctah_branch_vector.push(&static_mixer_41);
-    // 2
-    ctah_branch_vector.push(&ctah_vertical);
-    // 3
-    ctah_branch_vector.push(&ctah_horizontal);
-    // 4
-    ctah_branch_vector.push(&pipe_8a);
-    // 5
-    ctah_branch_vector.push(&static_mixer_40);
-    // 6
-    ctah_branch_vector.push(&pipe_9);
-    // 7
-    ctah_branch_vector.push(&pipe_10);
-    // 8
-    ctah_branch_vector.push(&pipe_11);
-    // 9
-    ctah_branch_vector.push(&pipe_12);
-    // 10
-    ctah_branch_vector.push(&ctah_pump);
-    // 11
-    ctah_branch_vector.push(&pipe_13);
-    // 12
-    ctah_branch_vector.push(&pipe_14);
-
-    // now set the vector in the CTAHBranch Object
-
-    let mut ctah_branch = CTAHBranch::new();
-    ctah_branch.set_fluid_component_vector(ctah_branch_vector);
-
-    // let's try setting ctah branch pressure to about 500 Pa
-    //
-    // This is basically how you set ctah pump pressure... kind of cumbersome
-    // but oh well
-
-    let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
-    
-    ctah_branch.set_ctah_pump_pressure(
-        Pressure::new::<pascal>(500_f64), 
-        &mut mutable_ctah_pump);
-
-    // now for the heater branch
-
-    let heater_branch_factory = HeaterBranch::new();
-
-    let branch5 = heater_branch_factory.get_branch5();
-    let pipe4 = heater_branch_factory.get_pipe4();
-    let pipe3 = heater_branch_factory.get_pipe3();
-    let mixer10 = heater_branch_factory.get_mixer10();
-    let pipe2a = heater_branch_factory.get_pipe2a();
-    let heater_top_head_1a = heater_branch_factory.get_heater_top_head_1a();
-    let ciet_heater = heater_branch_factory.get_ciet_heater();
-    let heater_bottom_head_1b = heater_branch_factory.get_heater_bottom_head_1b();
-    let pipe18 = heater_branch_factory.get_pipe18();
-
-    let mut heater_branch_vector :Vec<&dyn FluidComponent> = vec![];
-
-    heater_branch_vector.push(&branch5);
-    heater_branch_vector.push(&pipe4);
-    heater_branch_vector.push(&pipe3);
-    heater_branch_vector.push(&mixer10);
-    heater_branch_vector.push(&pipe2a);
-    heater_branch_vector.push(&heater_top_head_1a);
-    heater_branch_vector.push(&ciet_heater);
-    heater_branch_vector.push(&heater_bottom_head_1b);
-    heater_branch_vector.push(&pipe18);
-
-    let mut heater_branch = HeaterBranch::new();
-    heater_branch.set_fluid_component_vector(heater_branch_vector);
-
-    // last but not least the dhx branch
-    let dhx_branch_factory = DHXBranch::new();
-
-    let pipe26 = dhx_branch_factory.get_pipe26();
-    // item 25
-    let static_mixer_21 = dhx_branch_factory.get_static_mixer_21();
-    let pipe25a = dhx_branch_factory.get_pipe25a();
-    // item 24
-    let dhx_shell_side_heat_exchanger = dhx_branch_factory.get_dhx_shell_side_heat_exchanger();
-    // item 23
-    let static_mixer_20 = dhx_branch_factory.get_static_mixer_20();
-    let pipe23a = dhx_branch_factory.get_pipe23a();
-    let pipe22 = dhx_branch_factory.get_pipe22();
-    // item 21a
-    let flowmeter20 = dhx_branch_factory.get_flowmeter20();
-    let pipe21 = dhx_branch_factory.get_pipe21();
-    let pipe20 = dhx_branch_factory.get_pipe20();
-    let pipe19 = dhx_branch_factory.get_pipe19();
-
-    let mut dhx_branch_vector :Vec<&dyn FluidComponent> = vec![];
-
-    dhx_branch_vector.push(&pipe26);
-    dhx_branch_vector.push(&static_mixer_21);
-    dhx_branch_vector.push(&pipe25a);
-    dhx_branch_vector.push(&dhx_shell_side_heat_exchanger);
-    dhx_branch_vector.push(&static_mixer_20);
-    dhx_branch_vector.push(&pipe23a);
-    dhx_branch_vector.push(&pipe22);
-    dhx_branch_vector.push(&flowmeter20);
-    dhx_branch_vector.push(&pipe21);
-    dhx_branch_vector.push(&pipe20);
-    dhx_branch_vector.push(&pipe19);
-
-    let mut dhx_branch = DHXBranch::new();
-    dhx_branch.set_fluid_component_vector(dhx_branch_vector);
-
-    // now we are ready for ciet
-
-    let mut ciet_isothermal_facility = 
-        CIETIsothermalFacility::new(ctah_branch, heater_branch, dhx_branch);
 
     // we need to prepare transmitters and receivers for the
     // ciet isothermal facility
 
     //let (tx, rx) = mpsc::channel();
 
-    let mutex_locked_a = Arc::new(Mutex::new(1));
 
-    let mutex_locked_ciet = Arc::new(Mutex::new(ciet_isothermal_facility));
-
-    let mutex_locked_pipe26 = Arc::new(Mutex::new(pipe26));
-
+    // now this algorithm is REALLY inefficient, i am instantiating CIET at
+    // EVERY timestep in addition to calculation
+    //
+    // but if it works, it works
     let calculate_flowrate_and_pressure_loss = move || {
+
+        // construct CIET
+        let start_of_object_init = Instant::now();
+
+        // here i will start storing all of ciet's component objects
+        // and constructing them into vectors
+        //
+        // firstly, the ctah branch
+
+        let ctah_branch_factory = CTAHBranch::new();
+        let pipe6a = ctah_branch_factory.get_pipe6a();
+        let static_mixer_41 = ctah_branch_factory.get_static_mixer_41();
+        let ctah_vertical = ctah_branch_factory.get_ctah_vertical();
+        let ctah_horizontal = ctah_branch_factory.get_ctah_horizontal();
+        let pipe_8a = ctah_branch_factory.get_pipe_8a();
+        let static_mixer_40 = ctah_branch_factory.get_static_mixer_40();
+        let pipe_9 = ctah_branch_factory.get_pipe_9();
+        let pipe_10 = ctah_branch_factory.get_pipe_10();
+        let pipe_11 = ctah_branch_factory.get_pipe_11();
+        let pipe_12 = ctah_branch_factory.get_pipe_12();
+        let ctah_pump = ctah_branch_factory.get_ctah_pump();
+        let pipe_13 = ctah_branch_factory.get_pipe_13();
+        let pipe_14 = ctah_branch_factory.get_pipe_14();
+
+        // now push them into a vector
+
+        let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+        // element number: 0 
+        ctah_branch_vector.push(&pipe6a); 
+        // 1
+        ctah_branch_vector.push(&static_mixer_41);
+        // 2
+        ctah_branch_vector.push(&ctah_vertical);
+        // 3
+        ctah_branch_vector.push(&ctah_horizontal);
+        // 4
+        ctah_branch_vector.push(&pipe_8a);
+        // 5
+        ctah_branch_vector.push(&static_mixer_40);
+        // 6
+        ctah_branch_vector.push(&pipe_9);
+        // 7
+        ctah_branch_vector.push(&pipe_10);
+        // 8
+        ctah_branch_vector.push(&pipe_11);
+        // 9
+        ctah_branch_vector.push(&pipe_12);
+        // 10
+        ctah_branch_vector.push(&ctah_pump);
+        // 11
+        ctah_branch_vector.push(&pipe_13);
+        // 12
+        ctah_branch_vector.push(&pipe_14);
+
+        // now set the vector in the CTAHBranch Object
+
+        let mut ctah_branch = CTAHBranch::new();
+        ctah_branch.set_fluid_component_vector(ctah_branch_vector);
+
+        // now for the heater branch
+
+        let heater_branch_factory = HeaterBranch::new();
+
+        let branch5 = heater_branch_factory.get_branch5();
+        let pipe4 = heater_branch_factory.get_pipe4();
+        let pipe3 = heater_branch_factory.get_pipe3();
+        let mixer10 = heater_branch_factory.get_mixer10();
+        let pipe2a = heater_branch_factory.get_pipe2a();
+        let heater_top_head_1a = heater_branch_factory.get_heater_top_head_1a();
+        let ciet_heater = heater_branch_factory.get_ciet_heater();
+        let heater_bottom_head_1b = heater_branch_factory.get_heater_bottom_head_1b();
+        let pipe18 = heater_branch_factory.get_pipe18();
+
+        let mut heater_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+        heater_branch_vector.push(&branch5);
+        heater_branch_vector.push(&pipe4);
+        heater_branch_vector.push(&pipe3);
+        heater_branch_vector.push(&mixer10);
+        heater_branch_vector.push(&pipe2a);
+        heater_branch_vector.push(&heater_top_head_1a);
+        heater_branch_vector.push(&ciet_heater);
+        heater_branch_vector.push(&heater_bottom_head_1b);
+        heater_branch_vector.push(&pipe18);
+
+        let mut heater_branch = HeaterBranch::new();
+        heater_branch.set_fluid_component_vector(heater_branch_vector);
+
+        // last but not least the dhx branch
+        let dhx_branch_factory = DHXBranch::new();
+
+        let pipe26 = dhx_branch_factory.get_pipe26();
+        // item 25
+        let static_mixer_21 = dhx_branch_factory.get_static_mixer_21();
+        let pipe25a = dhx_branch_factory.get_pipe25a();
+        // item 24
+        let dhx_shell_side_heat_exchanger = dhx_branch_factory.get_dhx_shell_side_heat_exchanger();
+        // item 23
+        let static_mixer_20 = dhx_branch_factory.get_static_mixer_20();
+        let pipe23a = dhx_branch_factory.get_pipe23a();
+        let pipe22 = dhx_branch_factory.get_pipe22();
+        // item 21a
+        let flowmeter20 = dhx_branch_factory.get_flowmeter20();
+        let pipe21 = dhx_branch_factory.get_pipe21();
+        let pipe20 = dhx_branch_factory.get_pipe20();
+        let pipe19 = dhx_branch_factory.get_pipe19();
+
+        let mut dhx_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+        dhx_branch_vector.push(&pipe26);
+        dhx_branch_vector.push(&static_mixer_21);
+        dhx_branch_vector.push(&pipe25a);
+        dhx_branch_vector.push(&dhx_shell_side_heat_exchanger);
+        dhx_branch_vector.push(&static_mixer_20);
+        dhx_branch_vector.push(&pipe23a);
+        dhx_branch_vector.push(&pipe22);
+        dhx_branch_vector.push(&flowmeter20);
+        dhx_branch_vector.push(&pipe21);
+        dhx_branch_vector.push(&pipe20);
+        dhx_branch_vector.push(&pipe19);
+
+        let mut dhx_branch = DHXBranch::new();
+        dhx_branch.set_fluid_component_vector(dhx_branch_vector);
+
+        // now we are ready for ciet
+
+        let mut ciet_isothermal_facility = 
+        CIETIsothermalFacility::new(ctah_branch, heater_branch, dhx_branch);
+
+        let initiation_duration = start_of_object_init.elapsed();
+
         // first let's get the address space
         // i want to first set my ciet ctah branch pressure to the user specified
         // value
         let mut address_space = address_space.write();
 
-        let mut a = *mutex_locked_a.lock().unwrap();
-        a = 2;
+        // making vectors here and borrowing is OK 
+        // but bringing objects with trait objects in here is not
+        let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
 
-        //let mut ciet_isothermal_facility = 
-        //    *mutex_locked_ciet.lock().unwrap();
-
-        //let pipe26 = mutex_locked_pipe26.lock().unwrap();
-
+        // element number: 0 
+        ctah_branch_vector.push(&pipe6a); 
         // we first find a variable by nodeID
         // i'm trying to find the lbm node and return its value
      
@@ -282,6 +283,11 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let pump_pressure_value = address_space.
             get_variable_value(ctah_pump_node).unwrap();
 
+        // let's try setting ctah branch pressure to the user specified value
+        //
+        // This is basically how you set ctah pump pressure... kind of cumbersome
+        // but oh well
+
         // step 3, convert variable value into f64
         let pump_pressure_value: f64 = pump_pressure_value.
             value.unwrap().as_f64().unwrap();
@@ -290,39 +296,83 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let user_specified_pump_pressure = 
             Pressure::new::<pascal>(pump_pressure_value);
 
+        let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
+
         // step 5, set the pump pressure to the correct value
         // and calculate everything
+        //
+
+        
+        // need to mutably borrow ciet and return the mutable borrow
+        let (calc_time,
+             ctah_branch_flowrate,
+             heater_branch_flowrate,
+             dhx_branch_flowrate)
+             = ciet_isothermal_facility.calculate(
+            user_specified_pump_pressure,
+            &mut mutable_ctah_pump);
 
         // this mutable ctah pump cannot be used safely
         // as it cannot be shared between threads
-        // mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
-        //
-        //
-        // For the sending and receiving,
-        // need to treat this as a multithreaded operation...
-        // https://stackoverflow.com/questions/25649423/sending-trait-objects-between-threads-in-rust
 
-        // this mutable ciet_isothermal_facility 
-        // also cannot be shared safely between threads
-        //let time_taken = 
-        //    ciet_isothermal_facility.calculate(
-        //    user_specified_pump_pressure, &mut mutable_ctah_pump);
 
-        let start = Instant::now();
-
-        let time_taken = start.elapsed();
 
         // step 6 set the time variable
 
-        let time_taken_milleseconds: u16 = 
-            time_taken.as_millis().try_into().unwrap();
+        let calc_time_taken_milleseconds: u16 = 
+            calc_time.as_millis().try_into().unwrap();
 
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             calculation_time_node.clone(), 
-            time_taken_milleseconds as u16,
+            calc_time_taken_milleseconds as u16,
             &now, 
             &now);
+
+        let initiation_time_taken_millseconds: u16 =
+            initiation_duration.as_millis().try_into().unwrap();
+
+        let now = DateTime::now();
+        let _ = address_space.set_variable_value(
+            initiation_time_node.clone(), 
+            initiation_time_taken_millseconds as u16,
+            &now, 
+            &now);
+
+        let total_time_taken: u16 =
+            calc_time_taken_milleseconds + initiation_time_taken_millseconds;
+
+        let now = DateTime::now();
+        let _ = address_space.set_variable_value(
+            total_calc_time_node.clone(), 
+            total_time_taken as u16,
+            &now, 
+            &now);
+
+        // step 7 let's put in our flowrate values
+
+        
+        let now = DateTime::now();
+        let _ = address_space.set_variable_value(
+            ctah_branch_mass_flowrate_node.clone(), 
+            ctah_branch_flowrate.value as f64,
+            &now, 
+            &now);
+
+        let now = DateTime::now();
+        let _ = address_space.set_variable_value(
+            heater_branch_mass_flowrate_node.clone(), 
+            heater_branch_flowrate.value as f64,
+            &now, 
+            &now);
+
+        let now = DateTime::now();
+        let _ = address_space.set_variable_value(
+            dhx_branch_mass_flowrate_node.clone(), 
+            dhx_branch_flowrate.value as f64,
+            &now, 
+            &now);
+
 
         // i think we are done!
 

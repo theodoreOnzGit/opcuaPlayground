@@ -1,6 +1,7 @@
 extern crate fluid_mechanics_rust;
 use std::time::{Instant, Duration};
-use crate::{ctah_branch::*, therminol_component::TherminolCustomComponent, HeaterBranch, DHXBranch, heater_branch, dhx_branch};
+use crate::{ctah_branch::*, therminol_component::TherminolCustomComponent, HeaterBranch, 
+    DHXBranch, heater_branch, dhx_branch};
 
 use fluid_mechanics_rust::prelude::*;
 
@@ -12,10 +13,10 @@ use fluid_mechanics_rust::prelude::*;
 /// no heat transfer equations are solved
 pub struct CIETIsothermalFacility<'ciet_collection_lifetime> {
 
-    ctah_pump_pressure: Pressure,
-    ctah_branch_mass_flowrate: MassRate,
-    dhx_branch_mass_flowrate: MassRate,
-    heater_branch_mass_flowrate: MassRate,
+    pub ctah_pump_pressure: Pressure,
+    pub ctah_branch_mass_flowrate: MassRate,
+    pub dhx_branch_mass_flowrate: MassRate,
+    pub heater_branch_mass_flowrate: MassRate,
 
     super_collection_vector_immutable: 
         Vec<&'ciet_collection_lifetime dyn FluidComponentCollectionMethods>,
@@ -91,7 +92,9 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
     pub fn calculate(&'ciet_collection_lifetime mut self,
                      ctah_pump_pressure: Pressure,
                      mutable_ctah_pump: 
-                     &'ciet_collection_lifetime mut TherminolCustomComponent) -> Duration {
+                     &'ciet_collection_lifetime mut TherminolCustomComponent) -> 
+        (Duration,MassRate,MassRate,MassRate)
+        {
 
         let start = Instant::now();
 
@@ -168,7 +171,10 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
 
         let elapsed_time: Duration= start.elapsed();
 
-        return elapsed_time;
+        return (elapsed_time,
+                ctah_branch_flowrate,
+                heater_branch_flowrate,
+                dhx_branch_flowrate);
 
     }
 

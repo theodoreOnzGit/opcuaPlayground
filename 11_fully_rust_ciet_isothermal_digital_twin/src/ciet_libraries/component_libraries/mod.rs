@@ -62,7 +62,7 @@ impl<'pipe_lifetime> Pipe6a{
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_6a;
     }
@@ -125,7 +125,7 @@ impl StaticMixer41 {
 
         let name = "static_mixer_41_label_6";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
         let component_length = Length::new::<meter>(0.1526);
@@ -144,7 +144,7 @@ impl StaticMixer41 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -220,7 +220,7 @@ impl CTAHVertical {
 
         let name = "ctah_vertical_label_7a";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(1.19e-2);
@@ -240,7 +240,7 @@ impl CTAHVertical {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -310,7 +310,7 @@ impl CTAHHorizontal {
 
         let name = "ctah_horizontal_label_7b";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(1.19e-2);
@@ -330,7 +330,7 @@ impl CTAHHorizontal {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -377,7 +377,7 @@ impl Pipe8a {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_8a;
     }
@@ -435,7 +435,7 @@ impl StaticMixer40 {
 
         let name = "static_mixer_40_label_8";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -455,7 +455,7 @@ impl StaticMixer40 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -503,7 +503,7 @@ impl Pipe9 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_9;
     }
@@ -548,7 +548,7 @@ impl Pipe10 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_10;
     }
@@ -594,7 +594,7 @@ impl Pipe11 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_11;
     }
@@ -639,7 +639,7 @@ impl Pipe12 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_12;
     }
@@ -682,7 +682,7 @@ impl CTAHPump {
 
         let name = "ctah_pump";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -702,7 +702,7 @@ impl CTAHPump {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -751,7 +751,7 @@ impl Pipe13 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_13;
     }
@@ -803,7 +803,7 @@ impl Pipe14 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_14;
     }
@@ -862,7 +862,7 @@ impl Flowmeter40 {
 
         let name = "flowmeter_40_14a";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -882,7 +882,7 @@ impl Flowmeter40 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -934,7 +934,7 @@ impl Pipe15 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_15;
     }
@@ -983,7 +983,7 @@ impl Pipe16 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_16;
     }
@@ -1039,7 +1039,7 @@ impl Branch17 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return branch_17;
     }
@@ -1117,7 +1117,7 @@ impl Branch5 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return branch_5;
     }
@@ -1167,7 +1167,7 @@ impl Pipe4 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_4;
     }
@@ -1216,7 +1216,7 @@ impl Pipe3 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_3;
     }
@@ -1288,7 +1288,7 @@ impl StaticMixer10 {
 
         let name = "static_mixer_10_label_2";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -1308,7 +1308,7 @@ impl StaticMixer10 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -1361,7 +1361,7 @@ impl Pipe2a {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_2a_static_mixer;
     }
@@ -1436,7 +1436,7 @@ impl HeaterTopHead1a {
 
         let name = "heater_top_head_label_1a";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(6.60e-3);
@@ -1456,7 +1456,7 @@ impl HeaterTopHead1a {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -1531,7 +1531,7 @@ impl CietHeaterVersion1 {
 
         let name = "heater_version_1_label_1";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(6.60e-3);
@@ -1551,7 +1551,7 @@ impl CietHeaterVersion1 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -1624,7 +1624,7 @@ impl HeaterBottomHead1b {
 
         let name = "heater_bottom_head_label_1b";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(6.60e-3);
@@ -1644,7 +1644,7 @@ impl HeaterBottomHead1b {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -1694,7 +1694,7 @@ impl Pipe18 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_18;
     }
@@ -1751,7 +1751,7 @@ impl Pipe26 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return pipe_26;
     }
@@ -1820,7 +1820,7 @@ impl StaticMixer21 {
 
         let name = "static_mixer_21_label_25";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -1840,7 +1840,7 @@ impl StaticMixer21 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -1890,7 +1890,7 @@ impl Pipe25a {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return static_mixer_pipe_25a;
     }
@@ -1966,7 +1966,7 @@ impl DHXShellSideHeatExchanger {
 
         let name = "dhx_shell_side_label_24";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(5.65e-3);
@@ -1986,7 +1986,7 @@ impl DHXShellSideHeatExchanger {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -2059,7 +2059,7 @@ impl StaticMixer20 {
 
         let name = "static_mixer_20_label_23";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -2079,7 +2079,7 @@ impl StaticMixer20 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -2127,7 +2127,7 @@ impl Pipe23a {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return static_mixer_pipe_23a;
     }
@@ -2173,7 +2173,7 @@ impl Pipe22 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return static_mixer_pipe_22;
     }
@@ -2245,7 +2245,7 @@ impl Flowmeter20 {
 
         let name = "flowmeter_20_label_21a";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -2265,7 +2265,7 @@ impl Flowmeter20 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -2361,7 +2361,7 @@ impl Flowmeter20WithHighKCheckValve {
 
         let name = "flowmeter_20_label_21a_with_check_valve";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -2381,7 +2381,7 @@ impl Flowmeter20WithHighKCheckValve {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -2427,7 +2427,7 @@ impl Pipe21 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return static_mixer_pipe_21;
     }
@@ -2472,7 +2472,7 @@ impl Pipe20 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return static_mixer_pipe_20;
     }
@@ -2517,7 +2517,7 @@ impl Pipe19 {
             hydraulic_diameter, 
             form_loss_k, 
             absolute_roughness, 
-            &self.therminol_properties);
+            );
 
         return static_mixer_pipe_19;
     }
@@ -2587,7 +2587,7 @@ impl Flowmeter30 {
 
         let name = "flowmeter_30";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -2607,7 +2607,7 @@ impl Flowmeter30 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -2684,7 +2684,7 @@ impl Flowmeter60 {
 
         let name = "flowmeter_60_label_37a";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -2704,7 +2704,7 @@ impl Flowmeter60 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -2776,7 +2776,7 @@ impl StaticMixer60 {
 
         let name = "static_mixer_60_label_36";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -2796,7 +2796,7 @@ impl StaticMixer60 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
+                 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 
@@ -2866,7 +2866,7 @@ impl StaticMixer61 {
 
         let name = "static_mixer_61_label_31";
 
-        let therminol_properties_reference = &self.therminol_properties;
+        
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
 
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
@@ -2886,7 +2886,6 @@ impl StaticMixer61 {
                 cross_sectional_area, 
                 hydraulic_diameter, 
                 absolute_roughness, 
-                therminol_properties_reference, 
                 &Self::custom_k, 
                 &Self::custom_darcy);
 

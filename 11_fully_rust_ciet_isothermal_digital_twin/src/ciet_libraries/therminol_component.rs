@@ -10,8 +10,7 @@ use fluid_mechanics_rust::prelude::*;
 // This makes it easy to see what traits are being implemented here
 
 pub trait TherminolCustomComponentTraits<'trait_lifetime> :
-ConstantCompositionSinglePhaseFluidPropertiesAssociatedFunctions<'trait_lifetime>
-+ FluidComponent
+ FluidComponent
 + FluidCustomComponentCalcPressureLoss<'trait_lifetime>
 + FluidCustomComponentCalcPressureChange<'trait_lifetime>
 {}
@@ -20,7 +19,7 @@ ConstantCompositionSinglePhaseFluidPropertiesAssociatedFunctions<'trait_lifetime
 // and start implementing it
 pub struct TherminolCustomComponent<'pipe_lifetime> {
 
-    therminol_properties_reference: &'pipe_lifetime dyn FluidProperties,
+    therminol_properties: TherminolVP1Properties,
     fluid_temp: ThermodynamicTemperature,
     fluid_mass_flowrate: MassRate,
 
@@ -33,7 +32,9 @@ pub struct TherminolCustomComponent<'pipe_lifetime> {
     pressure_loss: Pressure,
     absolute_roughness: Length,
     name: String,
-
+    
+    // these are trait object references which cannot be brought into
+    // the scope
     custom_k: &'pipe_lifetime dyn Fn(f64) -> f64,
     custom_darcy: &'pipe_lifetime dyn Fn(f64,f64) ->f64,
 
@@ -404,17 +405,11 @@ FluidComponent for TherminolCustomComponent<'pipe_lifetime>{
     fn get_fluid_viscosity(&mut self) -> DynamicViscosity {
 
         // get fluid temp first
-        let fluid_temp = self.get_fluid_temp();
+        let fluid_temp = self.fluid_temp;
 
         // then the fluid properties
 
-        let fluid_properties = self.get_fluid_properties();
-
-        // let's get viscosity
-
-        let fluid_viscosity = 
-            Self::viscosity(fluid_temp, fluid_properties);
-
+        let fluid_viscosity = self.therminol_properties.viscosity(fluid_temp);
         return fluid_viscosity;
 
 
@@ -424,16 +419,11 @@ FluidComponent for TherminolCustomComponent<'pipe_lifetime>{
 
 
         // get fluid temp first
-        let fluid_temp = self.get_fluid_temp();
+        let fluid_temp = self.fluid_temp;
 
         // then the fluid properties
 
-        let fluid_properties = self.get_fluid_properties();
-
-        // let's get viscosity
-
-        let fluid_viscosity = 
-            Self::viscosity(fluid_temp, fluid_properties);
+        let fluid_viscosity = self.therminol_properties.viscosity(fluid_temp);
 
         return fluid_viscosity;
 
@@ -444,16 +434,11 @@ FluidComponent for TherminolCustomComponent<'pipe_lifetime>{
     fn get_fluid_density(&mut self) -> MassDensity {
 
         // get fluid temp first
-        let fluid_temp = self.get_fluid_temp();
+        let fluid_temp = self.fluid_temp;
 
         // then the fluid properties
 
-        let fluid_properties = self.get_fluid_properties();
-
-        // let's get density
-
-        let fluid_density = 
-            Self::density(fluid_temp, fluid_properties);
+        let fluid_density = self.therminol_properties.density(fluid_temp);
 
         return fluid_density;
 
@@ -464,16 +449,10 @@ FluidComponent for TherminolCustomComponent<'pipe_lifetime>{
 
 
         // get fluid temp first
-        let fluid_temp = self.get_fluid_temp();
+        let fluid_temp = self.fluid_temp;
 
         // then the fluid properties
-
-        let fluid_properties = self.get_fluid_properties();
-
-        // let's get density
-
-        let fluid_density = 
-            Self::density(fluid_temp, fluid_properties);
+        let fluid_density = self.therminol_properties.density(fluid_temp);
 
         return fluid_density;
 
@@ -521,36 +500,6 @@ FluidComponent for TherminolCustomComponent<'pipe_lifetime>{
 
 }
 
-impl<'pipe_lifetime> 
-ConstantCompositionSinglePhaseFluidPropertiesAssociatedFunctions<'pipe_lifetime>
-for TherminolCustomComponent<'pipe_lifetime>{
-
-    fn get_fluid_properties(&self) -> &'pipe_lifetime dyn FluidProperties {
-
-        return self.therminol_properties_reference;
-
-    }
-
-    fn set_fluid_properties(&mut self,
-                            fluid_properties: &'pipe_lifetime dyn FluidProperties){
-
-        self.therminol_properties_reference = fluid_properties;
-
-    }
-
-    fn get_fluid_temp(&self) -> ThermodynamicTemperature {
-
-        return self.fluid_temp;
-
-    }
-
-    fn set_fluid_temp(&mut self,
-                      fluid_temp: ThermodynamicTemperature){
-
-        self.fluid_temp = fluid_temp;
-
-    }
-}
 
 impl<'pipe_lifetime> TherminolCustomComponent<'pipe_lifetime>{
 
@@ -562,13 +511,12 @@ impl<'pipe_lifetime> TherminolCustomComponent<'pipe_lifetime>{
                cross_sectional_area: Area,
                hydraulic_diameter: Length,
                absolute_roughness: Length,
-               therminol_properties_reference: &'pipe_lifetime TherminolVP1Properties,
                custom_k: &'pipe_lifetime dyn Fn(f64)-> f64 ,
                custom_darcy: &'pipe_lifetime dyn Fn(f64,f64) -> f64 ) -> Self {
 
         return Self { 
             name: name.to_string(),
-            therminol_properties_reference: therminol_properties_reference,
+            therminol_properties: TherminolVP1Properties::new(),
             fluid_temp: fluid_temp, 
             fluid_mass_flowrate: MassRate::new::<kilogram_per_second>(0.0), 
             internal_pressure: Pressure::new::<pascal>(0.0), 
