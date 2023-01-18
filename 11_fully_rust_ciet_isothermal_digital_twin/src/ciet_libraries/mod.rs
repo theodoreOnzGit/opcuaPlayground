@@ -21,6 +21,6 @@ pub mod branch;
 /// contains the class representing ciet facility in isothermal operation
 /// primary loop only
 ///
-pub mod isothermial_ciet_facility;
-pub use isothermial_ciet_facility::*;
+pub mod isothermal_ciet_facility;
+pub use isothermal_ciet_facility::*;
 
