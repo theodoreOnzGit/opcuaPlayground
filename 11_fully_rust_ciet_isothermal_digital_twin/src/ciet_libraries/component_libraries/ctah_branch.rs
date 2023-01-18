@@ -2,7 +2,8 @@ extern crate fluid_mechanics_rust;
 use fluid_mechanics_rust::prelude::*;
 
 use crate::{Pipe6a, StaticMixer41, CTAHVertical, CTAHHorizontal, 
-    Pipe8a, StaticMixer40, Pipe9, Pipe10, Pipe11, Pipe12, CTAHPump, Pipe13, Pipe14};
+    Pipe8a, StaticMixer40, Pipe9, Pipe10, Pipe11, Pipe12, CTAHPump, Pipe13, Pipe14, 
+    therminol_pipe::TherminolPipe, therminol_component::TherminolCustomComponent};
 
 pub struct CTAHBranch<'ctah_branch_lifetime> {
 
@@ -82,6 +83,58 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
         // so for ease of use and readability, i may want to nest the 
         // actual component objects within the ctah branch
 
+    }
+
+    /// these help to return the components to the environment
+
+    pub fn get_pipe6a(&self) -> TherminolPipe {
+        return self.pipe6a.get();
+    }
+
+    pub fn get_static_mixer_41(&self) -> TherminolCustomComponent {
+        return self.static_mixer_41.get();
+    }
+
+    pub fn get_ctah_vertical(&self) -> TherminolCustomComponent {
+        return self.ctah_vertical.get();
+    }
+
+    pub fn get_ctah_horizontal(&self) -> TherminolCustomComponent{
+        return self.ctah_horizontal.get();
+    }
+
+    pub fn get_pipe_8a(&self) -> TherminolPipe {
+        return self.pipe_8a.get();
+    }
+
+    pub fn get_static_mixer_40(&self) -> TherminolCustomComponent {
+        return self.static_mixer_40.get();
+    }
+    pub fn get_pipe_9(&self) -> TherminolPipe {
+        return self.pipe_9.get();
+    }
+
+    pub fn get_pipe_10(&self) -> TherminolPipe {
+        return self.pipe_10.get();
+    }
+
+    pub fn get_pipe_11(&self) -> TherminolPipe {
+        return self.pipe_11.get();
+    }
+
+    pub fn get_pipe_12(&self) -> TherminolPipe {
+        return self.pipe_12.get();
+    }
+
+    pub fn get_ctah_pump(&self) -> TherminolCustomComponent {
+        return self.ctah_pump.get();
+    }
+
+    pub fn get_pipe_13(&self) -> TherminolPipe {
+        return self.pipe_13.get();
+    }
+    pub fn get_pipe_14(&self) -> TherminolPipe {
+        return self.pipe_14.get();
     }
 
 }
