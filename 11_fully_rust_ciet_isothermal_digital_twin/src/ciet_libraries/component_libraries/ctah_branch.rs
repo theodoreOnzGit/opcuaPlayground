@@ -74,6 +74,10 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
                                   user_specified_pressure: Pressure){
 
         // should we do max/min pressure??? IDK
+        // i'll just have an actual ctah pump object
+
+        let ctah_pump = CTAHPump::new();
+
 
         // inside the CTAH branch i should have all my components
         // so for ease of use and readability, i may want to nest the 
