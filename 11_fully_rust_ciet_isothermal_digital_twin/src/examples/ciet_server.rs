@@ -149,7 +149,6 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let pipe_10 = ctah_branch_factory.get_pipe_10();
         let pipe_11 = ctah_branch_factory.get_pipe_11();
         let pipe_12 = ctah_branch_factory.get_pipe_12();
-        let ctah_pump = ctah_branch_factory.get_ctah_pump();
         let pipe_13 = ctah_branch_factory.get_pipe_13();
         let pipe_14 = ctah_branch_factory.get_pipe_14();
 
@@ -179,6 +178,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             Pressure::new::<pascal>(pump_pressure_value);
 
         let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
+        mutable_ctah_pump.set_internal_pressure_source(user_specified_pump_pressure);
 
         let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
 
@@ -369,7 +369,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
     };
 
-    server.add_polling_action(100, calculate_flowrate_and_pressure_loss);
+    server.add_polling_action(500, calculate_flowrate_and_pressure_loss);
 
     // to check if polling server adds the polling time to
     // the execution time
