@@ -10,18 +10,18 @@ use fluid_mechanics_rust::prelude::*;
 /// temperature is assumed to be 21C all round
 ///
 /// no heat transfer equations are solved
-pub struct CIETIsothermalFacility<'ciet_object_lifetime> {
+pub struct CIETIsothermalFacility<'ciet_collection_lifetime> {
 
     ctah_pump_pressure: Pressure,
     ctah_branch_mass_flowrate: MassRate,
     dhx_branch_mass_flowrate: MassRate,
     heater_branch_mass_flowrate: MassRate,
 
-    super_collection_vector_immutable: Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>,
+    super_collection_vector_immutable: Vec<&'ciet_collection_lifetime dyn FluidComponentCollectionMethods>,
 
-    ctah_branch: CTAHBranch<'ciet_object_lifetime>,
-    heater_branch: HeaterBranch<'ciet_object_lifetime>,
-    dhx_branch: DHXBranch<'ciet_object_lifetime>
+    ctah_branch: CTAHBranch<'ciet_collection_lifetime>,
+    heater_branch: HeaterBranch<'ciet_collection_lifetime>,
+    dhx_branch: DHXBranch<'ciet_collection_lifetime>
 
 
 
@@ -63,9 +63,16 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         return self.ctah_pump_pressure;
     }
 
+    #[inline]
     pub fn set_ctah_pump_pressure(
-        &mut self, user_specified_pressure: Pressure){
+        &mut self, 
+        user_specified_pressure: Pressure,
+        mutable_ctah_pump: &'ciet_collection_lifetime mut TherminolCustomComponent){
+
         self.ctah_pump_pressure = user_specified_pressure;
+        self.ctah_branch.set_ctah_pump_pressure(
+            user_specified_pressure, mutable_ctah_pump);
+
     }
 
     pub fn get_ctah_branch_mass_flowrate(&self) -> MassRate {
@@ -80,7 +87,7 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         return self.heater_branch_mass_flowrate;
     }
 
-    pub fn calculate(&mut self,
+    pub fn calculate(&'ciet_collection_lifetime mut self,
                      ctah_pump_pressure: Pressure,
                      mutable_ctah_pump: 
                      &'ciet_collection_lifetime mut TherminolCustomComponent) -> Duration {
@@ -101,9 +108,22 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
 
         // (a) set the internal pressure of the ctah pump
         // use some specialised set method to get this done
+        
+        self.set_ctah_pump_pressure(ctah_pump_pressure, 
+                                    mutable_ctah_pump);
 
-        self.ctah_branch.set_ctah_pump_pressure(
-            ctah_pump_pressure, mutable_ctah_pump);
+        // i'll then prep the vectors
+        let ciet_branch_vectors:
+            Vec<&'ciet_collection_lifetime dyn FluidComponentCollectionMethods>
+            = vec![
+            &self.ctah_branch,
+            &self.heater_branch,
+            &self.dhx_branch ];
+
+        self.super_collection_vector_immutable.clear();
+        self.super_collection_vector_immutable = ciet_branch_vectors;
+
+
 
         // (b) set the mass flowrate over the entire parallel super collection to be
         // zero and obtain the pressure change
@@ -143,6 +163,7 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
 
         // now that i've gotten all the calculations, i can return the
         // elapsed time to the environment
+        
 
         let elapsed_time: Duration= start.elapsed();
 

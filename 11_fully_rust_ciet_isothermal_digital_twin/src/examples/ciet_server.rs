@@ -8,6 +8,7 @@ use opcua::server::{config};
 
 use fluid_mechanics_rust::prelude::*;
 
+use crate::CIETIsothermalFacility;
 use crate::CTAHBranch;
 use crate::DHXBranch;
 use crate::HeaterBranch;
@@ -63,7 +64,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                               "dhx_branch_mass_flowrate_kg_per_s", 0 as f64),
                 Variable::new(&calculation_time_node, 
                               "calculation_time_s", 
-                              "calculation_time_s", 0 as f64),
+                              "calculation_time_s", 0 as u16),
             ],
             &sample_folder_id,
         );
@@ -233,46 +234,69 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     dhx_branch_vector.push(&pipe20);
     dhx_branch_vector.push(&pipe19);
 
+    let mut dhx_branch = DHXBranch::new();
+    dhx_branch.set_fluid_component_vector(dhx_branch_vector);
+
     // now we are ready for ciet
 
-    let convert_lbm_to_kg = move || {
-        //// first let's get the address space
-        //let mut address_space = address_space.write();
+    let mut ciet_isothermal_facility = 
+        CIETIsothermalFacility::new(ctah_branch, heater_branch, dhx_branch);
 
-        //// we first find a variable by nodeID
-        //// i'm trying to find the lbm node and return its value
-        ////
+    let calculate_flowrate_and_pressure_loss = move || {
+        // first let's get the address space
+        // i want to first set my ciet ctah branch pressure to the user specified
+        // value
+        let mut address_space = address_space.write();
+
+        // we first find a variable by nodeID
+        // i'm trying to find the lbm node and return its value
         //
-        //// step 1, find the correct node object
-        //let lbm_node = writeable_variable_node.clone();
+        
+        // step 1, find the correct node object
+        let ctah_pump_node = ctah_pump_pressure_node.clone();
 
-        //// step 2, find the variable using this node object
-        //let lbm_variable_value = address_space.
-        //    get_variable_value(lbm_node).unwrap();
+        // step 2, find the variable using this node object
+        let pump_pressure_value = address_space.
+            get_variable_value(ctah_pump_node).unwrap();
 
-        //// step 3, convert variable value into f64
-        //let lbm_variable_value: f64 = lbm_variable_value.
-        //    value.unwrap().as_f64().unwrap();
+        // step 3, convert variable value into f64
+        let pump_pressure_value: f64 = pump_pressure_value.
+            value.unwrap().as_f64().unwrap();
 
-        //// step 4 convert lbm to kg
-        //let kg_value = lbm_variable_value * 0.454_f64;
+        // step 4 convert f64 to Pressure
+        let user_specified_pump_pressure = 
+            Pressure::new::<pascal>(pump_pressure_value);
 
-        //// step 5 set the kg variable
-        //let now = DateTime::now();
-        //let _ = address_space.set_variable_value(
-        //    readonly_variable_node.clone(), 
-        //    kg_value as f64,
-        //    &now, 
-        //    &now);
+        // step 5, set the pump pressure to the correct value
+        // and calculate everything
+        let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
 
-        //// i think we are done!
+        let time_taken = 
+            ciet_isothermal_facility.calculate(
+            user_specified_pump_pressure, &mut mutable_ctah_pump);
+
+        
+
+        // step 6 set the time variable
+
+        let time_taken_milleseconds: u16 = 
+            time_taken.as_millis().try_into().unwrap();
+
+        let now = DateTime::now();
+        let _ = address_space.set_variable_value(
+            calculation_time_node.clone(), 
+            time_taken_milleseconds as u16,
+            &now, 
+            &now);
+
+        // i think we are done!
 
 
 
 
     };
 
-    server.add_polling_action(300, convert_lbm_to_kg);
+    server.add_polling_action(100, calculate_flowrate_and_pressure_loss);
 
     // to check if polling server adds the polling time to
     // the execution time
@@ -284,28 +308,6 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     // otherwise it will print twice as often
 
 
-    let sleep = move || {
-
-        println!("\n started sleep\n");
-
-        let sleep_time = time::Duration::from_millis(2500);
-        thread::sleep(sleep_time);
-
-        println!("\n finished sleeping after {:?}s, yawn \n", 
-                 sleep_time.as_secs_f64());
-
-    };
-
-    // we can see the polling action timer functions as some sort
-    // of upper limit rather than add to the time that the function takes
-    server.add_polling_action(2500, sleep);
-
-    // runs server if the user wants to
-    if run_server == true {
-        server.run();
-    }
-
-    // let's also have something to print the endpoint
 
 
 }
