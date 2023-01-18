@@ -273,7 +273,12 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
         // this mutable ctah pump cannot be used safely
         // as it cannot be shared between threads
-        mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
+        // mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
+        //
+        //
+        // For the sending and receiving,
+        // need to treat this as a multithreaded operation...
+        // https://stackoverflow.com/questions/25649423/sending-trait-objects-between-threads-in-rust
 
         // this mutable ciet_isothermal_facility 
         // also cannot be shared safely between threads

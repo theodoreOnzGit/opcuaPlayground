@@ -17,7 +17,8 @@ pub struct CIETIsothermalFacility<'ciet_collection_lifetime> {
     dhx_branch_mass_flowrate: MassRate,
     heater_branch_mass_flowrate: MassRate,
 
-    super_collection_vector_immutable: Vec<&'ciet_collection_lifetime dyn FluidComponentCollectionMethods>,
+    super_collection_vector_immutable: 
+        Vec<&'ciet_collection_lifetime dyn FluidComponentCollectionMethods>,
 
     ctah_branch: CTAHBranch<'ciet_collection_lifetime>,
     heater_branch: HeaterBranch<'ciet_collection_lifetime>,
