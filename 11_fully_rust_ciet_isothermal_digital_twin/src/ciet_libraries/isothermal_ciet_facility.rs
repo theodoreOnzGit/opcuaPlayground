@@ -1,6 +1,6 @@
 extern crate fluid_mechanics_rust;
 use std::time::{Instant, Duration};
-use crate::{ctah_branch::*, therminol_component::TherminolCustomComponent, HeaterBranch};
+use crate::{ctah_branch::*, therminol_component::TherminolCustomComponent, HeaterBranch, DHXBranch, heater_branch, dhx_branch};
 
 use fluid_mechanics_rust::prelude::*;
 
@@ -21,7 +21,7 @@ pub struct CIETIsothermalFacility<'ciet_object_lifetime> {
 
     ctah_branch: CTAHBranch<'ciet_object_lifetime>,
     heater_branch: HeaterBranch<'ciet_object_lifetime>,
-    dhx_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
+    dhx_branch: DHXBranch<'ciet_object_lifetime>
 
 
 
@@ -153,9 +153,25 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
 
     // constructor
 
-    pub fn new() -> Self {
+    pub fn new(ctah_branch: CTAHBranch<'ciet_collection_lifetime>,
+               heater_branch: HeaterBranch<'ciet_collection_lifetime>,
+               dhx_branch: DHXBranch<'ciet_collection_lifetime>) -> Self {
 
-        unimplemented!();
+        // again here we have an empty vector and we move ownership of
+        // the dhx branch to this vector
+        //
+
+        
+        return Self { 
+            ctah_pump_pressure: Pressure::new::<pascal>(0.0), 
+            ctah_branch_mass_flowrate: MassRate::new::<kilogram_per_second>(0.0), 
+            dhx_branch_mass_flowrate: MassRate::new::<kilogram_per_second>(0.0), 
+            heater_branch_mass_flowrate: MassRate::new::<kilogram_per_second>(0.0), 
+            super_collection_vector_immutable: vec![], 
+            ctah_branch: ctah_branch, 
+            heater_branch: heater_branch, 
+            dhx_branch: dhx_branch 
+        }
 
     }
    
