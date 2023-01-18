@@ -9,6 +9,7 @@ use opcua::server::{config};
 use fluid_mechanics_rust::prelude::*;
 
 use crate::CTAHBranch;
+use crate::DHXBranch;
 use crate::HeaterBranch;
 
 /// in example 8,     
@@ -199,8 +200,40 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     let mut heater_branch = HeaterBranch::new();
     heater_branch.set_fluid_component_vector(heater_branch_vector);
 
-    // last but not least the dracs
+    // last but not least the dhx branch
+    let dhx_branch_factory = DHXBranch::new();
 
+    let pipe26 = dhx_branch_factory.get_pipe26();
+    // item 25
+    let static_mixer_21 = dhx_branch_factory.get_static_mixer_21();
+    let pipe25a = dhx_branch_factory.get_pipe25a();
+    // item 24
+    let dhx_shell_side_heat_exchanger = dhx_branch_factory.get_dhx_shell_side_heat_exchanger();
+    // item 23
+    let static_mixer_20 = dhx_branch_factory.get_static_mixer_20();
+    let pipe23a = dhx_branch_factory.get_pipe23a();
+    let pipe22 = dhx_branch_factory.get_pipe22();
+    // item 21a
+    let flowmeter20 = dhx_branch_factory.get_flowmeter20();
+    let pipe21 = dhx_branch_factory.get_pipe21();
+    let pipe20 = dhx_branch_factory.get_pipe20();
+    let pipe19 = dhx_branch_factory.get_pipe19();
+
+    let mut dhx_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+    dhx_branch_vector.push(&pipe26);
+    dhx_branch_vector.push(&static_mixer_21);
+    dhx_branch_vector.push(&pipe25a);
+    dhx_branch_vector.push(&dhx_shell_side_heat_exchanger);
+    dhx_branch_vector.push(&static_mixer_20);
+    dhx_branch_vector.push(&pipe23a);
+    dhx_branch_vector.push(&pipe22);
+    dhx_branch_vector.push(&flowmeter20);
+    dhx_branch_vector.push(&pipe21);
+    dhx_branch_vector.push(&pipe20);
+    dhx_branch_vector.push(&pipe19);
+
+    // now we are ready for ciet
 
     let convert_lbm_to_kg = move || {
         //// first let's get the address space
