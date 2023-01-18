@@ -64,10 +64,10 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
             pipe_14: Pipe14::new(),
             fluid_component_vector_immutable: ctah_branch_vector_empty,
         }
-
-
-
     }
+
+
+
 
     /// sets the ctah pump pressure to whatever value the user specifies
     pub fn set_ctah_pump_pressure(&mut self,
@@ -76,7 +76,6 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
         // should we do max/min pressure??? IDK
         // i'll just have an actual ctah pump object
 
-        let ctah_pump = CTAHPump::new();
 
 
         // inside the CTAH branch i should have all my components

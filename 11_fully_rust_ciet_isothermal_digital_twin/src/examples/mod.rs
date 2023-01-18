@@ -41,3 +41,7 @@ pub use example7::*;
 /// delays or thread::sleep()
 pub mod example8;
 pub use example8::*;
+
+/// ciet server
+pub mod ciet_server;
+pub use ciet_server::*;
