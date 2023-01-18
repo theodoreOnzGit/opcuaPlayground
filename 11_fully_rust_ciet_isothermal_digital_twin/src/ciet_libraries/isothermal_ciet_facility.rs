@@ -1,5 +1,6 @@
 extern crate fluid_mechanics_rust;
 use std::time::{Instant, Duration};
+use crate::{ctah_branch::*, therminol_component::TherminolCustomComponent};
 
 use fluid_mechanics_rust::prelude::*;
 
@@ -18,7 +19,7 @@ pub struct CIETIsothermalFacility<'ciet_object_lifetime> {
 
     super_collection_vector_immutable: Vec<&'ciet_object_lifetime dyn FluidComponentCollectionMethods>,
 
-    ctah_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
+    ctah_branch: CTAHBranch<'ciet_object_lifetime>,
     heater_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
     dhx_branch: &'ciet_object_lifetime dyn FluidComponentCollectionMethods,
 
@@ -79,7 +80,10 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         return self.heater_branch_mass_flowrate;
     }
 
-    pub fn calculate(&mut self) -> Duration {
+    pub fn calculate(&mut self,
+                     ctah_pump_pressure: Pressure,
+                     mutable_ctah_pump: 
+                     &'ciet_collection_lifetime mut TherminolCustomComponent) -> Duration {
 
         let start = Instant::now();
 
@@ -98,7 +102,8 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         // (a) set the internal pressure of the ctah pump
         // use some specialised set method to get this done
 
-        unimplemented!();
+        self.ctah_branch.set_ctah_pump_pressure(
+            ctah_pump_pressure, mutable_ctah_pump);
 
         // (b) set the mass flowrate over the entire parallel super collection to be
         // zero and obtain the pressure change
