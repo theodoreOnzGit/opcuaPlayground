@@ -1,5 +1,6 @@
 use std::thread;
 use std::time;
+use std::time::Instant;
 
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
@@ -269,13 +270,20 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
         // step 5, set the pump pressure to the correct value
         // and calculate everything
-        let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
 
-        let time_taken = 
-            ciet_isothermal_facility.calculate(
-            user_specified_pump_pressure, &mut mutable_ctah_pump);
+        // this mutable ctah pump cannot be used safely
+        // as it cannot be shared between threads
+        //let mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
 
-        
+        // this mutable ciet_isothermal_facility 
+        // also cannot be shared safely between threads
+        //let time_taken = 
+        //    ciet_isothermal_facility.calculate(
+        //    user_specified_pump_pressure, &mut mutable_ctah_pump);
+
+        let start = Instant::now();
+
+        let time_taken = start.elapsed();
 
         // step 6 set the time variable
 
