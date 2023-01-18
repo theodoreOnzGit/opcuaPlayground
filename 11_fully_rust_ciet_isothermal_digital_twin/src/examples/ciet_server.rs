@@ -9,7 +9,7 @@ use opcua::server::{config};
 /// in example 8,     
 /// we want to check if the server runs polling actions synchronously 
 /// or asynchronously
-pub fn example_8_check_polling_action_delays_two(run_server: bool){
+pub fn construct_and_run_ciet_server(run_server: bool){
 
     let mut server = build_standard_server();
     // step 2, u can add variables or nodes
@@ -24,11 +24,14 @@ pub fn example_8_check_polling_action_delays_two(run_server: bool){
             .unwrap()
     };
 
-    // i'll then make a read only and write only node
+    // I'll have 4 variables here
     // note that each variable needs a separate node ID
 
-    let readonly_variable_node = NodeId::new(ns, "readonly_variable");
-    let writeable_variable_node = NodeId::new(ns, "writeable_variable");
+    let ctah_branch_mass_flowrate_node = NodeId::new(ns, "ctah_branch_mass_flowrate");
+    let heater_branch_mass_flowrate_node = NodeId::new(ns, "heater_branch_flowrate");
+    let dhx_branch_mass_flowrate_node = NodeId::new(ns, "dhx_branch_flowrate");
+    let calculation_time_node = NodeId::new(ns, "calculation_time");
+    let ctah_pump_pressure_node = NodeId::new(ns, "ctah_pump_pressure");
 
     let address_space = server.address_space();
 
@@ -39,14 +42,24 @@ pub fn example_8_check_polling_action_delays_two(run_server: bool){
 
         // Create a sample folder under objects folder
         let sample_folder_id = address_space
-            .add_folder("readonly", "readonly", &NodeId::objects_folder_id())
+            .add_folder("sensor data", "sensor data", &NodeId::objects_folder_id())
             .unwrap();
 
         // Add some variables to our sample folder. Values will be overwritten by the timer
         let _ = address_space.add_variables(
             vec![
-                Variable::new(&readonly_variable_node, 
-                              "mass_kg", "mass_kg", 0 as f64),
+                Variable::new(&ctah_branch_mass_flowrate_node, 
+                              "ctah_branch_mass_flowrate_kg_per_s", 
+                              "ctah_branch_mass_flowrate_kg_per_s", 0 as f64),
+                Variable::new(&heater_branch_mass_flowrate_node, 
+                              "heater_branch_mass_flowrate_kg_per_s", 
+                              "heater_branch_mass_flowrate_kg_per_s", 0 as f64),
+                Variable::new(&dhx_branch_mass_flowrate_node, 
+                              "dhx_branch_mass_flowrate_kg_per_s", 
+                              "dhx_branch_mass_flowrate_kg_per_s", 0 as f64),
+                Variable::new(&calculation_time_node, 
+                              "calculation_time_s", 
+                              "calculation_time_s", 0 as f64),
             ],
             &sample_folder_id,
         );
@@ -57,12 +70,12 @@ pub fn example_8_check_polling_action_delays_two(run_server: bool){
     {
         let mut address_space = address_space.write();
         let folder_id = address_space
-            .add_folder("Writeable", "Writeable", &NodeId::objects_folder_id())
+            .add_folder("Controller", "Controller", &NodeId::objects_folder_id())
             .unwrap();
 
 
-        VariableBuilder::new(&writeable_variable_node, 
-                             "mass_in_lbm", "mass_in_lbm")
+        VariableBuilder::new(&ctah_pump_pressure_node, 
+                             "ctah_branch_pressure_pa", "ctah_branch_pressure_pa")
             .data_type(DataTypeId::Float)
             .value(0 as f64)
             .writable()
@@ -114,36 +127,36 @@ pub fn example_8_check_polling_action_delays_two(run_server: bool){
 
 
     let convert_lbm_to_kg = move || {
-        // first let's get the address space
-        let mut address_space = address_space.write();
+        //// first let's get the address space
+        //let mut address_space = address_space.write();
 
-        // we first find a variable by nodeID
-        // i'm trying to find the lbm node and return its value
+        //// we first find a variable by nodeID
+        //// i'm trying to find the lbm node and return its value
+        ////
         //
-        
-        // step 1, find the correct node object
-        let lbm_node = writeable_variable_node.clone();
+        //// step 1, find the correct node object
+        //let lbm_node = writeable_variable_node.clone();
 
-        // step 2, find the variable using this node object
-        let lbm_variable_value = address_space.
-            get_variable_value(lbm_node).unwrap();
+        //// step 2, find the variable using this node object
+        //let lbm_variable_value = address_space.
+        //    get_variable_value(lbm_node).unwrap();
 
-        // step 3, convert variable value into f64
-        let lbm_variable_value: f64 = lbm_variable_value.
-            value.unwrap().as_f64().unwrap();
+        //// step 3, convert variable value into f64
+        //let lbm_variable_value: f64 = lbm_variable_value.
+        //    value.unwrap().as_f64().unwrap();
 
-        // step 4 convert lbm to kg
-        let kg_value = lbm_variable_value * 0.454_f64;
+        //// step 4 convert lbm to kg
+        //let kg_value = lbm_variable_value * 0.454_f64;
 
-        // step 5 set the kg variable
-        let now = DateTime::now();
-        let _ = address_space.set_variable_value(
-            readonly_variable_node.clone(), 
-            kg_value as f64,
-            &now, 
-            &now);
+        //// step 5 set the kg variable
+        //let now = DateTime::now();
+        //let _ = address_space.set_variable_value(
+        //    readonly_variable_node.clone(), 
+        //    kg_value as f64,
+        //    &now, 
+        //    &now);
 
-        // i think we are done!
+        //// i think we are done!
 
 
 
