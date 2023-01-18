@@ -320,7 +320,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     // the endpoint prints (every 5s)
     // otherwise it will print twice as often
 
-
+    if run_server { server.run(); }
 
 
 }
