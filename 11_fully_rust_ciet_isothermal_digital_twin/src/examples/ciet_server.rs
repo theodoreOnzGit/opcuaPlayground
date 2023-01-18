@@ -1,3 +1,4 @@
+use std::sync::mpsc;
 use std::thread;
 use std::time;
 use std::time::Instant;
@@ -242,6 +243,11 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
     let mut ciet_isothermal_facility = 
         CIETIsothermalFacility::new(ctah_branch, heater_branch, dhx_branch);
+
+    // we need to prepare transmitters and receivers for the
+    // ciet isothermal facility
+
+    //let (tx, rx) = mpsc::channel();
 
     let calculate_flowrate_and_pressure_loss = move || {
         // first let's get the address space
