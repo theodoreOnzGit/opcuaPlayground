@@ -71,13 +71,14 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
 
 
     /// sets the ctah pump pressure to whatever value the user specifies
-    pub fn set_ctah_pump_pressure(&mut self,
-                                  user_specified_pressure: Pressure){
+    pub fn set_ctah_pump_pressure(user_specified_pressure: Pressure,
+                                  mut ctah_pump: TherminolCustomComponent){
 
         // should we do max/min pressure??? IDK
         // i'll just have an actual ctah pump object
+        
 
-
+        ctah_pump.set_internal_pressure_source(user_specified_pressure);
 
         // inside the CTAH branch i should have all my components
         // so for ease of use and readability, i may want to nest the 
@@ -86,6 +87,9 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
     }
 
     /// these help to return the components to the environment
+    ///
+    /// what you are supposed to do is first
+    /// to 
 
     pub fn get_pipe6a(&self) -> TherminolPipe {
         return self.pipe6a.get();
