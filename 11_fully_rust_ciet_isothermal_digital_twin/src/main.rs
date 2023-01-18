@@ -34,7 +34,7 @@ fn main() {
 
 
 
-    construct_and_run_ciet_server(dont_run_server);
+    construct_and_run_ciet_server(run_server);
 
 }
 

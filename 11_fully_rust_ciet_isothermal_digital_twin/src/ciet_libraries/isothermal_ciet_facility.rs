@@ -89,10 +89,8 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         return self.heater_branch_mass_flowrate;
     }
 
-    pub fn calculate(&'ciet_collection_lifetime mut self,
-                     ctah_pump_pressure: Pressure,
-                     mutable_ctah_pump: 
-                     &'ciet_collection_lifetime mut TherminolCustomComponent) -> 
+
+    pub fn calculate(&'ciet_collection_lifetime mut self) -> 
         (Duration,MassRate,MassRate,MassRate)
         {
 
@@ -110,11 +108,6 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
 
         
 
-        // (a) set the internal pressure of the ctah pump
-        // use some specialised set method to get this done
-        
-        self.set_ctah_pump_pressure(ctah_pump_pressure, 
-                                    mutable_ctah_pump);
 
         // i'll then prep the vectors
         let ciet_branch_vectors:

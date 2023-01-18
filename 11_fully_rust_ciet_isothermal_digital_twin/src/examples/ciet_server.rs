@@ -154,6 +154,31 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let pipe_14 = ctah_branch_factory.get_pipe_14();
 
         // now push them into a vector
+        // step 2, find the variable using this node object
+        // first let's get the address space
+        // i want to first set my ciet ctah branch pressure to the user specified
+        // value
+        let mut address_space = address_space.write();
+        
+        // step 1, find the correct node object
+        let ctah_pump_node = ctah_pump_pressure_node.clone();
+        let pump_pressure_value = address_space.
+            get_variable_value(ctah_pump_node).unwrap();
+
+        // let's try setting ctah branch pressure to the user specified value
+        //
+        // This is basically how you set ctah pump pressure... kind of cumbersome
+        // but oh well
+
+        // step 3, convert variable value into f64
+        let pump_pressure_value: f64 = pump_pressure_value.
+            value.unwrap().as_f64().unwrap();
+
+        // step 4 convert f64 to Pressure
+        let user_specified_pump_pressure = 
+            Pressure::new::<pascal>(pump_pressure_value);
+
+        let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
 
         let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
 
@@ -178,7 +203,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         // 9
         ctah_branch_vector.push(&pipe_12);
         // 10
-        ctah_branch_vector.push(&ctah_pump);
+        ctah_branch_vector.push(&mutable_ctah_pump);
         // 11
         ctah_branch_vector.push(&pipe_13);
         // 12
@@ -261,42 +286,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
         let initiation_duration = start_of_object_init.elapsed();
 
-        // first let's get the address space
-        // i want to first set my ciet ctah branch pressure to the user specified
-        // value
-        let mut address_space = address_space.write();
 
-        // making vectors here and borrowing is OK 
-        // but bringing objects with trait objects in here is not
-        let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
-
-        // element number: 0 
-        ctah_branch_vector.push(&pipe6a); 
-        // we first find a variable by nodeID
-        // i'm trying to find the lbm node and return its value
-     
-        
-        // step 1, find the correct node object
-        let ctah_pump_node = ctah_pump_pressure_node.clone();
-
-        // step 2, find the variable using this node object
-        let pump_pressure_value = address_space.
-            get_variable_value(ctah_pump_node).unwrap();
-
-        // let's try setting ctah branch pressure to the user specified value
-        //
-        // This is basically how you set ctah pump pressure... kind of cumbersome
-        // but oh well
-
-        // step 3, convert variable value into f64
-        let pump_pressure_value: f64 = pump_pressure_value.
-            value.unwrap().as_f64().unwrap();
-
-        // step 4 convert f64 to Pressure
-        let user_specified_pump_pressure = 
-            Pressure::new::<pascal>(pump_pressure_value);
-
-        let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
 
         // step 5, set the pump pressure to the correct value
         // and calculate everything
@@ -308,9 +298,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
              ctah_branch_flowrate,
              heater_branch_flowrate,
              dhx_branch_flowrate)
-             = ciet_isothermal_facility.calculate(
-            user_specified_pump_pressure,
-            &mut mutable_ctah_pump);
+             = ciet_isothermal_facility.calculate();
 
         // this mutable ctah pump cannot be used safely
         // as it cannot be shared between threads
