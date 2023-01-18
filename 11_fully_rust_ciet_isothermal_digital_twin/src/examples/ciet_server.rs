@@ -9,6 +9,7 @@ use opcua::server::{config};
 use fluid_mechanics_rust::prelude::*;
 
 use crate::CTAHBranch;
+use crate::HeaterBranch;
 
 /// in example 8,     
 /// we want to check if the server runs polling actions synchronously 
@@ -168,6 +169,10 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     ctah_branch.set_ctah_pump_pressure(
         Pressure::new::<pascal>(500_f64), 
         &mut mutable_ctah_pump);
+
+    // now for the heater branch
+
+    let heater_branch_factory = HeaterBranch::new();
 
 
 

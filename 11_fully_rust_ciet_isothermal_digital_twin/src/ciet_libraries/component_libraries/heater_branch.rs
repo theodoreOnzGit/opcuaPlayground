@@ -3,7 +3,8 @@ use fluid_mechanics_rust::prelude::*;
 
 use crate::{Branch5, 
     therminol_pipe::TherminolPipe, therminol_component::TherminolCustomComponent, 
-    Pipe4, Pipe3, StaticMixer10, Pipe2a, HeaterTopHead1a, CietHeaterVersion1, HeaterBottomHead1b, Pipe18};
+    Pipe4, Pipe3, StaticMixer10, Pipe2a, HeaterTopHead1a, 
+    CietHeaterVersion1, HeaterBottomHead1b, Pipe18};
 
 pub struct HeaterBranch<'heater_branch_lifetime> {
 
@@ -27,10 +28,25 @@ impl<'heater_branch_lifetime> HeaterBranch<'heater_branch_lifetime> {
     /// constructor, returns an instance of the ctah branch
     pub fn new() -> Self {
 
+        let empty_vec: Vec<&'heater_branch_lifetime dyn FluidComponent> = vec![];
         
-        unimplemented!();
-        // constructor will return the CTAH branch with all its items
+
+        // constructor will return the heater branch with all its factories
         // but the vector will be empty
+        //
+
+        Self {
+            branch5: Branch5::new(),
+            pipe4: Pipe4::new(),
+            pipe3: Pipe3::new(),
+            mixer10: StaticMixer10::new(),
+            pipe2a: Pipe2a::new(),
+            heater_top_head_1a: HeaterTopHead1a::new(),
+            ciet_heater: CietHeaterVersion1::new(),
+            heater_bottom_head_1b: HeaterBottomHead1b::new(),
+            pipe18: Pipe18::new(),
+            fluid_component_vector_immutable: empty_vec
+        }
     }
 
     pub fn get_branch5(&self) -> TherminolPipe {
