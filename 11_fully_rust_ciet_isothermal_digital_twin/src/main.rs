@@ -15,6 +15,8 @@ pub use examples::example8::*;
 pub mod ciet_libraries;
 pub use ciet_libraries::*;
 
+use crate::examples::ciet_server::construct_and_run_ciet_server;
+
 
 fn main() {
     println!("Hello, world!");
@@ -32,7 +34,7 @@ fn main() {
 
 
 
-    
+    construct_and_run_ciet_server(dont_run_server);
 
 }
 
