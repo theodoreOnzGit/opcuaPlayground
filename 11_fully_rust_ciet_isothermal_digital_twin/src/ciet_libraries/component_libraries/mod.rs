@@ -10,6 +10,10 @@ pub mod ctah_branch;
 pub use ctah_branch::*;
 
 
+/// contains a class for the heater branch
+pub mod heater_branch;
+pub use heater_branch::*;
+
 
 /// Pipe6a in Compact Integral Effects Test (CIET)
 /// CTAH branch 
