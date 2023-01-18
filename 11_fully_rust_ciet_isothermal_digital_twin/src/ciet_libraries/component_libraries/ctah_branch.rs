@@ -41,8 +41,32 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
     /// constructor, returns an instance of the ctah branch
     pub fn new() -> Self {
 
+        
 
-        unimplemented!();
+        // constructor will return the CTAH branch with all its items
+        // but the vector will be empty
+        let ctah_branch_vector_empty: Vec<&'ctah_branch_lifetime dyn FluidComponent>
+            = vec![];
+
+        return Self { 
+            pipe6a: Pipe6a::new(),
+            static_mixer_41: StaticMixer41::new(),
+            ctah_vertical: CTAHVertical::new(),
+            ctah_horizontal: CTAHHorizontal::new(),
+            pipe_8a: Pipe8a::new(),
+            static_mixer_40: StaticMixer40::new(),
+            pipe_9: Pipe9::new(),
+            pipe_10: Pipe10::new(),
+            pipe_11: Pipe11::new(),
+            pipe_12: Pipe12::new(),
+            ctah_pump: CTAHPump::new(), 
+            pipe_13: Pipe13::new(),
+            pipe_14: Pipe14::new(),
+            fluid_component_vector_immutable: ctah_branch_vector_empty,
+        }
+
+
+
     }
 
     /// sets the ctah pump pressure to whatever value the user specifies
