@@ -30,14 +30,20 @@ pub fn assert_ctah_behave_ok() {
     let pipe_10 = ctah_branch_factory.get_pipe_10();
     let pipe_11 = ctah_branch_factory.get_pipe_11();
     let pipe_12 = ctah_branch_factory.get_pipe_12();
+    let pipe_13 = ctah_branch_factory.get_pipe_13();
+    let pipe_14 = ctah_branch_factory.get_pipe_14();
+    let flowmeter_40_14a = ctah_branch_factory.get_flowmeter_40_14a();
+    let pipe_15 = ctah_branch_factory.get_pipe_15();
+    let pipe_16 = ctah_branch_factory.get_pipe_16();
+    let branch_17 = ctah_branch_factory.get_branch_17();
+
+
 
     let user_specified_pump_pressure = 
         Pressure::new::<pascal>(pump_pressure_pascals);
     let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
     mutable_ctah_pump.set_internal_pressure_source(user_specified_pump_pressure);
 
-    let pipe_13 = ctah_branch_factory.get_pipe_13();
-    let pipe_14 = ctah_branch_factory.get_pipe_14();
 
     let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
     // element number: 0 
@@ -66,6 +72,15 @@ pub fn assert_ctah_behave_ok() {
     ctah_branch_vector.push(&pipe_13);
     // 12
     ctah_branch_vector.push(&pipe_14);
+    //13
+    ctah_branch_vector.push(&flowmeter_40_14a);
+    //14
+    ctah_branch_vector.push(&pipe_15);
+    //15
+    ctah_branch_vector.push(&pipe_16);
+    //16
+    ctah_branch_vector.push(&branch_17);
+
 
     let mut ctah_branch = CTAHBranch::new();
     ctah_branch.set_fluid_component_vector(ctah_branch_vector);

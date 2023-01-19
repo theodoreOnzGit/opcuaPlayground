@@ -3,7 +3,7 @@ use fluid_mechanics_rust::prelude::*;
 
 use crate::{Pipe6a, StaticMixer41, CTAHVertical, CTAHHorizontal, 
     Pipe8a, StaticMixer40, Pipe9, Pipe10, Pipe11, Pipe12, CTAHPump, Pipe13, Pipe14, 
-    therminol_pipe::TherminolPipe, therminol_component::TherminolCustomComponent};
+    therminol_pipe::TherminolPipe, therminol_component::TherminolCustomComponent, Pipe16, Pipe15, Branch17, Flowmeter40};
 
 pub struct CTAHBranch<'ctah_branch_lifetime> {
 
@@ -32,6 +32,14 @@ pub struct CTAHBranch<'ctah_branch_lifetime> {
     pipe_13: Pipe13,
     //14
     pipe_14: Pipe14,
+    //15 
+    flowmeter_40_14a: Flowmeter40,
+    //16
+    pipe_15: Pipe15,
+    //17
+    pipe_16: Pipe16,
+    //18
+    branch_17: Branch17,
 
     fluid_component_vector_immutable: 
         Vec<&'ctah_branch_lifetime dyn FluidComponent>
@@ -63,6 +71,10 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
             ctah_pump: CTAHPump::new(), 
             pipe_13: Pipe13::new(),
             pipe_14: Pipe14::new(),
+            flowmeter_40_14a: Flowmeter40::new(),
+            pipe_15: Pipe15::new(),
+            pipe_16: Pipe16::new(),
+            branch_17: Branch17::new(),
             fluid_component_vector_immutable: ctah_branch_vector_empty,
         }
     }
@@ -149,6 +161,19 @@ impl<'ctah_branch_lifetime> CTAHBranch<'ctah_branch_lifetime> {
     }
     pub fn get_pipe_14(&self) -> TherminolPipe {
         return self.pipe_14.get();
+    }
+    pub fn get_flowmeter_40_14a(&self) -> TherminolCustomComponent {
+        return self.flowmeter_40_14a.get();
+    }
+
+    pub fn get_pipe_15(&self) -> TherminolPipe {
+        return self.pipe_15.get();
+    }
+    pub fn get_pipe_16(&self) -> TherminolPipe {
+        return self.pipe_16.get();
+    }
+    pub fn get_branch_17(&self) -> TherminolPipe {
+        return self.branch_17.get();
     }
 
 }
