@@ -6,7 +6,7 @@ pub fn assert_ctah_behave_ok() {
     use crate::CTAHBranch;
 
     // get a version of ctah i know is working
-    let mass_rate_kg_per_s = 0.18;
+    let mass_rate_kg_per_s = 0.0;
     let temperature_degrees_c = 21.0;
 
     let pump_pressure_pascals = 0.0;
