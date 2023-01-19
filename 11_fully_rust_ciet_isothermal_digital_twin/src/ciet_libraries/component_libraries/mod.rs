@@ -79,14 +79,13 @@ pub struct StaticMixer41 {
     // from top to bottom
     //
     // label 6 on diagram
-    therminol_properties: TherminolVP1Properties,
 }
 
 impl StaticMixer41 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {};
 
     }
 
@@ -127,7 +126,7 @@ impl StaticMixer41 {
         
         let fluid_temp = ThermodynamicTemperature::new::<degree_celsius>(21.0);
         let hydraulic_diameter = Length::new::<meter>(2.79e-2);
-        let component_length = Length::new::<meter>(0.1526);
+        let component_length = Length::new::<meter>(0.33);
         let cross_sectional_area = Area::new::<square_meter>(6.11e-4);
         // note that aboslute roughness doesn't matter here really
         // because we are having laminar flow in the experimental data range
