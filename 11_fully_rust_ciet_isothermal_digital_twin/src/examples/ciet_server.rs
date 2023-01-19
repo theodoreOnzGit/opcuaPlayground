@@ -114,6 +114,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         println!("\n opc.tcp://{}:{}{} \n",ip_add,4840,CUSTOM_ENDPOINT_PATH);
     };
 
+
     //server.add_polling_action(5000, print_endpoint);
     server.add_polling_action(5000, print_endpoint_simple);
 

@@ -577,6 +577,7 @@ dependencies = [
 name = "opcua_rust_test_server"
 version = "0.1.0"
 dependencies = [
+ "approx",
  "chrono",
  "fluid_mechanics_rust",
  "local-ip-address",

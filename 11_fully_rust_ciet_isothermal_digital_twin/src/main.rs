@@ -15,6 +15,7 @@ pub use examples::example8::*;
 pub mod ciet_libraries;
 pub use ciet_libraries::*;
 
+
 use crate::examples::ciet_server::construct_and_run_ciet_server;
 
 
@@ -39,3 +40,5 @@ fn main() {
 }
 
 
+#[cfg(test)]
+pub mod tests_and_examples; 

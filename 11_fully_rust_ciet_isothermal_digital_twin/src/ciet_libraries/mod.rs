@@ -25,5 +25,4 @@ pub mod isothermal_ciet_facility;
 pub use isothermal_ciet_facility::*;
 
 
-pub mod unsafe_send_sync_impls;
-pub use unsafe_send_sync_impls::*;
+
