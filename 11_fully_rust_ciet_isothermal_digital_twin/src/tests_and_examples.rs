@@ -3,6 +3,7 @@ extern crate approx;
 pub fn assert_ctah_behave_ok() {
 
     use fluid_mechanics_rust::prelude::*;
+    use crate::CTAHBranch;
 
     // get a version of ctah i know is working
     let mass_rate_kg_per_s = 0.18;
@@ -18,13 +19,67 @@ pub fn assert_ctah_behave_ok() {
 
     // get a test version of ctah, the one based on traits
 
+    let ctah_branch_factory = CTAHBranch::new();
+    let pipe6a = ctah_branch_factory.get_pipe6a();
+    let static_mixer_41 = ctah_branch_factory.get_static_mixer_41();
+    let ctah_vertical = ctah_branch_factory.get_ctah_vertical();
+    let ctah_horizontal = ctah_branch_factory.get_ctah_horizontal();
+    let pipe_8a = ctah_branch_factory.get_pipe_8a();
+    let static_mixer_40 = ctah_branch_factory.get_static_mixer_40();
+    let pipe_9 = ctah_branch_factory.get_pipe_9();
+    let pipe_10 = ctah_branch_factory.get_pipe_10();
+    let pipe_11 = ctah_branch_factory.get_pipe_11();
+    let pipe_12 = ctah_branch_factory.get_pipe_12();
+
+    let user_specified_pump_pressure = 
+        Pressure::new::<pascal>(pump_pressure_pascals);
+    let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
+    mutable_ctah_pump.set_internal_pressure_source(user_specified_pump_pressure);
+
+    let pipe_13 = ctah_branch_factory.get_pipe_13();
+    let pipe_14 = ctah_branch_factory.get_pipe_14();
+
+    let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
+    // element number: 0 
+    ctah_branch_vector.push(&pipe6a); 
+    // 1
+    ctah_branch_vector.push(&static_mixer_41);
+    // 2
+    ctah_branch_vector.push(&ctah_vertical);
+    // 3
+    ctah_branch_vector.push(&ctah_horizontal);
+    // 4
+    ctah_branch_vector.push(&pipe_8a);
+    // 5
+    ctah_branch_vector.push(&static_mixer_40);
+    // 6
+    ctah_branch_vector.push(&pipe_9);
+    // 7
+    ctah_branch_vector.push(&pipe_10);
+    // 8
+    ctah_branch_vector.push(&pipe_11);
+    // 9
+    ctah_branch_vector.push(&pipe_12);
+    // 10
+    ctah_branch_vector.push(&mutable_ctah_pump);
+    // 11
+    ctah_branch_vector.push(&pipe_13);
+    // 12
+    ctah_branch_vector.push(&pipe_14);
+
+    let mut ctah_branch = CTAHBranch::new();
+    ctah_branch.set_fluid_component_vector(ctah_branch_vector);
+
+    let test_ctah_pressure_change = 
+        ctah_branch.get_pressure_change(
+            MassRate::new::<kilogram_per_second>(mass_rate_kg_per_s));
 
 
     // assert
 
     approx::assert_relative_eq!(
         reference_ctah_pressure_change,
-        0.0,
+        test_ctah_pressure_change.value,
         max_relative = 0.01);
 
 }
