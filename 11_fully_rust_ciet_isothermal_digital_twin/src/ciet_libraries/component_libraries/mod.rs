@@ -26,7 +26,6 @@ pub struct Pipe6a {
 
     // pipe 6a
     // otherwise known as the static mixer pipe 6a
-    therminol_properties: TherminolVP1Properties,
 
 }
 
@@ -34,7 +33,7 @@ impl<'pipe_lifetime> Pipe6a{
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {}
 
     }
 
