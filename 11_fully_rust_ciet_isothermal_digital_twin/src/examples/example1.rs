@@ -173,17 +173,3 @@ pub fn example_1_timer_server_no_connection(run_server: bool){
 
 }
 
-#[cfg(test)]
-mod test_example_1 {
-
-    pub fn test_eg_1() {
-
-        let run_server = false;
-
-        use crate::example_1_timer_server_no_connection;
-
-        example_1_timer_server_no_connection(run_server);
-
-    }
-
-}

@@ -25,6 +25,7 @@ pub struct DHXBranch<'dhx_branch_lifetime> {
     pipe22: Pipe22,
     // item 21a
     flowmeter20: Flowmeter20,
+    flowmeter20_check_valve: Flowmeter20WithHighKCheckValve,
     pipe21: Pipe21,
     pipe20: Pipe20,
     pipe19: Pipe19,
@@ -59,6 +60,7 @@ impl<'dhx_branch_lifetime> DHXBranch<'dhx_branch_lifetime> {
             pipe22: Pipe22::new(),
             // item 21a
             flowmeter20: Flowmeter20::new(),
+            flowmeter20_check_valve: Flowmeter20WithHighKCheckValve::new(),
             pipe21: Pipe21::new(),
             pipe20: Pipe20::new(),
             pipe19: Pipe19::new(),
@@ -96,6 +98,10 @@ impl<'dhx_branch_lifetime> DHXBranch<'dhx_branch_lifetime> {
 
     pub fn get_flowmeter20(&self) -> TherminolCustomComponent {
         return self.flowmeter20.get();
+    }
+
+    pub fn get_flowmeter20_check_valve(&self) -> TherminolCustomComponent {
+        return self.flowmeter20_check_valve.get();
     }
 
     pub fn get_pipe21(&self) -> TherminolPipe {

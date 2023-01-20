@@ -1,8 +1,13 @@
-use std::sync::Arc;
-use std::sync::Mutex;
-use std::sync::mpsc;
-use std::thread;
-use std::time;
+// these imports are for mutex locks and atomic reference counting (ARC)
+// which are for bringing mutable objects and references into multithread
+// operations safely
+//
+// probably use in future
+//use std::sync::Arc;
+//use std::sync::Mutex;
+//use std::sync::mpsc;
+//use std::thread;
+//use std::time;
 use std::time::Instant;
 
 #[warn(missing_docs)]
@@ -453,7 +458,7 @@ fn build_standard_server() -> Server {
 
     // then we build the server
 
-    let mut server = server_builder.server().unwrap();
+    let server = server_builder.server().unwrap();
     return server;
 
 }

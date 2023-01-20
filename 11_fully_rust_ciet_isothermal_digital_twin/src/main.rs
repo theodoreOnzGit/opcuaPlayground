@@ -26,8 +26,8 @@ fn main() {
     let run_server = true;
     let dont_run_server = false;
 
-    //example_3_timer_server_auto_ip_addr(dont_run_server);
-    //example_4_timer_server_auto_ip_addr(dont_run_server);
+    example_3_timer_server_auto_ip_addr(dont_run_server);
+    example_4_timer_server_auto_ip_addr(dont_run_server);
     //example_5_read_and_write_variables(run_server);
     //example_6_read_and_write_variables(run_server);
     //example_7_check_polling_action_delays(run_server);
