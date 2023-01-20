@@ -366,13 +366,92 @@ pub fn assert_ctah_behave_ok() {
 
 }
 
+
+#[test]
+pub fn assert_heater_branch_ok(){
+
+    let mut mass_flowrate_kg_per_sec_vec: Vec<f64> = 
+        vec![];
+
+    mass_flowrate_kg_per_sec_vec.push(0.0);
+    mass_flowrate_kg_per_sec_vec.push(0.2);
+    mass_flowrate_kg_per_sec_vec.push(0.4);
+    mass_flowrate_kg_per_sec_vec.push(0.7);
+    mass_flowrate_kg_per_sec_vec.push(1.0);
+    mass_flowrate_kg_per_sec_vec.push(-0.2);
+    mass_flowrate_kg_per_sec_vec.push(-0.4);
+    mass_flowrate_kg_per_sec_vec.push(-0.7);
+    mass_flowrate_kg_per_sec_vec.push(-1.0);
+
+    for mass_rate_kg_per_s in mass_flowrate_kg_per_sec_vec.iter() {
+
+        use fluid_mechanics_rust::prelude::*;
+        use crate::HeaterBranch;
+
+        // get a version of heater i know is working
+        let temperature_degrees_c = 21.0;
+
+        let pump_pressure_pascals = 0.0;
+
+        let reference_heater_pressure_change = 
+            get_heater_branch_isothermal_pressure_change_pascals(
+                *mass_rate_kg_per_s,
+                temperature_degrees_c);
+
+        // get a test version of heater, the one based on traits
+
+        let heater_branch_factory = HeaterBranch::new();
+
+        let branch5 = heater_branch_factory.get_branch5();
+        let pipe4 = heater_branch_factory.get_pipe4();
+        let pipe3 = heater_branch_factory.get_pipe3();
+        let mixer10 = heater_branch_factory.get_mixer10();
+        let pipe2a = heater_branch_factory.get_pipe2a();
+        let heater_top_head_1a = heater_branch_factory.get_heater_top_head_1a();
+        let ciet_heater = heater_branch_factory.get_ciet_heater();
+        let heater_bottom_head_1b = heater_branch_factory.get_heater_bottom_head_1b();
+        let pipe18 = heater_branch_factory.get_pipe18();
+
+        let mut heater_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+        heater_branch_vector.push(&branch5);
+        heater_branch_vector.push(&pipe4);
+        heater_branch_vector.push(&pipe3);
+        heater_branch_vector.push(&mixer10);
+        heater_branch_vector.push(&pipe2a);
+        heater_branch_vector.push(&heater_top_head_1a);
+        heater_branch_vector.push(&ciet_heater);
+        heater_branch_vector.push(&heater_bottom_head_1b);
+        heater_branch_vector.push(&pipe18);
+
+        let mut heater_branch = HeaterBranch::new();
+        heater_branch.set_fluid_component_vector(heater_branch_vector);
+
+        let test_heater_pressure_change = 
+            heater_branch.get_pressure_change(
+                MassRate::new::<kilogram_per_second>(*mass_rate_kg_per_s));
+
+
+        // assert
+
+        approx::assert_relative_eq!(
+            reference_heater_pressure_change,
+            test_heater_pressure_change.value,
+            max_relative = 0.01);
+    }
+}
+
+
+extern crate fluid_mechanics_rust;
+use fluid_mechanics_rust::prelude::*;
+
+/// here is reference code from the python maturin rust
+/// opcua server
 pub fn get_ctah_branch_isothermal_pressure_change_pascals(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64,
     pump_pressure_pascals: f64) -> f64 {
 
-    extern crate fluid_mechanics_rust;
-    use fluid_mechanics_rust::prelude::*;
     //import necessary things...
     use fluid_mechanics_rust::therminol_component::factory;
     use fluid_mechanics_rust::therminol_component::CalcPressureChange;
@@ -540,5 +619,113 @@ pub fn get_ctah_branch_isothermal_pressure_change_pascals(
             mass_flowrate,
             fluid_temp);
 
+    return pressure_change_total.get::<pascal>();
+}
+
+fn get_heater_branch_isothermal_pressure_change_pascals(
+    mass_rate_kg_per_s: f64,
+    temperature_degrees_c: f64) -> f64 {
+    //import necessary things...
+    use fluid_mechanics_rust::therminol_component::factory;
+    use fluid_mechanics_rust::therminol_component::CalcPressureChange;
+
+    // fluid temp and pressure
+    let fluid_temp = ThermodynamicTemperature::new::<
+        degree_celsius>(temperature_degrees_c);
+    let mass_flowrate = MassRate::new::<
+        kilogram_per_second>(mass_rate_kg_per_s);
+
+    // let's get branch 5 and pipe 4
+    //
+    let branch_5 = factory::Branch5::get();
+    let pipe_4 = factory::Pipe4::get();
+
+    // lets get pipe 3 and static mixer 2 and pipe 2a
+    let pipe_3 = factory::Pipe3::get();
+    let mx10_2 = factory::StaticMixer10::get();
+    let pipe_2a = factory::Pipe2a::get();
+
+    // let's get the heater components 1a, 1 and 1b
+    let heater_top_head_1a =
+        factory::HeaterTopHead1a::get();
+    let heater_version_1_1 =
+        factory::CietHeaterVersion1::get();
+    let heater_bottom_head_label_1b =
+        factory::HeaterBottomHead1b::get();
+
+    // now we'll get pipe 18
+
+    let pipe_18 = factory::Pipe18::get();
+
+    // now that we've gotten our items, we can
+    // then sum up the pressure change contributions
+    // given
+
+    let mut pressure_change_total =
+        Pressure::new::<pascal>(0.0);
+
+    // branch5 and pipe4
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &branch_5,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_4,
+            mass_flowrate,
+            fluid_temp);
+
+    // pipe 3 and static mixer 2 and pipe 2a
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_3,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &mx10_2,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_2a,
+            mass_flowrate,
+            fluid_temp);
+
+    // heater
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &heater_top_head_1a,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &heater_version_1_1,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &heater_bottom_head_label_1b,
+            mass_flowrate,
+            fluid_temp);
+
+    //pipe 18
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_18,
+            mass_flowrate,
+            fluid_temp);
+
+    // convert the object to f64 and return
     return pressure_change_total.get::<pascal>();
 }
