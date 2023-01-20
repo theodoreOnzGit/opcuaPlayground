@@ -75,13 +75,13 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                               "dhx_branch_mass_flowrate_kg_per_s", 0 as f64),
                 Variable::new(&calculation_time_node, 
                               "calculation_time_s", 
-                              "calculation_time_s", 0 as u16),
+                              "calculation_time_s", 0 as f64),
                 Variable::new(&initiation_time_node, 
                               "ciet_obj_construction_time", 
-                              "ciet_obj_construction_time", 0 as u16),
+                              "ciet_obj_construction_time", 0 as f64),
                 Variable::new(&total_calc_time_node, 
                               "construction_time_plus_calc_time", 
-                              "construction_time_plus_calc_time", 0 as u16),
+                              "construction_time_plus_calc_time", 0 as f64),
             ],
             &sample_folder_id,
         );
@@ -331,7 +331,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             calculation_time_node.clone(), 
-            calc_time_taken_milleseconds as u16,
+            calc_time_taken_milleseconds as f64,
             &now, 
             &now);
 
@@ -341,7 +341,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             initiation_time_node.clone(), 
-            initiation_time_taken_millseconds as u16,
+            initiation_time_taken_millseconds as f64,
             &now, 
             &now);
 
@@ -351,7 +351,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             total_calc_time_node.clone(), 
-            total_time_taken as u16,
+            total_time_taken as f64,
             &now, 
             &now);
 
