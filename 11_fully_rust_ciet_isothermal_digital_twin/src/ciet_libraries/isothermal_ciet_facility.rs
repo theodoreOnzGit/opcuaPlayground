@@ -190,8 +190,21 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
             let heater_branch_flowrate = self.heater_branch.
                 get_mass_flowrate_from_pressure_change(pressure_change);
 
-            let dhx_branch_flowrate = self.dhx_branch.
+            let mut dhx_branch_mass_flowrate = 
+                MassRate::new::<kilogram_per_second>(0.0);
+            if test_pressure_change.value > dhx_branch_hydrostatic_pressure.value {
+
+                // check valve behaviour here, if the pressure change is more than
+                // hydrostatic pressure
+                // mass flowrate is set to zero
+                // or rather, left at zero
+            } else {
+
+            let dhx_branch_mass_flowrate = self.dhx_branch.
                 get_mass_flowrate_from_pressure_change(pressure_change);
+
+            }
+
 
             self.ctah_branch_mass_flowrate = ctah_branch_flowrate;
             self.heater_branch_mass_flowrate = heater_branch_flowrate;
