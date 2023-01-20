@@ -210,11 +210,6 @@ impl<'ctah_branch_lifetime> FluidComponentCollectionMethods for CTAHBranch<'ctah
         let fluid_component_collection_vector = 
             self.get_immutable_fluid_component_vector();
 
-        // first we get hydrostatic_pressure
-
-        let zero_mass_flow: MassRate 
-            = MassRate::new::<kilogram_per_second>(0.0);
-
 
         // i'm keeping bounds artificially low for ciet
         // -1 or +1 kg/s

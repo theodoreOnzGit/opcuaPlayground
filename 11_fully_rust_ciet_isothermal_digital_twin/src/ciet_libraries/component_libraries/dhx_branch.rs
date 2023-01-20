@@ -7,6 +7,10 @@ use crate::{
     StaticMixer20, Pipe23a, Pipe22, Flowmeter20WithHighKCheckValve, 
     Pipe21, Pipe20, Pipe19, Flowmeter20};
 
+extern crate roots;
+use roots::find_root_brent;
+use roots::SimpleConvergency;
+
 pub struct DHXBranch<'dhx_branch_lifetime> {
 
     pipe26: Pipe26,
@@ -133,16 +137,64 @@ impl<'dhx_branch_lifetime> FluidComponentCollectionMethods for DHXBranch<'dhx_br
         pressure_change: Pressure) -> MassRate{
 
 
+
         let fluid_component_collection_vector = 
             self.get_immutable_fluid_component_vector();
 
-        let mass_flowrate = 
-            <Self as FluidComponentCollectionSeriesAssociatedFunctions>
-            ::calculate_mass_flowrate_from_pressure_change(
-                pressure_change, 
+
+        // i'm keeping bounds artificially low for ciet
+        // -1 or +1 kg/s
+        let upper_bound = MassRate::new::<kilogram_per_second>(1.0);
+
+
+        let lower_bound = MassRate::new::<kilogram_per_second>(-1.0);
+
+
+        // now we have a function comparing the pressure change
+        // to the pressure change of the calculated value
+
+        let mass_flow_from_pressure_chg_root = 
+            |mass_flow_kg_per_s: f64| -> f64 {
+
+            let mass_flow_kg_per_s_double = mass_flow_kg_per_s; 
+
+            let mass_rate = 
+                MassRate::new::<kilogram_per_second>(
+                    mass_flow_kg_per_s_double);
+
+
+            let pressure_change_tested = 
+                Self::calculate_pressure_change_from_mass_flowrate(
+                mass_rate, 
                 fluid_component_collection_vector);
 
-        return mass_flowrate;
+            // now i've obtained the pressure change, i convert it to f64
+
+            let pressure_change_user_stipulated_pascals_f64 = 
+                pressure_change.value;
+
+            // since we are finding root, then we must also
+            // subtract it from our pressure change value
+
+
+            let pressure_change_error: f64 =
+                pressure_change_user_stipulated_pascals_f64 - 
+                pressure_change_tested.value;
+
+            return pressure_change_error;
+
+        };
+
+        let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+
+        let mass_flowrate_result 
+            = find_root_brent(
+                upper_bound.value,
+                lower_bound.value,
+                &mass_flow_from_pressure_chg_root,
+                &mut convergency);
+
+        return MassRate::new::<kilogram_per_second>(mass_flowrate_result.unwrap());
     }
 
 
