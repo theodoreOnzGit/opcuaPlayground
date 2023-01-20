@@ -198,7 +198,67 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         }
 
     }
-   
+    fn ciet_v1_algorithm_incomplete(&self){
+        let pressure_change = Pressure::new::<pascal>(0.0);
+        // i'm using the same algorithm from ciet digital twin v1
+
+        let pressure_change_root = 
+            |pressure_change_pascals: f64| -> f64 {
+
+                // let's get heater branch mass flowrate
+                // given the iterated pressure change
+                //
+                let test_pressure_change = 
+                    Pressure::new::<pascal>(pressure_change_pascals);
+
+                let heater_branch_mass_flowrate = 
+                    self.heater_branch.
+                    get_mass_flowrate_from_pressure_change(
+                        test_pressure_change);
+
+                let dhx_branch_mass_flowrate = 
+                    self.dhx_branch.
+                    get_mass_flowrate_from_pressure_change(
+                        test_pressure_change);
+
+                let ctah_branch_mass_flowrate = 
+                    self.ctah_branch.
+                    get_mass_flowrate_from_pressure_change(
+                        test_pressure_change);
+
+                let total_mass_flowrate = 
+                    heater_branch_mass_flowrate 
+                    + dhx_branch_mass_flowrate
+                    + ctah_branch_mass_flowrate;
+
+                return total_mass_flowrate.value;
+
+
+            };
+
+        let zero_flowrate = MassRate::new::<kilogram_per_second>(0.0);
+
+        let upper_bound = self.heater_branch.
+            get_pressure_change(zero_flowrate) +
+            Pressure::new::<pascal>(50000_f64);
+
+        let lower_bound = self.heater_branch.
+            get_pressure_change(zero_flowrate) +
+            Pressure::new::<pascal>(-50000_f64);
+
+        let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+
+        let mass_flowrate_result 
+            = find_root_brent(
+                upper_bound.value,
+                lower_bound.value,
+                &pressure_change_root,
+                &mut convergency);
+
+        //return MassRate::new::<kilogram_per_second>(
+        //    mass_flowrate_result.unwrap());
+    }
+
 
 }
 
@@ -255,64 +315,18 @@ FluidComponentCollectionMethods for CIETIsothermalFacility<'ciet_object_lifetime
         &self,
         pressure_change: Pressure) -> MassRate{
 
+        let fluid_component_collection_vector = 
+            self.get_immutable_vector();
+        
+        let mass_flowrate = 
+            <Self as FluidComponentSuperCollectionParallelAssociatedFunctions>
+            ::calculate_mass_flowrate_from_pressure_change(
+                pressure_change, 
+                fluid_component_collection_vector);
 
-        // i'm using the same algorithm from ciet digital twin v1
-        let pressure_change_root = 
-            |pressure_change_pascals: f64| -> f64 {
-
-                // let's get heater branch mass flowrate
-                // given the iterated pressure change
-                //
-                let test_pressure_change = 
-                    Pressure::new::<pascal>(pressure_change_pascals);
-
-                let heater_branch_mass_flowrate = 
-                    self.heater_branch.
-                    get_mass_flowrate_from_pressure_change(
-                        test_pressure_change);
-
-                let dhx_branch_mass_flowrate = 
-                    self.dhx_branch.
-                    get_mass_flowrate_from_pressure_change(
-                        test_pressure_change);
-
-                let ctah_branch_mass_flowrate = 
-                    self.ctah_branch.
-                    get_mass_flowrate_from_pressure_change(
-                        test_pressure_change);
-
-                let total_mass_flowrate = 
-                    heater_branch_mass_flowrate 
-                    + dhx_branch_mass_flowrate
-                    + ctah_branch_mass_flowrate;
-
-                return total_mass_flowrate.value;
-
-
-        };
-
-        let zero_flowrate = MassRate::new::<kilogram_per_second>(0.0);
-
-        let upper_bound = self.heater_branch.
-            get_pressure_change(zero_flowrate) +
-            Pressure::new::<pascal>(50000_f64);
-
-        let lower_bound = self.heater_branch.
-            get_pressure_change(zero_flowrate) +
-            Pressure::new::<pascal>(-50000_f64);
-
-        let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
-
-        let mass_flowrate_result 
-            = find_root_brent(
-                upper_bound.value,
-                lower_bound.value,
-                &pressure_change_root,
-                &mut convergency);
-
-        return MassRate::new::<kilogram_per_second>(
-            mass_flowrate_result.unwrap());
+        return mass_flowrate;
     }
+
 
 }
 
