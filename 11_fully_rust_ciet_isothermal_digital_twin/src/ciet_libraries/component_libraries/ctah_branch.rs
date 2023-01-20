@@ -5,6 +5,10 @@ use crate::{Pipe6a, StaticMixer41, CTAHVertical, CTAHHorizontal,
     Pipe8a, StaticMixer40, Pipe9, Pipe10, Pipe11, Pipe12, CTAHPump, Pipe13, Pipe14, 
     therminol_pipe::TherminolPipe, therminol_component::TherminolCustomComponent, Pipe16, Pipe15, Branch17, Flowmeter40};
 
+extern crate roots;
+use roots::find_root_brent;
+use roots::SimpleConvergency;
+
 pub struct CTAHBranch<'ctah_branch_lifetime> {
 
     pipe6a: Pipe6a, 
@@ -206,13 +210,69 @@ impl<'ctah_branch_lifetime> FluidComponentCollectionMethods for CTAHBranch<'ctah
         let fluid_component_collection_vector = 
             self.get_immutable_fluid_component_vector();
 
-        let mass_flowrate = 
+        // first we get hydrostatic_pressure
+
+        let zero_mass_flow: MassRate 
+            = MassRate::new::<kilogram_per_second>(0.0);
+
+        let hydrostatic_pressure_change = 
             <Self as FluidComponentCollectionSeriesAssociatedFunctions>
-            ::calculate_mass_flowrate_from_pressure_change(
-                pressure_change, 
+            ::calculate_pressure_change_from_mass_flowrate(
+                zero_mass_flow, 
                 fluid_component_collection_vector);
 
-        return mass_flowrate;
+        let upper_bound = hydrostatic_pressure_change + 
+            Pressure::new::<pascal>(50_000.0);
+
+
+        let lower_bound = hydrostatic_pressure_change + 
+            Pressure::new::<pascal>(-50_000.0);
+
+        // now we have a function comparing the pressure change
+        // to the pressure change of the calculated value
+
+        let mass_flow_from_pressure_chg_root = 
+            |mass_flow_kg_per_s: f64| -> f64 {
+
+            let mass_flow_kg_per_s_double = mass_flow_kg_per_s; 
+
+            let mass_rate = 
+                MassRate::new::<kilogram_per_second>(
+                    mass_flow_kg_per_s_double);
+
+
+            let pressure_change_tested = 
+                Self::calculate_pressure_change_from_mass_flowrate(
+                mass_rate, 
+                fluid_component_collection_vector);
+
+            // now i've obtained the pressure change, i convert it to f64
+
+            let pressure_change_user_stipulated_pascals_f64 = 
+                pressure_change.value;
+
+            // since we are finding root, then we must also
+            // subtract it from our pressure change value
+
+
+            let pressure_change_error: f64 =
+                pressure_change_user_stipulated_pascals_f64 - 
+                pressure_change_tested.value;
+
+            return pressure_change_error;
+
+        };
+
+        let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+
+        let mass_flowrate_result 
+            = find_root_brent(
+                upper_bound.value,
+                lower_bound.value,
+                &mass_flow_from_pressure_chg_root,
+                &mut convergency);
+
+        return MassRate::new::<kilogram_per_second>(mass_flowrate_result.unwrap());
     }
 
 

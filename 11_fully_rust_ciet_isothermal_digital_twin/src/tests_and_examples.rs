@@ -112,6 +112,11 @@ pub fn assert_ctah_behave_ok() {
             max_relative = 0.01);
     }
 
+
+    // now i want to test if the ctah branch 
+    // can handle positive, negative and zero
+    // pressure drops
+
     let mut pressure_vec_pa: Vec<f64> = vec![];
 
     pressure_vec_pa.push(0.0);
@@ -206,13 +211,25 @@ pub fn assert_ctah_behave_ok() {
             ctah_branch.get_mass_flowrate_from_pressure_change(
                 Pressure::new::<pascal>(*pressure_change_value));
 
-        let reference_ctah_pressure_change = 
+        let reference_ctah_pressure_change: f64 = 
             get_ctah_branch_isothermal_pressure_change_pascals(
                 test_ctah_mass_flowrate.value,
                 temperature_degrees_c,
                 pump_pressure_pascals);
 
         // assert
+        //
+
+        if *pressure_change_value == 0.0 {
+
+            approx::assert_abs_diff_eq!(
+                *pressure_change_value,
+                reference_ctah_pressure_change,
+                epsilon = 10.0);
+
+            return;
+        }
+
 
         approx::assert_relative_eq!(
             reference_ctah_pressure_change,
@@ -221,6 +238,127 @@ pub fn assert_ctah_behave_ok() {
 
     }
 
+    let mut pressure_vec_pa: Vec<f64> = vec![];
+
+    pressure_vec_pa.push(0.0);
+    pressure_vec_pa.push(0.2*1000.0);
+    pressure_vec_pa.push(0.4*1000.0);
+    pressure_vec_pa.push(0.7*1000.0);
+    pressure_vec_pa.push(1.0*1000.0);
+    pressure_vec_pa.push(-0.2*1000.0);
+    pressure_vec_pa.push(-0.4*1000.0);
+    pressure_vec_pa.push(-0.7*1000.0);
+    pressure_vec_pa.push(-1.0*1000.0);
+
+    for pressure_change_value in pressure_vec_pa.iter(){
+
+        use fluid_mechanics_rust::prelude::*;
+        use crate::CTAHBranch;
+
+        // get a version of ctah i know is working
+        let temperature_degrees_c = 21.0;
+
+        let pump_pressure_pascals = 1000.0;
+
+
+        // get a test version of ctah, the one based on traits
+
+        let ctah_branch_factory = CTAHBranch::new();
+        let pipe6a = ctah_branch_factory.get_pipe6a();
+        let static_mixer_41 = ctah_branch_factory.get_static_mixer_41();
+        let ctah_vertical = ctah_branch_factory.get_ctah_vertical();
+        let ctah_horizontal = ctah_branch_factory.get_ctah_horizontal();
+        let pipe_8a = ctah_branch_factory.get_pipe_8a();
+        let static_mixer_40 = ctah_branch_factory.get_static_mixer_40();
+        let pipe_9 = ctah_branch_factory.get_pipe_9();
+        let pipe_10 = ctah_branch_factory.get_pipe_10();
+        let pipe_11 = ctah_branch_factory.get_pipe_11();
+        let pipe_12 = ctah_branch_factory.get_pipe_12();
+        let pipe_13 = ctah_branch_factory.get_pipe_13();
+        let pipe_14 = ctah_branch_factory.get_pipe_14();
+        let flowmeter_40_14a = ctah_branch_factory.get_flowmeter_40_14a();
+        let pipe_15 = ctah_branch_factory.get_pipe_15();
+        let pipe_16 = ctah_branch_factory.get_pipe_16();
+        let branch_17 = ctah_branch_factory.get_branch_17();
+
+
+
+        let user_specified_pump_pressure = 
+            Pressure::new::<pascal>(pump_pressure_pascals);
+        let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
+        mutable_ctah_pump.set_internal_pressure_source(user_specified_pump_pressure);
+
+
+        let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
+        // element number: 0 
+        ctah_branch_vector.push(&pipe6a); 
+        // 1
+        ctah_branch_vector.push(&static_mixer_41);
+        // 2
+        ctah_branch_vector.push(&ctah_vertical);
+        // 3
+        ctah_branch_vector.push(&ctah_horizontal);
+        // 4
+        ctah_branch_vector.push(&pipe_8a);
+        // 5
+        ctah_branch_vector.push(&static_mixer_40);
+        // 6
+        ctah_branch_vector.push(&pipe_9);
+        // 7
+        ctah_branch_vector.push(&pipe_10);
+        // 8
+        ctah_branch_vector.push(&pipe_11);
+        // 9
+        ctah_branch_vector.push(&pipe_12);
+        // 10
+        ctah_branch_vector.push(&mutable_ctah_pump);
+        // 11
+        ctah_branch_vector.push(&pipe_13);
+        // 12
+        ctah_branch_vector.push(&pipe_14);
+        //13
+        ctah_branch_vector.push(&flowmeter_40_14a);
+        //14
+        ctah_branch_vector.push(&pipe_15);
+        //15
+        ctah_branch_vector.push(&pipe_16);
+        //16
+        ctah_branch_vector.push(&branch_17);
+
+
+        let mut ctah_branch = CTAHBranch::new();
+        ctah_branch.set_fluid_component_vector(ctah_branch_vector);
+
+        let test_ctah_mass_flowrate = 
+            ctah_branch.get_mass_flowrate_from_pressure_change(
+                Pressure::new::<pascal>(*pressure_change_value));
+
+        let reference_ctah_pressure_change: f64 = 
+            get_ctah_branch_isothermal_pressure_change_pascals(
+                test_ctah_mass_flowrate.value,
+                temperature_degrees_c,
+                pump_pressure_pascals);
+
+        // assert
+        //
+
+        if *pressure_change_value == 0.0 {
+
+            approx::assert_abs_diff_eq!(
+                *pressure_change_value,
+                reference_ctah_pressure_change,
+                epsilon = 10.0);
+
+            return;
+        }
+
+
+        approx::assert_relative_eq!(
+            reference_ctah_pressure_change,
+            pressure_change_value,
+            max_relative = 0.01);
+
+    }
 
 }
 
