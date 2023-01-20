@@ -221,6 +221,8 @@ impl<'ctah_branch_lifetime> FluidComponentCollectionMethods for CTAHBranch<'ctah
                 zero_mass_flow, 
                 fluid_component_collection_vector);
 
+        // i'm keeping bounds artificially low for ciet
+        // about 50,000 Pa plus minus the hydrostatic pressure
         let upper_bound = hydrostatic_pressure_change + 
             Pressure::new::<pascal>(50_000.0);
 

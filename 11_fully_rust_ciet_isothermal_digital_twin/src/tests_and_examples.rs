@@ -249,6 +249,10 @@ pub fn assert_ctah_behave_ok() {
     pressure_vec_pa.push(-0.4*1000.0);
     pressure_vec_pa.push(-0.7*1000.0);
     pressure_vec_pa.push(-1.0*1000.0);
+    pressure_vec_pa.push(-1.0*10000.0);
+    pressure_vec_pa.push(1.0*10000.0);
+    pressure_vec_pa.push(-1.0*1000000.0);
+    pressure_vec_pa.push(1.0*1000000.0);
 
     for pressure_change_value in pressure_vec_pa.iter(){
 
@@ -258,7 +262,7 @@ pub fn assert_ctah_behave_ok() {
         // get a version of ctah i know is working
         let temperature_degrees_c = 21.0;
 
-        let pump_pressure_pascals = 1000.0;
+        let pump_pressure_pascals = *pressure_change_value;
 
 
         // get a test version of ctah, the one based on traits
@@ -331,7 +335,7 @@ pub fn assert_ctah_behave_ok() {
 
         let test_ctah_mass_flowrate = 
             ctah_branch.get_mass_flowrate_from_pressure_change(
-                Pressure::new::<pascal>(*pressure_change_value));
+                Pressure::new::<pascal>(1000.0));
 
         let reference_ctah_pressure_change: f64 = 
             get_ctah_branch_isothermal_pressure_change_pascals(
