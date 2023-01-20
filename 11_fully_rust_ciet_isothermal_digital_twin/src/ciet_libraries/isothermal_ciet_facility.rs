@@ -97,82 +97,100 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
         (Duration,MassRate,MassRate,MassRate)
         {
 
-        let start = Instant::now();
+            // start the timer
+            let start = Instant::now();
 
-        // run function here to calculate ciet
+            // i'm using the same algorithm from ciet digital twin v1
 
-        // firstly get a function to calculate mass flowrate given the
-        // internal pressure of ctah pump
-        //
-        // we use a super collection of fluid components
-        // ie a parallel collection of three branches
-        // feed in a mass flowrate of zero
-        // and solve the equation for pressure change
+            let pressure_change_root = 
+                |pressure_change_pascals: f64| -> f64 {
 
-        
+                    // let's get heater branch mass flowrate
+                    // given the iterated pressure change
+                    //
+                    let test_pressure_change = 
+                        Pressure::new::<pascal>(pressure_change_pascals);
 
-
-        // i'll then prep the vectors
-        let ciet_branch_vectors:
-            Vec<&'ciet_collection_lifetime dyn FluidComponentCollectionMethods>
-            = vec![
-            &self.ctah_branch,
-            &self.heater_branch,
-            &self.dhx_branch ];
-
-        self.super_collection_vector_immutable.clear();
-        self.super_collection_vector_immutable = ciet_branch_vectors;
+                    let heater_branch_mass_flowrate = 
+                        self.heater_branch.
+                        get_mass_flowrate_from_pressure_change(
+                            test_pressure_change);
 
 
+                    let dhx_branch_mass_flowrate = 
+                        self.dhx_branch.
+                        get_mass_flowrate_from_pressure_change(
+                            test_pressure_change);
 
-        // (b) set the mass flowrate over the entire parallel super collection to be
-        // zero and obtain the pressure change
-        //
-        // i'm basically treating ciet's branches as one parallel collection of three
-        // branches
-        // and i'm saying the net flowrate through the branches is zero
-        
-        let zero_mass_flow = MassRate::new::<kilogram_per_second>(0.0);
+                    
+                    let ctah_branch_mass_flowrate = 
+                        self.ctah_branch.
+                        get_mass_flowrate_from_pressure_change(
+                            test_pressure_change);
+                    panic!("{:?}",test_pressure_change);
+                    let total_mass_flowrate = 
+                        heater_branch_mass_flowrate 
+                        + dhx_branch_mass_flowrate
+                        + ctah_branch_mass_flowrate;
 
-        let pressure_change = self.get_pressure_change(zero_mass_flow);
-
-
-        // second, using the pressure change we found,
-        // find the individual branch flowrates
-        // so i want concrete branch objects here 
-        // to calcualte pressure change and set the flowrates accordingly
-        // and pretty much we are done
-        //
-        // so i will be getting my branch objects and invoking the
-        // get mass flowrate function from them
-
-        let ctah_branch_flowrate = self.ctah_branch.
-            get_mass_flowrate_from_pressure_change(pressure_change);
-
-        let heater_branch_flowrate = self.heater_branch.
-            get_mass_flowrate_from_pressure_change(pressure_change);
-
-        let dhx_branch_flowrate = self.dhx_branch.
-            get_mass_flowrate_from_pressure_change(pressure_change);
-
-        self.ctah_branch_mass_flowrate = ctah_branch_flowrate;
-        self.heater_branch_mass_flowrate = heater_branch_flowrate;
-        self.dhx_branch_mass_flowrate = dhx_branch_flowrate;
+                    return total_mass_flowrate.value;
 
 
+                };
 
-        // now that i've gotten all the calculations, i can return the
-        // elapsed time to the environment
-        
+            let zero_flowrate = MassRate::new::<kilogram_per_second>(0.0);
 
-        let elapsed_time: Duration= start.elapsed();
+            let upper_bound = self.heater_branch.
+                get_pressure_change(zero_flowrate) +
+                Pressure::new::<pascal>(50000_f64);
 
-        return (elapsed_time,
-                ctah_branch_flowrate,
-                heater_branch_flowrate,
-                dhx_branch_flowrate);
+            let lower_bound = self.heater_branch.
+                get_pressure_change(zero_flowrate) +
+                Pressure::new::<pascal>(-50000_f64);
 
-    }
+
+            let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+
+            // the buggy bit...
+            let pressure_change_value 
+                = find_root_brent(
+                    upper_bound.value,
+                    lower_bound.value,
+                    &pressure_change_root,
+                    &mut convergency).unwrap();
+
+            //let pressure_change_value = 0.0;
+
+            let pressure_change = 
+                Pressure::new::<pascal>(pressure_change_value);
+
+            let ctah_branch_flowrate = self.ctah_branch.
+                get_mass_flowrate_from_pressure_change(pressure_change);
+
+            let heater_branch_flowrate = self.heater_branch.
+                get_mass_flowrate_from_pressure_change(pressure_change);
+
+            let dhx_branch_flowrate = self.dhx_branch.
+                get_mass_flowrate_from_pressure_change(pressure_change);
+
+            self.ctah_branch_mass_flowrate = ctah_branch_flowrate;
+            self.heater_branch_mass_flowrate = heater_branch_flowrate;
+            self.dhx_branch_mass_flowrate = dhx_branch_flowrate;
+
+
+
+            // now that i've gotten all the calculations, i can return the
+            // elapsed time to the environment
+
+
+            let elapsed_time: Duration= start.elapsed();
+
+            return (elapsed_time,
+                    ctah_branch_flowrate,
+                    heater_branch_flowrate,
+                    dhx_branch_flowrate);
+
+        }
 
 
     // constructor
