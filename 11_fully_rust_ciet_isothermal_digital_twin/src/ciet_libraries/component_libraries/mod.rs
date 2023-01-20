@@ -163,7 +163,7 @@ pub struct CTAHVertical {
     // also pipe isn't circular
     // so we'll have to use custom fldk to help
     // label 7a
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 /// CTAH vertical is actually an fldk type pipe
@@ -246,7 +246,7 @@ impl CTAHVertical {
     }
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -264,7 +264,7 @@ pub struct CTAHHorizontal {
     // empirical data in page 48 on pdf viewer in Dr
     // Zweibaum thesis shows reverse flow has same
     // pressure drop characteristics as forward flow
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl CTAHHorizontal {
@@ -336,7 +336,7 @@ impl CTAHHorizontal {
     }
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -346,7 +346,7 @@ impl CTAHHorizontal {
 pub struct Pipe8a {
     // pipe 8a
     // otherwise known as the static mixer pipe 8a
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe8a {
@@ -382,7 +382,7 @@ impl Pipe8a {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -395,7 +395,7 @@ impl Pipe8a {
 /// forced convection flow direction is same as top to bottom
 /// has a fldk of 21+4000/Re
 pub struct StaticMixer40 {
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl StaticMixer40 {
 
@@ -462,7 +462,7 @@ impl StaticMixer40 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -471,7 +471,7 @@ impl StaticMixer40 {
 /// pipe number 9 in CIET's CTAH branch
 pub struct Pipe9 {
     // pipe 9
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe9 {
@@ -508,7 +508,7 @@ impl Pipe9 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -517,7 +517,7 @@ impl Pipe9 {
 /// pipe number 10 in CIET's CTAH branch
 pub struct Pipe10 {
     // pipe 10
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe10 {
@@ -553,7 +553,7 @@ impl Pipe10 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -563,7 +563,7 @@ impl Pipe10 {
 /// pipe number 11 in CIET's CTAH branch
 pub struct Pipe11 {
     // pipe 11
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe11 {
@@ -599,7 +599,7 @@ impl Pipe11 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -608,7 +608,7 @@ impl Pipe11 {
 /// pipe number 12 in CIET's CTAH branch
 pub struct Pipe12 {
     // pipe 12
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe12 {
@@ -644,7 +644,7 @@ impl Pipe12 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -656,7 +656,7 @@ impl Pipe12 {
 ///
 /// it is located between pipe 12 and 13
 pub struct CTAHPump {
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl CTAHPump {
 
@@ -709,7 +709,7 @@ impl CTAHPump {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -720,7 +720,7 @@ pub struct Pipe13 {
     // pipe 13 on the diagram in Nico Zweibaum nodalisation
     // probably some combination of V-42,
     // F-40 and F-41 on CIET diagram
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe13 {
@@ -756,7 +756,7 @@ impl Pipe13 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -772,7 +772,7 @@ pub struct Pipe14 {
     //
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also 90 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe14 {
@@ -808,7 +808,7 @@ impl Pipe14 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -819,7 +819,7 @@ pub struct Flowmeter40 {
     // ctah line flowmeter 40
     // label 14a on simulation diagram
     // fldk = 18.0+93000/Re
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl Flowmeter40 {
 
@@ -889,7 +889,7 @@ impl Flowmeter40 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -903,7 +903,7 @@ pub struct Pipe15 {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also
     // -49.36983 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe15 {
@@ -939,7 +939,7 @@ impl Pipe15 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -952,7 +952,7 @@ pub struct Pipe16 {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also
     // -49.36983 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe16 {
@@ -988,7 +988,7 @@ impl Pipe16 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1008,7 +1008,7 @@ pub struct Branch17 {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is 0 degrees
     //
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Branch17 {
@@ -1044,7 +1044,7 @@ impl Branch17 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1086,7 +1086,7 @@ pub struct Branch5 {
     // i add 180 degrees so that it is
     // properly reversed in
     // inclination angle from top to bottom
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Branch5 {
@@ -1122,7 +1122,7 @@ impl Branch5 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1136,7 +1136,7 @@ pub struct Pipe4 {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also
     // 49.743387 +180.0 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe4 {
@@ -1172,7 +1172,7 @@ impl Pipe4 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1185,7 +1185,7 @@ pub struct Pipe3 {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also
     // 90.0 +180.0 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe3 {
@@ -1221,7 +1221,7 @@ impl Pipe3 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1242,7 +1242,7 @@ pub struct StaticMixer10 {
     // so from a flow perspective it is before the
     // heater
     //
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl StaticMixer10 {
 
@@ -1315,7 +1315,7 @@ impl StaticMixer10 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1330,7 +1330,7 @@ pub struct Pipe2a {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also
     // 90.0 +180.0 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe2a {
@@ -1366,7 +1366,7 @@ impl Pipe2a {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1379,7 +1379,7 @@ pub struct HeaterTopHead1a {
     //
     // inclined at 90 degrees bottom to top
     // or 90 degrees + 180 top to bottom orientation
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl HeaterTopHead1a {
@@ -1463,7 +1463,7 @@ impl HeaterTopHead1a {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1480,7 +1480,7 @@ pub struct CietHeaterVersion1 {
     //
     // inclined at 90 degrees bottom to top
     // or 90 degrees + 180 top to bottom orientation
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl CietHeaterVersion1 {
@@ -1558,7 +1558,7 @@ impl CietHeaterVersion1 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1571,7 +1571,7 @@ pub struct HeaterBottomHead1b {
     //
     // inclined at 90 degrees bottom to top
     // or 90 degrees + 180 top to bottom orientation
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl HeaterBottomHead1b {
@@ -1651,7 +1651,7 @@ impl HeaterBottomHead1b {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1663,7 +1663,7 @@ pub struct Pipe18 {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also
     // -40.00520 +180.0 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe18 {
@@ -1699,7 +1699,7 @@ impl Pipe18 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1720,7 +1720,7 @@ pub struct Pipe26 {
     // and from a top to bottom direction from pipe 5
     // to pipe 17, the incline angle is also
     // -40.00520 +180.0 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe26 {
@@ -1756,7 +1756,7 @@ impl Pipe26 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1775,7 +1775,7 @@ pub struct StaticMixer21 {
     // it such that flow going from bottom to top
     // encounters more resistance
     //
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl StaticMixer21 {
 
@@ -1847,7 +1847,7 @@ impl StaticMixer21 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -1858,7 +1858,7 @@ impl StaticMixer21 {
 pub struct Pipe25a {
     // pipe 25a
     // otherwise known as the static mixer pipe 25a
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe25a {
@@ -1895,7 +1895,7 @@ impl Pipe25a {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -1912,7 +1912,7 @@ impl Pipe25a {
 ///
 pub struct DHXShellSideHeatExchanger {
 
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl DHXShellSideHeatExchanger {
@@ -1993,7 +1993,7 @@ impl DHXShellSideHeatExchanger {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -2014,7 +2014,7 @@ impl DHXShellSideHeatExchanger {
 /// original angle is is 90 degrees
 /// but i orientate from top to bottom
 pub struct StaticMixer20 {
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl StaticMixer20 {
 
@@ -2086,7 +2086,7 @@ impl StaticMixer20 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -2096,7 +2096,7 @@ impl StaticMixer20 {
 /// otherwise known as the static mixer pipe 
 /// to MX-20
 pub struct Pipe23a {
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe23a {
@@ -2132,7 +2132,7 @@ impl Pipe23a {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -2142,7 +2142,7 @@ impl Pipe23a {
 pub struct Pipe22 {
     // pipe 22
     // otherwise known as the static mixer pipe 22
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe22 {
@@ -2178,7 +2178,7 @@ impl Pipe22 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -2197,7 +2197,7 @@ pub struct Flowmeter20 {
     //
     // That is the forward direction of flow for FM20,
     //
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl Flowmeter20 {
 
@@ -2272,7 +2272,7 @@ impl Flowmeter20 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -2301,7 +2301,7 @@ pub struct Flowmeter20WithHighKCheckValve {
     //
     // That is the forward direction of flow for FM20,
     //
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl Flowmeter20WithHighKCheckValve {
 
@@ -2388,7 +2388,7 @@ impl Flowmeter20WithHighKCheckValve {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -2396,7 +2396,7 @@ impl Flowmeter20WithHighKCheckValve {
 /// pipe 21 within CIET DHX loop
 pub struct Pipe21 {
     // pipe 21
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe21 {
@@ -2432,7 +2432,7 @@ impl Pipe21 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -2441,7 +2441,7 @@ impl Pipe21 {
 /// pipe 20 within CIET DHX loop
 pub struct Pipe20 {
     // pipe 20
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe20 {
@@ -2477,7 +2477,7 @@ impl Pipe20 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -2486,7 +2486,7 @@ impl Pipe20 {
 /// pipe 19 within CIET DHX loop
 pub struct Pipe19 {
     // pipe 19
-    therminol_properties: TherminolVP1Properties,
+    
 }
 
 impl Pipe19 {
@@ -2522,7 +2522,7 @@ impl Pipe19 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 
@@ -2541,7 +2541,7 @@ pub struct Flowmeter30 {
     // not labelled on diagram
     // we use the convention of top of bypass branch to bottom
     // hence degree is a 180-90 degrees = -90 degrees
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl Flowmeter30 {
 
@@ -2614,7 +2614,7 @@ impl Flowmeter30 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -2638,7 +2638,7 @@ impl Flowmeter30 {
 pub struct Flowmeter60 {
     // we use the convention of top of bypass branch to bottom (Tank 2)
     // hence degree is -90
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl Flowmeter60 {
 
@@ -2711,7 +2711,7 @@ impl Flowmeter60 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -2731,7 +2731,7 @@ pub struct StaticMixer60 {
     // in reality flow goes from top to
     // bottom in natural convection
     //
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl StaticMixer60 {
 
@@ -2803,7 +2803,7 @@ impl StaticMixer60 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
@@ -2822,7 +2822,7 @@ pub struct StaticMixer61 {
     // top in natural convection
     // so it is actually after the DHX from perspective of flow
     //
-    therminol_properties: TherminolVP1Properties,
+    
 }
 impl StaticMixer61 {
 
@@ -2892,7 +2892,7 @@ impl StaticMixer61 {
 
     pub fn new() -> Self {
 
-        return Self { therminol_properties: TherminolVP1Properties::new() }
+        return Self {  }
 
     }
 }
