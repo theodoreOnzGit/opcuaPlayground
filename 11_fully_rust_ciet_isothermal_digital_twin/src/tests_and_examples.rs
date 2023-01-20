@@ -439,6 +439,92 @@ pub fn assert_heater_branch_ok(){
             test_heater_pressure_change.value,
             max_relative = 0.01);
     }
+
+    // now for mass flowrate from pressure tests
+    let mut pressure_vec_pa: Vec<f64> = vec![];
+
+    pressure_vec_pa.push(0.0);
+    pressure_vec_pa.push(0.2*1000.0);
+    pressure_vec_pa.push(0.4*1000.0);
+    pressure_vec_pa.push(0.7*1000.0);
+    pressure_vec_pa.push(1.0*1000.0);
+    pressure_vec_pa.push(-0.2*1000.0);
+    pressure_vec_pa.push(-0.4*1000.0);
+    pressure_vec_pa.push(-0.7*1000.0);
+    pressure_vec_pa.push(-1.0*1000.0);
+    pressure_vec_pa.push(-1.0*10000.0);
+    pressure_vec_pa.push(1.0*10000.0);
+    pressure_vec_pa.push(-1.0*1000000.0);
+    pressure_vec_pa.push(1.0*1000000.0);
+
+    for pressure_change_value in pressure_vec_pa.iter(){
+        use fluid_mechanics_rust::prelude::*;
+        use crate::HeaterBranch;
+
+        // get a version of heater i know is working
+        let temperature_degrees_c = 21.0;
+
+
+
+        // get a test version of heater, the one based on traits
+
+        let heater_branch_factory = HeaterBranch::new();
+
+        let branch5 = heater_branch_factory.get_branch5();
+        let pipe4 = heater_branch_factory.get_pipe4();
+        let pipe3 = heater_branch_factory.get_pipe3();
+        let mixer10 = heater_branch_factory.get_mixer10();
+        let pipe2a = heater_branch_factory.get_pipe2a();
+        let heater_top_head_1a = heater_branch_factory.get_heater_top_head_1a();
+        let ciet_heater = heater_branch_factory.get_ciet_heater();
+        let heater_bottom_head_1b = heater_branch_factory.get_heater_bottom_head_1b();
+        let pipe18 = heater_branch_factory.get_pipe18();
+
+        let mut heater_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+        heater_branch_vector.push(&branch5);
+        heater_branch_vector.push(&pipe4);
+        heater_branch_vector.push(&pipe3);
+        heater_branch_vector.push(&mixer10);
+        heater_branch_vector.push(&pipe2a);
+        heater_branch_vector.push(&heater_top_head_1a);
+        heater_branch_vector.push(&ciet_heater);
+        heater_branch_vector.push(&heater_bottom_head_1b);
+        heater_branch_vector.push(&pipe18);
+
+        let mut heater_branch = HeaterBranch::new();
+        heater_branch.set_fluid_component_vector(heater_branch_vector);
+
+        let test_heater_mass_flowrate = 
+            heater_branch.
+            get_mass_flowrate_from_pressure_change(
+                Pressure::new::<pascal>(*pressure_change_value));
+
+        let reference_heater_pressure_change: f64 = 
+            get_heater_branch_isothermal_pressure_change_pascals(
+                test_heater_mass_flowrate.value,
+                temperature_degrees_c);
+
+        // assert
+        //
+
+        if *pressure_change_value == 0.0 {
+
+            approx::assert_abs_diff_eq!(
+                *pressure_change_value,
+                reference_heater_pressure_change,
+                epsilon = 10.0);
+
+            return;
+        }
+
+
+        approx::assert_relative_eq!(
+            reference_heater_pressure_change,
+            pressure_change_value,
+            max_relative = 0.01);
+
+    }
 }
 
 
