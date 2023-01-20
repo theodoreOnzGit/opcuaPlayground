@@ -366,6 +366,180 @@ pub fn assert_ctah_behave_ok() {
 
 }
 
+#[test]
+pub fn assert_dhx_branch_ok(){
+
+    let mut mass_flowrate_kg_per_sec_vec: Vec<f64> = 
+        vec![];
+
+    mass_flowrate_kg_per_sec_vec.push(0.0);
+    mass_flowrate_kg_per_sec_vec.push(0.2);
+    mass_flowrate_kg_per_sec_vec.push(0.4);
+    mass_flowrate_kg_per_sec_vec.push(0.7);
+    mass_flowrate_kg_per_sec_vec.push(1.0);
+    mass_flowrate_kg_per_sec_vec.push(-0.2);
+    mass_flowrate_kg_per_sec_vec.push(-0.4);
+    mass_flowrate_kg_per_sec_vec.push(-0.7);
+    mass_flowrate_kg_per_sec_vec.push(-1.0);
+
+    for mass_rate_kg_per_s in mass_flowrate_kg_per_sec_vec.iter() {
+
+        use fluid_mechanics_rust::prelude::*;
+        use crate::DHXBranch;
+
+        // get a version of dhx i know is working
+        let temperature_degrees_c = 21.0;
+
+
+        let reference_dhx_pressure_change = 
+            get_dhx_branch_isothermal_pressure_change_pascals(
+                *mass_rate_kg_per_s,
+                temperature_degrees_c);
+
+        // get a test version of dhx, the one based on traits
+
+        let dhx_branch_factory = DHXBranch::new();
+
+        let pipe26 = dhx_branch_factory.get_pipe26();
+        // item 25
+        let static_mixer_21 = dhx_branch_factory.get_static_mixer_21();
+        let pipe25a = dhx_branch_factory.get_pipe25a();
+        // item 24
+        let dhx_shell_side_heat_exchanger = dhx_branch_factory.get_dhx_shell_side_heat_exchanger();
+        // item 23
+        let static_mixer_20 = dhx_branch_factory.get_static_mixer_20();
+        let pipe23a = dhx_branch_factory.get_pipe23a();
+        let pipe22 = dhx_branch_factory.get_pipe22();
+        // item 21a
+        let flowmeter20 = dhx_branch_factory.get_flowmeter20();
+        let pipe21 = dhx_branch_factory.get_pipe21();
+        let pipe20 = dhx_branch_factory.get_pipe20();
+        let pipe19 = dhx_branch_factory.get_pipe19();
+
+        let mut dhx_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+        dhx_branch_vector.push(&pipe26);
+        dhx_branch_vector.push(&static_mixer_21);
+        dhx_branch_vector.push(&pipe25a);
+        dhx_branch_vector.push(&dhx_shell_side_heat_exchanger);
+        dhx_branch_vector.push(&static_mixer_20);
+        dhx_branch_vector.push(&pipe23a);
+        dhx_branch_vector.push(&pipe22);
+        dhx_branch_vector.push(&flowmeter20);
+        dhx_branch_vector.push(&pipe21);
+        dhx_branch_vector.push(&pipe20);
+        dhx_branch_vector.push(&pipe19);
+
+        let mut dhx_branch = DHXBranch::new();
+        dhx_branch.set_fluid_component_vector(dhx_branch_vector);
+
+        let test_dhx_pressure_change = 
+            dhx_branch.get_pressure_change(
+                MassRate::new::<kilogram_per_second>(*mass_rate_kg_per_s));
+
+
+        // assert
+
+        approx::assert_relative_eq!(
+            reference_dhx_pressure_change,
+            test_dhx_pressure_change.value,
+            max_relative = 0.01);
+    }
+
+    // now for mass flowrate from pressure tests
+    let mut pressure_vec_pa: Vec<f64> = vec![];
+
+    pressure_vec_pa.push(0.0);
+    pressure_vec_pa.push(0.2*1000.0);
+    pressure_vec_pa.push(0.4*1000.0);
+    pressure_vec_pa.push(0.7*1000.0);
+    pressure_vec_pa.push(1.0*1000.0);
+    pressure_vec_pa.push(-0.2*1000.0);
+    pressure_vec_pa.push(-0.4*1000.0);
+    pressure_vec_pa.push(-0.7*1000.0);
+    pressure_vec_pa.push(-1.0*1000.0);
+    pressure_vec_pa.push(-1.0*10000.0);
+    pressure_vec_pa.push(1.0*10000.0);
+    pressure_vec_pa.push(-1.0*1000000.0);
+    pressure_vec_pa.push(1.0*1000000.0);
+
+    for pressure_change_value in pressure_vec_pa.iter(){
+        use fluid_mechanics_rust::prelude::*;
+        use crate::DHXBranch;
+
+        // get a version of dhx i know is working
+        let temperature_degrees_c = 21.0;
+
+
+
+        // get a test version of dhx, the one based on traits
+
+        let dhx_branch_factory = DHXBranch::new();
+
+        let pipe26 = dhx_branch_factory.get_pipe26();
+        // item 25
+        let static_mixer_21 = dhx_branch_factory.get_static_mixer_21();
+        let pipe25a = dhx_branch_factory.get_pipe25a();
+        // item 24
+        let dhx_shell_side_heat_exchanger = dhx_branch_factory.get_dhx_shell_side_heat_exchanger();
+        // item 23
+        let static_mixer_20 = dhx_branch_factory.get_static_mixer_20();
+        let pipe23a = dhx_branch_factory.get_pipe23a();
+        let pipe22 = dhx_branch_factory.get_pipe22();
+        // item 21a
+        let flowmeter20 = dhx_branch_factory.get_flowmeter20();
+        let pipe21 = dhx_branch_factory.get_pipe21();
+        let pipe20 = dhx_branch_factory.get_pipe20();
+        let pipe19 = dhx_branch_factory.get_pipe19();
+
+        let mut dhx_branch_vector :Vec<&dyn FluidComponent> = vec![];
+
+        dhx_branch_vector.push(&pipe26);
+        dhx_branch_vector.push(&static_mixer_21);
+        dhx_branch_vector.push(&pipe25a);
+        dhx_branch_vector.push(&dhx_shell_side_heat_exchanger);
+        dhx_branch_vector.push(&static_mixer_20);
+        dhx_branch_vector.push(&pipe23a);
+        dhx_branch_vector.push(&pipe22);
+        dhx_branch_vector.push(&flowmeter20);
+        dhx_branch_vector.push(&pipe21);
+        dhx_branch_vector.push(&pipe20);
+        dhx_branch_vector.push(&pipe19);
+
+        let mut dhx_branch = DHXBranch::new();
+        dhx_branch.set_fluid_component_vector(dhx_branch_vector);
+
+        let test_dhx_mass_flowrate = 
+            dhx_branch.
+            get_mass_flowrate_from_pressure_change(
+                Pressure::new::<pascal>(*pressure_change_value));
+
+        let reference_dhx_pressure_change: f64 = 
+            get_dhx_branch_isothermal_pressure_change_pascals(
+                test_dhx_mass_flowrate.value,
+                temperature_degrees_c);
+
+        // assert
+        //
+
+        if *pressure_change_value == 0.0 {
+
+            approx::assert_abs_diff_eq!(
+                *pressure_change_value,
+                reference_dhx_pressure_change,
+                epsilon = 10.0);
+
+            return;
+        }
+
+
+        approx::assert_relative_eq!(
+            reference_dhx_pressure_change,
+            pressure_change_value,
+            max_relative = 0.01);
+
+    }
+}
 
 #[test]
 pub fn assert_heater_branch_ok(){
@@ -391,7 +565,6 @@ pub fn assert_heater_branch_ok(){
         // get a version of heater i know is working
         let temperature_degrees_c = 21.0;
 
-        let pump_pressure_pascals = 0.0;
 
         let reference_heater_pressure_change = 
             get_heater_branch_isothermal_pressure_change_pascals(
@@ -813,5 +986,124 @@ fn get_heater_branch_isothermal_pressure_change_pascals(
             fluid_temp);
 
     // convert the object to f64 and return
+    return pressure_change_total.get::<pascal>();
+}
+
+
+/// dhx branch from ciet isothermal digital twin v1
+fn get_dhx_branch_isothermal_pressure_change_pascals(
+    mass_rate_kg_per_s: f64,
+    temperature_degrees_c: f64) -> f64 {
+    use fluid_mechanics_rust::therminol_component::factory;
+    use fluid_mechanics_rust::therminol_component::CalcPressureChange;
+
+    // fluid temp and pressure
+    let fluid_temp = ThermodynamicTemperature::new::<
+        degree_celsius>(temperature_degrees_c);
+    let mass_flowrate = MassRate::new::<
+        kilogram_per_second>(mass_rate_kg_per_s);
+
+    // pipe 26, static mixer pipe 25a and static mixer 25
+    let pipe_26 = factory::Pipe26::get();
+    let mx21_25 = factory::StaticMixer21::get();
+    let pipe_25a = factory::Pipe25a::get();
+
+
+    // DHX heat exchanger
+    let dhx_shell_side_24 = factory::DHXShellSideHeatExchanger::get();
+
+
+    // static mixer pipe 23a, static mixer 23, and pipe 22
+    let mx20_23 = factory::StaticMixer20::get();
+    let pipe_23a = factory::Pipe23a::get();
+    let pipe_22 = factory::Pipe22::get();
+
+    // flowmeter 21a (FM-20)
+    let flowmeter_20_21a = factory::Flowmeter20::get();
+
+    // pipe 21 to 19
+    let pipe_21 = factory::Pipe21::get();
+    let pipe_20 = factory::Pipe20::get();
+    let pipe_19 = factory::Pipe19::get();
+
+
+    let mut pressure_change_total =
+        Pressure::new::<pascal>(0.0);
+
+    // pipe 26, static mixer pipe 25a and static mixer 25
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_26,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &mx21_25,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_25a,
+            mass_flowrate,
+            fluid_temp);
+
+    // DHX heat exchanger
+    //
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &dhx_shell_side_24,
+            mass_flowrate,
+            fluid_temp);
+
+    // static mixer pipe 23a, static mixer 23, and pipe 22
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &mx20_23,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_23a,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_22,
+            mass_flowrate,
+            fluid_temp);
+
+    // flowmeter 21a (FM-20)
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &flowmeter_20_21a,
+            mass_flowrate,
+            fluid_temp);
+
+    // pipe 21 to 19
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_21,
+            mass_flowrate,
+            fluid_temp);
+
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_20,
+            mass_flowrate,
+            fluid_temp);
+    pressure_change_total = pressure_change_total +
+        CalcPressureChange::from_mass_rate(
+            &pipe_19,
+            mass_flowrate,
+            fluid_temp);
+
+
+    // convert to f64 and return
     return pressure_change_total.get::<pascal>();
 }

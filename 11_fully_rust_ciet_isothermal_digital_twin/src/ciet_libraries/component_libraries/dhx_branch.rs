@@ -5,7 +5,7 @@ use crate::{
     therminol_pipe::TherminolPipe, therminol_component::TherminolCustomComponent, 
     Pipe26, StaticMixer21, Pipe25a, DHXShellSideHeatExchanger, 
     StaticMixer20, Pipe23a, Pipe22, Flowmeter20WithHighKCheckValve, 
-    Pipe21, Pipe20, Pipe19};
+    Pipe21, Pipe20, Pipe19, Flowmeter20};
 
 pub struct DHXBranch<'dhx_branch_lifetime> {
 
@@ -20,7 +20,7 @@ pub struct DHXBranch<'dhx_branch_lifetime> {
     pipe23a: Pipe23a,
     pipe22: Pipe22,
     // item 21a
-    flowmeter20: Flowmeter20WithHighKCheckValve,
+    flowmeter20: Flowmeter20,
     pipe21: Pipe21,
     pipe20: Pipe20,
     pipe19: Pipe19,
@@ -54,7 +54,7 @@ impl<'dhx_branch_lifetime> DHXBranch<'dhx_branch_lifetime> {
             pipe23a: Pipe23a::new(),
             pipe22: Pipe22::new(),
             // item 21a
-            flowmeter20: Flowmeter20WithHighKCheckValve::new(),
+            flowmeter20: Flowmeter20::new(),
             pipe21: Pipe21::new(),
             pipe20: Pipe20::new(),
             pipe19: Pipe19::new(),
