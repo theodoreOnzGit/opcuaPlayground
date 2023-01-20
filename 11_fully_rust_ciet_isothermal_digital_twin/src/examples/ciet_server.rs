@@ -152,6 +152,10 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let pipe_12 = ctah_branch_factory.get_pipe_12();
         let pipe_13 = ctah_branch_factory.get_pipe_13();
         let pipe_14 = ctah_branch_factory.get_pipe_14();
+        let flowmeter_40_14a = ctah_branch_factory.get_flowmeter_40_14a();
+        let pipe_15 = ctah_branch_factory.get_pipe_15();
+        let pipe_16 = ctah_branch_factory.get_pipe_16();
+        let branch_17 = ctah_branch_factory.get_branch_17();
 
         // now push them into a vector
         // step 2, find the variable using this node object
@@ -209,6 +213,14 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         ctah_branch_vector.push(&pipe_13);
         // 12
         ctah_branch_vector.push(&pipe_14);
+        //13
+        ctah_branch_vector.push(&flowmeter_40_14a);
+        //14
+        ctah_branch_vector.push(&pipe_15);
+        //15
+        ctah_branch_vector.push(&pipe_16);
+        //16
+        ctah_branch_vector.push(&branch_17);
 
         // now set the vector in the CTAHBranch Object
 
