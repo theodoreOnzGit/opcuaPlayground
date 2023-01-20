@@ -127,7 +127,7 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
                         self.ctah_branch.
                         get_mass_flowrate_from_pressure_change(
                             test_pressure_change);
-                    panic!("{:?}",test_pressure_change);
+
                     let total_mass_flowrate = 
                         heater_branch_mass_flowrate 
                         + dhx_branch_mass_flowrate

@@ -215,11 +215,6 @@ impl<'ctah_branch_lifetime> FluidComponentCollectionMethods for CTAHBranch<'ctah
         let zero_mass_flow: MassRate 
             = MassRate::new::<kilogram_per_second>(0.0);
 
-        let hydrostatic_pressure_change = 
-            <Self as FluidComponentCollectionSeriesAssociatedFunctions>
-            ::calculate_pressure_change_from_mass_flowrate(
-                zero_mass_flow, 
-                fluid_component_collection_vector);
 
         // i'm keeping bounds artificially low for ciet
         // -1 or +1 kg/s
