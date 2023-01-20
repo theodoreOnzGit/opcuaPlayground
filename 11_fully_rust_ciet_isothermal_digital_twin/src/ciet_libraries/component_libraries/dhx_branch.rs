@@ -131,7 +131,10 @@ impl<'dhx_branch_lifetime> FluidComponentCollectionMethods for DHXBranch<'dhx_br
     }
 
     /// calculates mass flowrate from pressure change
-
+    /// for dhx branch
+    ///
+    /// no check valve behaviour here
+    /// it will be put in the ciet part
     fn get_mass_flowrate_from_pressure_change(
         &self,
         pressure_change: Pressure) -> MassRate{

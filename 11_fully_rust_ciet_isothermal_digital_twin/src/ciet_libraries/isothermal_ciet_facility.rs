@@ -116,11 +116,31 @@ impl<'ciet_collection_lifetime> CIETIsothermalFacility<'ciet_collection_lifetime
                         get_mass_flowrate_from_pressure_change(
                             test_pressure_change);
 
+                    // here is where i implement the check valve behaviour
 
-                    let dhx_branch_mass_flowrate = 
+                    let dhx_branch_hydrostatic_pressure = 
                         self.dhx_branch.
-                        get_mass_flowrate_from_pressure_change(
-                            test_pressure_change);
+                        get_pressure_change(MassRate::new::<kilogram_per_second>(0.0));
+
+                    let mut dhx_branch_mass_flowrate = 
+                        MassRate::new::<kilogram_per_second>(0.0);
+
+                    if test_pressure_change.value > dhx_branch_hydrostatic_pressure.value {
+
+                        // check valve behaviour here, if the pressure change is more than
+                        // hydrostatic pressure
+                        // mass flowrate is set to zero
+                        // or rather, left at zero
+                    } else {
+
+                        dhx_branch_mass_flowrate = 
+                            self.dhx_branch.
+                            get_mass_flowrate_from_pressure_change(
+                                test_pressure_change);
+
+                    }
+
+
 
                     
                     let ctah_branch_mass_flowrate = 
