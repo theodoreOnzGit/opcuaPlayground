@@ -150,6 +150,17 @@ impl<'dhx_branch_lifetime> FluidComponentCollectionMethods for DHXBranch<'dhx_br
         let fluid_component_collection_vector = 
             self.get_immutable_fluid_component_vector();
 
+        // here is where i implement the check valve behaviour
+        let zero_flowrate = 
+            MassRate::new::<kilogram_per_second>(0.0);
+        let dhx_branch_hydrostatic_pressure = 
+            self.get_pressure_change(MassRate::new::<kilogram_per_second>(0.0));
+
+        if pressure_change.value > dhx_branch_hydrostatic_pressure.value {
+
+            return zero_flowrate;
+
+        } 
 
         // i'm keeping bounds artificially low for ciet
         // -1 or +1 kg/s
