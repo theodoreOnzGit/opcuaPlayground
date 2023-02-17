@@ -34,9 +34,28 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     let heater_branch_mass_flowrate_node = NodeId::new(ns, "heater_branch_flowrate");
     let dhx_branch_mass_flowrate_node = NodeId::new(ns, "dhx_branch_flowrate");
     let ctah_pump_pressure_node = NodeId::new(ns, "ctah_pump_pressure");
+
+
+    // Here are an additional 3 variables for calculation time
     let calculation_time_node = NodeId::new(ns, "calculation_time");
     let initiation_time_node = NodeId::new(ns, "ciet_obj_construction_time");
     let total_calc_time_node = NodeId::new(ns, "construction_time_plus_calc_time");
+
+    // And then some more variables for 
+    // (1) manometer reading error
+    // (2) loop pressure drop error due to flowrate error of 2\%
+    // (3) fldk error
+    // (4) total error (sqrt sum of them)
+    
+    let manometer_reading_error_pascals_node = NodeId::new(ns, "manometer_reading_error_pascals");
+    let loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals_node
+        = NodeId::new(ns, "loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals");
+    let loop_pressure_drop_error_due_to_fldk_pascals_node
+        = NodeId::new(ns, "loop_pressure_drop_error_due_to_fldk_pascals");
+    let loop_pressure_drop_error_total_node
+        = NodeId::new(ns, "loop_pressure_drop_error_total");
+
+
 
     let address_space = server.address_space();
 
@@ -70,6 +89,35 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                 Variable::new(&total_calc_time_node, 
                               "construction_time_plus_calc_time_ms", 
                               "construction_time_plus_calc_time_ms", 0 as f64),
+            ],
+            &sample_folder_id,
+        );
+    }
+
+    // this part is responsible for errors of pressure drop
+    {
+        let mut address_space = address_space.write();
+
+        // Create a sample folder under objects folder
+        let sample_folder_id = address_space
+            .add_folder("deviation and error", "deviation and error", &NodeId::objects_folder_id())
+            .unwrap();
+
+        // Add some variables to our sample folder. Values will be overwritten by the timer
+        let _ = address_space.add_variables(
+            vec![
+                Variable::new(&manometer_reading_error_pascals_node, 
+                              "manometer_reading_error_pascals", 
+                              "manometer_reading_error_pascals", 0 as f64),
+                Variable::new(&loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals_node, 
+                              "loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals", 
+                              "loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals", 0 as f64),
+                Variable::new(&loop_pressure_drop_error_due_to_fldk_pascals_node, 
+                              "loop_pressure_drop_error_due_to_fldk_pascals", 
+                              "loop_pressure_drop_error_due_to_fldk_pascals", 0 as f64),
+                Variable::new(&loop_pressure_drop_error_total_node, 
+                              "loop_pressure_drop_error_total", 
+                              "loop_pressure_drop_error_total", 0 as f64),
             ],
             &sample_folder_id,
         );
@@ -132,7 +180,8 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
         let mut address_space = address_space.write();
         
-        // step 1, find the correct node object
+        // step 1, find the correct node object for 
+        // pump pressure
         let ctah_pump_node = ctah_pump_pressure_node.clone();
         let pump_pressure_value = address_space.
             get_variable_value(ctah_pump_node).unwrap();
@@ -141,7 +190,8 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             value.unwrap().as_f64().unwrap();
 
         let ciet_temp_deg_c: f64 = 20.0;
-
+        // step 2 calculate mass flowrate for ctah,
+        // heater and dhx branch
         let (ctah_branch_flowrate,
              ctah_branch_pressure_change) = 
             get_ciet_isothermal_mass_flowrate(
@@ -159,7 +209,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                 ctah_branch_pressure_change.value,
                 ciet_temp_deg_c);
 
-
+        // step 3, calc time
         let calc_time = start_of_calc_time.elapsed();
 
 
@@ -167,6 +217,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let calc_time_taken_milleseconds: u16 = 
             calc_time.as_millis().try_into().unwrap();
 
+        // step 4, update values into nodes
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             calculation_time_node.clone(), 
@@ -192,8 +243,6 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             total_time_taken as f64,
             &now, 
             &now);
-
-        // step 7 let's put in our flowrate values
 
         
         let now = DateTime::now();
