@@ -47,7 +47,8 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     // (3) fldk error
     // (4) total error (sqrt sum of them)
     
-    let manometer_reading_error_pascals_node = NodeId::new(ns, "manometer_reading_error_pascals");
+    let manometer_reading_error_pascals_node 
+        = NodeId::new(ns, "manometer_reading_error_pascals");
     let loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals_node
         = NodeId::new(ns, "loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals");
     let loop_pressure_drop_error_due_to_fldk_pascals_node
