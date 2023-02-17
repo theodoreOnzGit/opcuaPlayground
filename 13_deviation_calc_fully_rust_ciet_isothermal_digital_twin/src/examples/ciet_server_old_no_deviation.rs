@@ -34,28 +34,9 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     let heater_branch_mass_flowrate_node = NodeId::new(ns, "heater_branch_flowrate");
     let dhx_branch_mass_flowrate_node = NodeId::new(ns, "dhx_branch_flowrate");
     let ctah_pump_pressure_node = NodeId::new(ns, "ctah_pump_pressure");
-
-
-    // Here are an additional 3 variables for calculation time
     let calculation_time_node = NodeId::new(ns, "calculation_time");
     let initiation_time_node = NodeId::new(ns, "ciet_obj_construction_time");
     let total_calc_time_node = NodeId::new(ns, "construction_time_plus_calc_time");
-
-    // And then some more variables for 
-    // (1) manometer reading error
-    // (2) loop pressure drop error due to flowrate error of 2\%
-    // (3) fldk error
-    // (4) total error (sqrt sum of them)
-    
-    let manometer_reading_error_pascals_node = NodeId::new(ns, "manometer_reading_error_pascals");
-    let loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals_node
-        = NodeId::new(ns, "loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals");
-    let loop_pressure_drop_error_due_to_fldk_pascals_node
-        = NodeId::new(ns, "loop_pressure_drop_error_due_to_fldk_pascals");
-    let loop_pressure_drop_error_total_node
-        = NodeId::new(ns, "loop_pressure_drop_error_total");
-
-
 
     let address_space = server.address_space();
 
@@ -89,35 +70,6 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                 Variable::new(&total_calc_time_node, 
                               "construction_time_plus_calc_time_ms", 
                               "construction_time_plus_calc_time_ms", 0 as f64),
-            ],
-            &sample_folder_id,
-        );
-    }
-
-    // this part is responsible for errors of pressure drop
-    {
-        let mut address_space = address_space.write();
-
-        // Create a sample folder under objects folder
-        let sample_folder_id = address_space
-            .add_folder("deviation and error", "deviation and error", &NodeId::objects_folder_id())
-            .unwrap();
-
-        // Add some variables to our sample folder. Values will be overwritten by the timer
-        let _ = address_space.add_variables(
-            vec![
-                Variable::new(&manometer_reading_error_pascals_node, 
-                              "manometer_reading_error_pascals", 
-                              "manometer_reading_error_pascals", 0 as f64),
-                Variable::new(&loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals_node, 
-                              "loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals", 
-                              "loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals", 0 as f64),
-                Variable::new(&loop_pressure_drop_error_due_to_fldk_pascals_node, 
-                              "loop_pressure_drop_error_due_to_fldk_pascals", 
-                              "loop_pressure_drop_error_due_to_fldk_pascals", 0 as f64),
-                Variable::new(&loop_pressure_drop_error_total_node, 
-                              "loop_pressure_drop_error_total", 
-                              "loop_pressure_drop_error_total", 0 as f64),
             ],
             &sample_folder_id,
         );
@@ -180,8 +132,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
         let mut address_space = address_space.write();
         
-        // step 1, find the correct node object for 
-        // pump pressure
+        // step 1, find the correct node object
         let ctah_pump_node = ctah_pump_pressure_node.clone();
         let pump_pressure_value = address_space.
             get_variable_value(ctah_pump_node).unwrap();
@@ -190,8 +141,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             value.unwrap().as_f64().unwrap();
 
         let ciet_temp_deg_c: f64 = 20.0;
-        // step 2 calculate mass flowrate for ctah,
-        // heater and dhx branch
+
         let (ctah_branch_flowrate,
              ctah_branch_pressure_change) = 
             get_ciet_isothermal_mass_flowrate(
@@ -209,14 +159,14 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                 ctah_branch_pressure_change.value,
                 ciet_temp_deg_c);
 
-        // step 3, calc time
+
         let calc_time = start_of_calc_time.elapsed();
+
 
 
         let calc_time_taken_milleseconds: u16 = 
             calc_time.as_millis().try_into().unwrap();
 
-        // step 4, update values into nodes
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             calculation_time_node.clone(), 
@@ -243,6 +193,8 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             &now, 
             &now);
 
+        // step 7 let's put in our flowrate values
+
         
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
@@ -262,79 +214,6 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let _ = address_space.set_variable_value(
             dhx_branch_mass_flowrate_node.clone(), 
             dhx_branch_flowrate as f64,
-            &now, 
-            &now);
-
-        // step 5, calculate errors and print
-
-        //(1) 2\% flowrate error
-        let two_percent_flowrate_error_ctah_heater_only_flow = 
-            get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                Pressure::new::<pascal>(pump_pressure_value),
-                0.02);
-
-        let now = DateTime::now();
-        let _ = address_space.set_variable_value(
-            loop_pressure_drop_error_due_to_coriolis_flowmeter_pascals_node.clone(), 
-            two_percent_flowrate_error_ctah_heater_only_flow.value as f64,
-            &now, 
-            &now);
-
-        //(2) 14.7 Pa manometer error
-        let manometer_reading_error_pascals = 
-            get_manometer_reading_error_pascals();
-
-        let now = DateTime::now();
-        let _ = address_space.set_variable_value(
-            manometer_reading_error_pascals_node.clone(), 
-            manometer_reading_error_pascals.value as f64,
-            &now, 
-            &now);
-
-        //(3) 10\% fldk error
-
-        let fldk_error_pascals_squared = 
-            get_fldk_error_pascals_ctah_branch(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                0.10)
-            * get_fldk_error_pascals_ctah_branch(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                0.10)
-            + get_fldk_error_pascals_heater_branch(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                0.10)
-            * get_fldk_error_pascals_heater_branch(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                0.10);
-
-        let fldk_error_pascals = 
-            fldk_error_pascals_squared.sqrt();
-
-        let now = DateTime::now();
-        let _ = address_space.set_variable_value(
-            loop_pressure_drop_error_due_to_fldk_pascals_node.clone(), 
-            fldk_error_pascals.value as f64,
-            &now, 
-            &now);
-
-        //(4) total error
-
-        let total_pressure_error_estimate_pascals_squared = 
-            two_percent_flowrate_error_ctah_heater_only_flow * 
-            two_percent_flowrate_error_ctah_heater_only_flow
-            + manometer_reading_error_pascals *
-            manometer_reading_error_pascals
-            + fldk_error_pascals_squared;
-
-        let total_pressure_error_estimate = 
-            total_pressure_error_estimate_pascals_squared.sqrt();
-
-
-        let now = DateTime::now();
-        let _ = address_space.set_variable_value(
-            loop_pressure_drop_error_total_node.clone(), 
-            total_pressure_error_estimate.value as f64,
             &now, 
             &now);
 
@@ -431,255 +310,6 @@ fn get_ip_as_str() -> String {
     return ip_add_string;
 
 }
-
-fn get_manometer_reading_error_pascals() -> Pressure {
-    // this is the error of
-    //
-    // sqrt(1mm^2 + 1mm^2) of dowtherm A at 20C
-    return Pressure::new::<pascal>(14.7);
-}
-
-fn get_fldk_error_pascals_ctah_branch(mass_flowrate: MassRate,
-    error_fraction: f64) -> Pressure {
-
-    //import necessary things...
-    use fluid_mechanics_rust::therminol_component::factory;
-    use fluid_mechanics_rust::prelude::*;
-    use fluid_mechanics_rust::therminol_component::CalcPressureChange;
-
-    let temperature_degrees_c: f64 = 20.0;
-    // for this, we are taking a blanket 10\% error
-    // but we can customise the error fraction
-    // for all components along the CTAH Heater loop
-    let fluid_temp = ThermodynamicTemperature::new::<
-        degree_celsius>(temperature_degrees_c);
-
-    let zero_mass_flow = 
-        MassRate::new::<kilogram_per_second>(0.0);
-
-
-    let mx10_2 = factory::StaticMixer10::get();
-
-    let heater_version_1_1 =
-        factory::CietHeaterVersion1::get();
-
-
-
-    //MX41
-    let static_mixer_41_6 = factory::StaticMixer41::get();
-
-    // let's get the component for ctah
-    // only the horizontal bit has experimentally determined
-    // fldk values
-    let ctah_horizontal_7b = factory::CTAHHorizontal::get();
-
-    // MX40
-    let static_mixer_40_8 = factory::StaticMixer40::get();
-
-    // let's get flowmeter 14a
-    let flowmeter_40_14a = factory::Flowmeter40::get();
-
-    // now that we've gotten our items, we can
-    // then sum up the pressure change contributions
-    // given
-
-
-
-    // static mixer 41 pressure
-
-    let pressure_drop_mx41 =
-        CalcPressureChange::from_mass_rate(
-            &static_mixer_41_6,
-            mass_flowrate,
-            fluid_temp) - 
-        CalcPressureChange::from_mass_rate(
-            &static_mixer_41_6,
-            zero_mass_flow,
-            fluid_temp);
-
-
-    // ctah pressure drop
-
-    let pressure_drop_ctah = 
-        CalcPressureChange::from_mass_rate(
-            &ctah_horizontal_7b,
-            mass_flowrate,
-            fluid_temp) 
-        - CalcPressureChange::from_mass_rate(
-            &ctah_horizontal_7b,
-            zero_mass_flow,
-            fluid_temp);
-
-    // static mixer 40 pressure
-    let pressure_drop_mx40 =
-        CalcPressureChange::from_mass_rate(
-            &static_mixer_40_8,
-            mass_flowrate,
-            fluid_temp) - 
-        CalcPressureChange::from_mass_rate(
-            &static_mixer_40_8,
-            zero_mass_flow,
-            fluid_temp);
-
-    // fm40 pressure drop
-    let pressure_drop_fm40 =
-        CalcPressureChange::from_mass_rate(
-            &flowmeter_40_14a,
-            mass_flowrate,
-            fluid_temp) - 
-        CalcPressureChange::from_mass_rate(
-            &flowmeter_40_14a,
-            zero_mass_flow,
-            fluid_temp);
-
-
-    // now we calculate the sum of squares
-    let pressure_sq_deviation = 
-        (error_fraction * pressure_drop_mx41) * (error_fraction * pressure_drop_mx41)
-        + (error_fraction * pressure_drop_mx40) * (error_fraction * pressure_drop_mx40)
-        + (error_fraction * pressure_drop_fm40) * (error_fraction * pressure_drop_fm40)
-        + (error_fraction * pressure_drop_ctah) * (error_fraction * pressure_drop_ctah);
-
-    let pressure_deviation_heater_branch = 
-        pressure_sq_deviation.sqrt();
-
-    // convert the object to f64 and return
-    return pressure_deviation_heater_branch;
-}
-
-fn get_fldk_error_pascals_heater_branch(mass_flowrate: MassRate,
-    error_fraction: f64) -> Pressure {
-
-    //import necessary things...
-    use fluid_mechanics_rust::therminol_component::factory;
-    use fluid_mechanics_rust::prelude::*;
-    use fluid_mechanics_rust::therminol_component::CalcPressureChange;
-
-    let temperature_degrees_c: f64 = 20.0;
-    // for this, we are taking a blanket 10\% error
-    // but we can customise the error fraction
-    // for all components along the CTAH Heater loop
-    let fluid_temp = ThermodynamicTemperature::new::<
-        degree_celsius>(temperature_degrees_c);
-
-    let zero_mass_flow = 
-        MassRate::new::<kilogram_per_second>(0.0);
-
-
-    let mx10_2 = factory::StaticMixer10::get();
-
-    let heater_version_1_1 =
-        factory::CietHeaterVersion1::get();
-
-
-
-    // now that we've gotten our items, we can
-    // then sum up the pressure change contributions
-    // given
-
-
-
-    // static mixer 2 pressure
-
-    let pressure_drop_mx10 =
-        CalcPressureChange::from_mass_rate(
-            &mx10_2,
-            mass_flowrate,
-            fluid_temp) - 
-        CalcPressureChange::from_mass_rate(
-            &mx10_2,
-            zero_mass_flow,
-            fluid_temp);
-
-
-    // heater
-
-    let pressure_drop_heater = 
-        CalcPressureChange::from_mass_rate(
-            &heater_version_1_1,
-            mass_flowrate,
-            fluid_temp) 
-        - CalcPressureChange::from_mass_rate(
-            &heater_version_1_1,
-            zero_mass_flow,
-            fluid_temp);
-
-    // now we calculate the sum of squares
-    let pressure_sq_deviation = 
-        (error_fraction * pressure_drop_mx10) * (error_fraction * pressure_drop_mx10)
-        + (error_fraction * pressure_drop_heater) * (error_fraction * pressure_drop_heater);
-
-    let pressure_deviation_heater_branch = 
-        pressure_sq_deviation.sqrt();
-
-    // convert the object to f64 and return
-    return pressure_deviation_heater_branch;
-}
-
-fn get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
-    mass_flowrate: MassRate,
-    ctah_pump_pressure: Pressure,
-    error_fraction: f64) -> Pressure {
-
-    // convert to f64
-    let x_value = mass_flowrate.value;
-    let x_error = x_value*error_fraction;
-    let temperature_degrees_c: f64 = 20.0;
-    let pump_pressure_pascals = ctah_pump_pressure.value;
-
-
-    // first, we compute a finite difference 
-    // we use the ctah branch flowrate as the function with
-    // which to perform sensitivity analysis
-    //
-    // on the loop pressure drop
-    let x_upper = x_value + x_error;
-    let x_lower = x_value - x_error;
-
-    // loop pressure drop calcs
-    //
-    // we go from top to bottom of ctah and heater branch
-    // when calculating pressure chg
-    // flow goes top of branch to bottom
-    //
-    // to make it go in a loop,
-    // we need to make the mass flowrate be positive
-    // in one branch and negative in the other
-    //
-    // then to find the pressure drop after going through a loop
-    // we need to trace from top to bottom of ctah branch
-    // and bottom to top of heater branch
-    let y_upper  = 
-        get_ctah_branch_isothermal_pressure_change_pascals(
-            x_upper,
-            temperature_degrees_c,
-            pump_pressure_pascals) -
-        get_heater_branch_isothermal_pressure_change_pascals(
-            -x_upper,
-            temperature_degrees_c);
-
-
-
-    let y_lower = 
-        get_ctah_branch_isothermal_pressure_change_pascals(
-            x_lower,
-            temperature_degrees_c,
-            pump_pressure_pascals) -
-        get_heater_branch_isothermal_pressure_change_pascals(
-            -x_lower,
-            temperature_degrees_c);
-
-    let gradient_estimate = 
-        (y_upper - y_lower)/(x_upper - x_lower);
-
-    let deviation_estimate_pascals = 
-        x_error * gradient_estimate;
-
-    // now lets return the pressure error
-    return Pressure::new::<pascal>(deviation_estimate_pascals);
-
-}
-
 
 fn get_dhx_branch_isothermal_pressure_change_pascals(
     mass_rate_kg_per_s: f64,

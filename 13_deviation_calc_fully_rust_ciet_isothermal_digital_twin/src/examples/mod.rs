@@ -46,6 +46,10 @@ pub use example8::*;
 pub mod ciet_server;
 pub use ciet_server::*;
 
+/// legacy ciet server without uncertainty
+pub mod ciet_server_old_no_deviation;
+pub use ciet_server_old_no_deviation::*;
+
 /// legacy ciet server with uncertainty
 pub mod ciet_server_old_with_deviation;
 pub use ciet_server_old_with_deviation::*;
