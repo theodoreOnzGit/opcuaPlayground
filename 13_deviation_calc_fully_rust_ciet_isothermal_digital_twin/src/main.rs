@@ -17,7 +17,8 @@ pub mod ciet_libraries;
 pub use ciet_libraries::*;
 
 
-use crate::examples::ciet_server::construct_and_run_ciet_server;
+use crate::examples::ciet_server;
+use crate::examples::ciet_server_old_with_deviation;
 
 
 fn main() {
@@ -36,7 +37,8 @@ fn main() {
 
 
 
-    // construct_and_run_ciet_server(run_server);
+    // ciet_server::construct_and_run_ciet_server(run_server);
+    ciet_server_old_with_deviation::construct_and_run_ciet_server(run_server);
 
 }
 
