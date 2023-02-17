@@ -12,6 +12,8 @@ use crate::CIETIsothermalFacility;
 use crate::CTAHBranch;
 use crate::DHXBranch;
 use crate::HeaterBranch;
+use roots::find_root_brent;
+use roots::SimpleConvergency;
 
 /// In this example, we use the legacy ciet server codes used in maturin
 /// to generate the results
@@ -581,6 +583,180 @@ fn get_dhx_branch_isothermal_pressure_change_pascals(
 
     // convert to f64 and return
     return pressure_change_total.get::<pascal>();
+}
+
+fn get_heater_branch_mass_flowrate(
+        pressure_change_pascals: f64,
+        temperature_degrees_c: f64) -> f64 {
+
+    // basically im solving for the mass rate which
+    // returns the correct pressure change
+    let upper_bound = MassRate::new::<kilogram_per_second>(1.0);
+    let lower_bound = MassRate::new::<kilogram_per_second>(-1.0);
+
+    let heater_pressure_chg_root = |mass_rate_kg_per_s: f64| -> f64 {
+
+        return get_heater_branch_isothermal_pressure_change_pascals(
+            mass_rate_kg_per_s,
+            temperature_degrees_c) - pressure_change_pascals;
+    };
+
+    let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+
+    let mass_flowrate_kg_per_s_solution = find_root_brent(
+        upper_bound.value,
+        lower_bound.value,
+        &heater_pressure_chg_root,
+        &mut convergency).unwrap();
+
+    return mass_flowrate_kg_per_s_solution;
+}
+
+
+fn get_ctah_branch_mass_flowrate(
+        pressure_change_pascals: f64,
+        temperature_degrees_c: f64,
+        pump_pressure_pascals: f64) -> f64 {
+
+    let upper_bound = MassRate::new::<kilogram_per_second>(1.0);
+    let lower_bound = MassRate::new::<kilogram_per_second>(-1.0);
+    // basically im solving for the mass rate which
+    // returns the correct pressure change
+    let ctah_pressure_chg_root = |
+            mass_rate_kg_per_s: f64| -> f64  {
+        return get_ctah_branch_isothermal_pressure_change_pascals(
+                mass_rate_kg_per_s,
+                temperature_degrees_c,
+                pump_pressure_pascals) - pressure_change_pascals;
+            };
+
+    let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+    let mass_flowrate_kg_per_s_solution = find_root_brent(
+        upper_bound.value,
+        lower_bound.value,
+        &ctah_pressure_chg_root,
+        &mut convergency).unwrap();
+
+    return mass_flowrate_kg_per_s_solution;
+
+}
+
+
+fn get_dhx_branch_mass_flowrate(
+        pressure_change_pascals: f64,
+        temperature_degrees_c: f64 ) -> f64 {
+
+    //# first let's check for reverse flow and return 0
+    //# flow if reverse, it's computationally cheaper
+    // here is where i implement the check valve behaviour
+    let zero_mass_flow_value: f64 = 0.0;
+    let hydrostatic_pressure = 
+        get_dhx_branch_isothermal_pressure_change_pascals(
+            zero_mass_flow_value,
+            temperature_degrees_c);
+
+    if pressure_change_pascals > hydrostatic_pressure {
+        return 0.0;
+    }
+
+    let upper_bound = MassRate::new::<kilogram_per_second>(1.0);
+    let lower_bound = MassRate::new::<kilogram_per_second>(-1.0);
+    //# basically im solving for the mass rate which
+    //# returns the correct pressure change
+    let dhx_pressure_chg_root = | mass_rate_kg_per_s:f64 | -> f64 {
+            return get_dhx_branch_isothermal_pressure_change_pascals(
+                mass_rate_kg_per_s,
+                temperature_degrees_c) - pressure_change_pascals;
+        };
+
+    let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+    let mass_flowrate_kg_per_s_solution = find_root_brent(
+        upper_bound.value,
+        lower_bound.value,
+        &dhx_pressure_chg_root,
+        &mut convergency).unwrap();
+
+    return mass_flowrate_kg_per_s_solution;
+}
+
+//# these methods solve for mass flowrate given a pump pressure
+//# and system temperature
+
+
+fn get_ciet_isothermal_mass_flowrate(
+        pump_pressure_pascals: f64,
+        temperature_degrees_c: f64) -> f64 {
+    //# the job of this function is to sum up the mass
+    //# flowrate of the branches in ciet
+    //# and solve for the value where the branch flowrates
+    //# sum up to zero
+    //# the convention is positive flowrate leaving the
+    //# top and negative flowrate entering the top
+
+    let pressure_change_root = |pressure_change_pascals: f64| -> f64 {
+        //# both branches must be subject to the same
+        //# pressure change since they are in parallel
+
+        let heater_branch_mass_flowrate = get_heater_branch_mass_flowrate(
+                        pressure_change_pascals,
+                        temperature_degrees_c);
+
+        let dhx_branch_mass_flowrate = get_dhx_branch_mass_flowrate(
+                        pressure_change_pascals,
+                        temperature_degrees_c);
+
+        let ctah_branch_mass_flowrate = get_ctah_branch_mass_flowrate(
+                pressure_change_pascals,
+                temperature_degrees_c,
+                pump_pressure_pascals);
+
+        let total_mass_flowrate = 
+            heater_branch_mass_flowrate
+            + dhx_branch_mass_flowrate
+            + ctah_branch_mass_flowrate;
+
+        return total_mass_flowrate;
+    };
+
+    //# we will solve for the correct pressure change
+    //# given the mass flowrate
+    //# the intervals will be 50000 pascals plus or minus
+    //# the hydrostatic pressure change of the heater
+    let zero_mass_flow_value = 0.0;
+    let hydrostatic_pressure = 
+        get_dhx_branch_isothermal_pressure_change_pascals(
+            zero_mass_flow_value,
+            temperature_degrees_c);
+
+    let upper_bound = 
+        hydrostatic_pressure +
+        Pressure::new::<pascal>(50000_f64).value;
+
+    let lower_bound = 
+        hydrostatic_pressure +
+        Pressure::new::<pascal>(-50000_f64).value;
+
+
+    let mut convergency = SimpleConvergency { eps:1e-9_f64, max_iter:30 };
+
+
+    let pressure_change_value 
+        = find_root_brent(
+            upper_bound,
+            lower_bound,
+            &pressure_change_root,
+            &mut convergency).unwrap();
+
+    //# once we get the pressure change root value,
+    //# we can get mass flowrate
+
+    let ctah_branch_mass_flowrate = get_ctah_branch_mass_flowrate(
+            pressure_change_value,
+            temperature_degrees_c,
+            pump_pressure_pascals);
+
+
+    return ctah_branch_mass_flowrate;
 }
 
 fn get_heater_branch_isothermal_pressure_change_pascals(
