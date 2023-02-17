@@ -1,6 +1,7 @@
 //use std::time;
 use std::time::Instant;
 
+use opcua::server::address_space;
 #[warn(missing_docs)]
 use opcua::server::prelude::*;
 use local_ip_address::local_ip;
@@ -35,6 +36,10 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     let dhx_branch_mass_flowrate_node = NodeId::new(ns, "dhx_branch_flowrate");
     let ctah_pump_pressure_node = NodeId::new(ns, "ctah_pump_pressure");
 
+    // I'll have another two here to close off the Heater and DHX branch respectively
+
+    let heater_branch_valve_node = NodeId::new(ns, "heater_branch_valve_open");
+    let dhx_branch_valve_node = NodeId::new(ns, "dhx_branch_valve_open");
 
     // Here are an additional 3 variables for calculation time
     let calculation_time_node = NodeId::new(ns, "calculation_time");
@@ -140,6 +145,22 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             .writable()
             .organized_by(&folder_id)
             .insert(&mut address_space);
+
+        VariableBuilder::new(&heater_branch_valve_node,
+                             "heater_branch_valve_open", "heater_branch_valve_open")
+            .data_type(DataTypeId::Boolean)
+            .value(true as bool)
+            .writable()
+            .organized_by(&folder_id)
+            .insert(&mut address_space);
+
+        VariableBuilder::new(&dhx_branch_valve_node,
+                             "dhx_branch_valve_open", "dhx_branch_valve_open")
+            .data_type(DataTypeId::Boolean)
+            .value(true as bool)
+            .writable()
+            .organized_by(&folder_id)
+            .insert(&mut address_space);
     }
 
 
@@ -182,13 +203,27 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let mut address_space = address_space.write();
         
         // step 1, find the correct node object for 
-        // pump pressure
+        // pump pressure and the
+        // boolean for valve control open or close
         let ctah_pump_node = ctah_pump_pressure_node.clone();
         let pump_pressure_value = address_space.
             get_variable_value(ctah_pump_node).unwrap();
-
         let pump_pressure_value: f64 = pump_pressure_value.
             value.unwrap().as_f64().unwrap();
+
+        // now for heater valve and dhx valve
+        let heater_valve_open = address_space.
+            get_variable_value(heater_branch_valve_node.clone()).unwrap();
+        //let heater_valve_open: bool = 
+        //    heater_valve_open.value.unwrap().try_into::<bool>().unwrap();
+        let heater_valve_open = true;
+
+        let dhx_valve_open = address_space.
+            get_variable_value(dhx_branch_valve_node.clone()).unwrap();
+        //let dhx_valve_open: bool = 
+        //    dhx_valve_open.value.unwrap().try_into::<bool>().unwrap();
+        let dhx_valve_open = true;
+        
 
         let ciet_temp_deg_c: f64 = 20.0;
         // step 2 calculate mass flowrate for ctah,
@@ -197,18 +232,22 @@ pub fn construct_and_run_ciet_server(run_server: bool){
              ctah_branch_pressure_change) = 
             get_ciet_isothermal_mass_flowrate(
                 pump_pressure_value,
-                ciet_temp_deg_c
+                ciet_temp_deg_c,
+                dhx_valve_open,
+                heater_valve_open
                 );
 
         let heater_branch_flowrate = 
             get_heater_branch_mass_flowrate(
                 ctah_branch_pressure_change.value,
-                ciet_temp_deg_c);
+                ciet_temp_deg_c,
+                heater_valve_open);
 
         let dhx_branch_flowrate = 
             get_dhx_branch_mass_flowrate(
                 ctah_branch_pressure_change.value,
-                ciet_temp_deg_c);
+                ciet_temp_deg_c,
+                dhx_valve_open);
 
         // step 3, calc time
         let calc_time = start_of_calc_time.elapsed();
@@ -802,7 +841,12 @@ fn get_dhx_branch_isothermal_pressure_change_pascals(
 
 fn get_heater_branch_mass_flowrate(
         pressure_change_pascals: f64,
-        temperature_degrees_c: f64) -> f64 {
+        temperature_degrees_c: f64,
+        heater_branch_valve_open: bool) -> f64 {
+
+    if heater_branch_valve_open == false {
+        return 0.0;
+    }
 
     // basically im solving for the mass rate which
     // returns the correct pressure change
@@ -859,8 +903,12 @@ fn get_ctah_branch_mass_flowrate(
 
 fn get_dhx_branch_mass_flowrate(
         pressure_change_pascals: f64,
-        temperature_degrees_c: f64 ) -> f64 {
+        temperature_degrees_c: f64,
+        dhx_branch_valve_open: bool) -> f64 {
 
+    if dhx_branch_valve_open == false {
+        return 0.0;
+    }
     //# first let's check for reverse flow and return 0
     //# flow if reverse, it's computationally cheaper
     // here is where i implement the check valve behaviour
@@ -900,7 +948,9 @@ fn get_dhx_branch_mass_flowrate(
 
 fn get_ciet_isothermal_mass_flowrate(
         pump_pressure_pascals: f64,
-        temperature_degrees_c: f64) -> (f64,Pressure) {
+        temperature_degrees_c: f64,
+        dhx_branch_valve_open: bool,
+        heater_branch_valve_open: bool) -> (f64,Pressure) {
     //# the job of this function is to sum up the mass
     //# flowrate of the branches in ciet
     //# and solve for the value where the branch flowrates
@@ -914,11 +964,13 @@ fn get_ciet_isothermal_mass_flowrate(
 
         let heater_branch_mass_flowrate = get_heater_branch_mass_flowrate(
                         pressure_change_pascals,
-                        temperature_degrees_c);
+                        temperature_degrees_c,
+                        heater_branch_valve_open);
 
         let dhx_branch_mass_flowrate = get_dhx_branch_mass_flowrate(
                         pressure_change_pascals,
-                        temperature_degrees_c);
+                        temperature_degrees_c,
+                        dhx_branch_valve_open);
 
         let ctah_branch_mass_flowrate = get_ctah_branch_mass_flowrate(
                 pressure_change_pascals,
