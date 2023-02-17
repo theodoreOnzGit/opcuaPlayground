@@ -130,35 +130,10 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
         // construct CIET
         let start_of_object_init = Instant::now();
+        let initiation_duration = start_of_object_init.elapsed();
 
-        // here i will start storing all of ciet's component objects
-        // and constructing them into vectors
-        //
-        // firstly, the ctah branch
+        let start_of_calc_time = Instant::now();
 
-        let ctah_branch_factory = CTAHBranch::new();
-        let pipe6a = ctah_branch_factory.get_pipe6a();
-        let static_mixer_41 = ctah_branch_factory.get_static_mixer_41();
-        let ctah_vertical = ctah_branch_factory.get_ctah_vertical();
-        let ctah_horizontal = ctah_branch_factory.get_ctah_horizontal();
-        let pipe_8a = ctah_branch_factory.get_pipe_8a();
-        let static_mixer_40 = ctah_branch_factory.get_static_mixer_40();
-        let pipe_9 = ctah_branch_factory.get_pipe_9();
-        let pipe_10 = ctah_branch_factory.get_pipe_10();
-        let pipe_11 = ctah_branch_factory.get_pipe_11();
-        let pipe_12 = ctah_branch_factory.get_pipe_12();
-        let pipe_13 = ctah_branch_factory.get_pipe_13();
-        let pipe_14 = ctah_branch_factory.get_pipe_14();
-        let flowmeter_40_14a = ctah_branch_factory.get_flowmeter_40_14a();
-        let pipe_15 = ctah_branch_factory.get_pipe_15();
-        let pipe_16 = ctah_branch_factory.get_pipe_16();
-        let branch_17 = ctah_branch_factory.get_branch_17();
-
-        // now push them into a vector
-        // step 2, find the variable using this node object
-        // first let's get the address space
-        // i want to first set my ciet ctah branch pressure to the user specified
-        // value
         let mut address_space = address_space.write();
         
         // step 1, find the correct node object
@@ -166,156 +141,32 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let pump_pressure_value = address_space.
             get_variable_value(ctah_pump_node).unwrap();
 
-        // let's try setting ctah branch pressure to the user specified value
-        //
-        // This is basically how you set ctah pump pressure... kind of cumbersome
-        // but oh well
-
-        // step 3, convert variable value into f64
         let pump_pressure_value: f64 = pump_pressure_value.
             value.unwrap().as_f64().unwrap();
 
-        // step 4 convert f64 to Pressure
-        let user_specified_pump_pressure = 
-            Pressure::new::<pascal>(pump_pressure_value);
+        let ciet_temp_deg_c: f64 = 20.0;
 
-        let mut mutable_ctah_pump = ctah_branch_factory.get_ctah_pump();
-        mutable_ctah_pump.set_internal_pressure_source(user_specified_pump_pressure);
+        let (ctah_branch_flowrate,
+             ctah_branch_pressure_change) = 
+            get_ciet_isothermal_mass_flowrate(
+                pump_pressure_value,
+                ciet_temp_deg_c
+                );
 
-        let mut ctah_branch_vector :Vec<&dyn FluidComponent> = vec![];
+        let heater_branch_flowrate = 
+            get_heater_branch_mass_flowrate(
+                ctah_branch_pressure_change.value,
+                ciet_temp_deg_c);
 
-        // element number: 0 
-        ctah_branch_vector.push(&pipe6a); 
-        // 1
-        ctah_branch_vector.push(&static_mixer_41);
-        // 2
-        ctah_branch_vector.push(&ctah_vertical);
-        // 3
-        ctah_branch_vector.push(&ctah_horizontal);
-        // 4
-        ctah_branch_vector.push(&pipe_8a);
-        // 5
-        ctah_branch_vector.push(&static_mixer_40);
-        // 6
-        ctah_branch_vector.push(&pipe_9);
-        // 7
-        ctah_branch_vector.push(&pipe_10);
-        // 8
-        ctah_branch_vector.push(&pipe_11);
-        // 9
-        ctah_branch_vector.push(&pipe_12);
-        // 10
-        ctah_branch_vector.push(&mutable_ctah_pump);
-        // 11
-        ctah_branch_vector.push(&pipe_13);
-        // 12
-        ctah_branch_vector.push(&pipe_14);
-        //13
-        ctah_branch_vector.push(&flowmeter_40_14a);
-        //14
-        ctah_branch_vector.push(&pipe_15);
-        //15
-        ctah_branch_vector.push(&pipe_16);
-        //16
-        ctah_branch_vector.push(&branch_17);
-
-        // now set the vector in the CTAHBranch Object
-
-        let mut ctah_branch = CTAHBranch::new();
-        ctah_branch.set_fluid_component_vector(ctah_branch_vector);
-
-        // now for the heater branch
-
-        let heater_branch_factory = HeaterBranch::new();
-
-        let branch5 = heater_branch_factory.get_branch5();
-        let pipe4 = heater_branch_factory.get_pipe4();
-        let pipe3 = heater_branch_factory.get_pipe3();
-        let mixer10 = heater_branch_factory.get_mixer10();
-        let pipe2a = heater_branch_factory.get_pipe2a();
-        let heater_top_head_1a = heater_branch_factory.get_heater_top_head_1a();
-        let ciet_heater = heater_branch_factory.get_ciet_heater();
-        let heater_bottom_head_1b = heater_branch_factory.get_heater_bottom_head_1b();
-        let pipe18 = heater_branch_factory.get_pipe18();
-
-        let mut heater_branch_vector :Vec<&dyn FluidComponent> = vec![];
-
-        heater_branch_vector.push(&branch5);
-        heater_branch_vector.push(&pipe4);
-        heater_branch_vector.push(&pipe3);
-        heater_branch_vector.push(&mixer10);
-        heater_branch_vector.push(&pipe2a);
-        heater_branch_vector.push(&heater_top_head_1a);
-        heater_branch_vector.push(&ciet_heater);
-        heater_branch_vector.push(&heater_bottom_head_1b);
-        heater_branch_vector.push(&pipe18);
-
-        let mut heater_branch = HeaterBranch::new();
-        heater_branch.set_fluid_component_vector(heater_branch_vector);
-
-        // last but not least the dhx branch
-        let dhx_branch_factory = DHXBranch::new();
-
-        let pipe26 = dhx_branch_factory.get_pipe26();
-        // item 25
-        let static_mixer_21 = dhx_branch_factory.get_static_mixer_21();
-        let pipe25a = dhx_branch_factory.get_pipe25a();
-        // item 24
-        let dhx_shell_side_heat_exchanger = dhx_branch_factory.get_dhx_shell_side_heat_exchanger();
-        // item 23
-        let static_mixer_20 = dhx_branch_factory.get_static_mixer_20();
-        let pipe23a = dhx_branch_factory.get_pipe23a();
-        let pipe22 = dhx_branch_factory.get_pipe22();
-        // item 21a
-        let flowmeter20 = dhx_branch_factory.get_flowmeter20();
-        let pipe21 = dhx_branch_factory.get_pipe21();
-        let pipe20 = dhx_branch_factory.get_pipe20();
-        let pipe19 = dhx_branch_factory.get_pipe19();
-
-        let mut dhx_branch_vector :Vec<&dyn FluidComponent> = vec![];
-
-        dhx_branch_vector.push(&pipe26);
-        dhx_branch_vector.push(&static_mixer_21);
-        dhx_branch_vector.push(&pipe25a);
-        dhx_branch_vector.push(&dhx_shell_side_heat_exchanger);
-        dhx_branch_vector.push(&static_mixer_20);
-        dhx_branch_vector.push(&pipe23a);
-        dhx_branch_vector.push(&pipe22);
-        dhx_branch_vector.push(&flowmeter20);
-        dhx_branch_vector.push(&pipe21);
-        dhx_branch_vector.push(&pipe20);
-        dhx_branch_vector.push(&pipe19);
-
-        let mut dhx_branch = DHXBranch::new();
-        dhx_branch.set_fluid_component_vector(dhx_branch_vector);
-
-        // now we are ready for ciet
-
-        let mut ciet_isothermal_facility = 
-        CIETIsothermalFacility::new(ctah_branch, heater_branch, dhx_branch);
-
-        let initiation_duration = start_of_object_init.elapsed();
+        let dhx_branch_flowrate = 
+            get_dhx_branch_mass_flowrate(
+                ctah_branch_pressure_change.value,
+                ciet_temp_deg_c);
 
 
-
-        // step 5, set the pump pressure to the correct value
-        // and calculate everything
-        //
-
-        
-        // need to mutably borrow ciet and return the mutable borrow
-        let (calc_time,
-             ctah_branch_flowrate,
-             heater_branch_flowrate,
-             dhx_branch_flowrate)
-             = ciet_isothermal_facility.calculate();
-
-        // this mutable ctah pump cannot be used safely
-        // as it cannot be shared between threads
+        let calc_time = start_of_calc_time.elapsed();
 
 
-
-        // step 6 set the time variable
 
         let calc_time_taken_milleseconds: u16 = 
             calc_time.as_millis().try_into().unwrap();
@@ -336,7 +187,6 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             initiation_time_taken_millseconds as f64,
             &now, 
             &now);
-
         let total_time_taken: u16 =
             calc_time_taken_milleseconds + initiation_time_taken_millseconds;
 
@@ -353,21 +203,21 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             ctah_branch_mass_flowrate_node.clone(), 
-            ctah_branch_flowrate.value as f64,
+            ctah_branch_flowrate as f64,
             &now, 
             &now);
 
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             heater_branch_mass_flowrate_node.clone(), 
-            heater_branch_flowrate.value as f64,
+            heater_branch_flowrate as f64,
             &now, 
             &now);
 
         let now = DateTime::now();
         let _ = address_space.set_variable_value(
             dhx_branch_mass_flowrate_node.clone(), 
-            dhx_branch_flowrate.value as f64,
+            dhx_branch_flowrate as f64,
             &now, 
             &now);
 
@@ -391,7 +241,6 @@ pub fn construct_and_run_ciet_server(run_server: bool){
     // otherwise it will print twice as often
 
     if run_server { server.run(); }
-
 
 }
 
@@ -446,7 +295,6 @@ fn build_standard_server() -> Server {
 
     let server_builder = 
         server_builder.endpoints(my_endpoints);
-
 
     // then we build the server
 
@@ -685,7 +533,7 @@ fn get_dhx_branch_mass_flowrate(
 
 fn get_ciet_isothermal_mass_flowrate(
         pump_pressure_pascals: f64,
-        temperature_degrees_c: f64) -> f64 {
+        temperature_degrees_c: f64) -> (f64,Pressure) {
     //# the job of this function is to sum up the mass
     //# flowrate of the branches in ciet
     //# and solve for the value where the branch flowrates
@@ -756,7 +604,8 @@ fn get_ciet_isothermal_mass_flowrate(
             pump_pressure_pascals);
 
 
-    return ctah_branch_mass_flowrate;
+    return (ctah_branch_mass_flowrate,
+            Pressure::new::<pascal>(pressure_change_value));
 }
 
 fn get_heater_branch_isothermal_pressure_change_pascals(
