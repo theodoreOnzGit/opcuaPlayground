@@ -12,5 +12,5 @@ pub mod ciet_server_old_with_deviation;
 pub use ciet_server_old_with_deviation::*;
 
 /// common ciet funcitons so that we don't have to keep them in one big file
-pub mod ciet_common_functions;
-pub use ciet_common_functions::*;
+pub mod ciet_functions_for_deviation_calcs;
+pub use ciet_functions_for_deviation_calcs::*;
