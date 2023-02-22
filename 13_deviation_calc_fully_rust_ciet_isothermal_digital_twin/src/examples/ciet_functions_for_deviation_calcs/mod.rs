@@ -1,7 +1,13 @@
+/// Deviation functions
+pub mod deviation_functions;
+pub use deviation_functions::*;
+
 use fluid_mechanics_rust::prelude::*;
 use roots::find_root_brent;
 use roots::SimpleConvergency;
 
+/// obtains pressure change over dhx branch
+/// returns f64 which is python friendly
 pub fn get_dhx_branch_isothermal_pressure_change_pascals(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64) -> f64 {
@@ -120,6 +126,11 @@ pub fn get_dhx_branch_isothermal_pressure_change_pascals(
     return pressure_change_total.get::<pascal>();
 }
 
+/// obtains mass flowrate over heater branch
+/// returns f64 which is python friendly
+///
+/// also requires you to define if the valve in this
+/// branch is opened or closed
 pub fn get_heater_branch_mass_flowrate(
         pressure_change_pascals: f64,
         temperature_degrees_c: f64,
@@ -153,6 +164,11 @@ pub fn get_heater_branch_mass_flowrate(
 }
 
 
+/// obtains mass flowrate over ctah branch
+/// returns f64 which is python friendly
+///
+/// also requires you to define if the valve in this
+/// branch is opened or closed
 pub fn get_ctah_branch_mass_flowrate(
         pressure_change_pascals: f64,
         temperature_degrees_c: f64,
@@ -187,6 +203,11 @@ pub fn get_ctah_branch_mass_flowrate(
 }
 
 
+/// obtains mass flowrate over dhx branch
+/// returns f64 which is python friendly
+///
+/// also requires you to define if the valve in this
+/// branch is opened or closed
 pub fn get_dhx_branch_mass_flowrate(
         pressure_change_pascals: f64,
         temperature_degrees_c: f64,
@@ -232,6 +253,14 @@ pub fn get_dhx_branch_mass_flowrate(
 //# and system temperature
 
 
+/// obtains mass flowrate over ctah branch (FM-40)
+/// returns f64 which is python friendly
+///
+/// also requires you to define if the valve in this
+/// branch is opened or closed
+///
+/// will also return the pressure change over each branch 
+/// to the environment
 pub fn get_ciet_isothermal_mass_flowrate(
         pump_pressure_pascals: f64,
         temperature_degrees_c: f64,
@@ -316,6 +345,9 @@ pub fn get_ciet_isothermal_mass_flowrate(
             Pressure::new::<pascal>(pressure_change_value));
 }
 
+/// obtains pressure change over heater branch 
+/// returns f64 which is python friendly
+///
 pub fn get_heater_branch_isothermal_pressure_change_pascals(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64) -> f64 {
@@ -425,6 +457,9 @@ pub fn get_heater_branch_isothermal_pressure_change_pascals(
 //
 
 
+/// obtains hydrostatic pressure change over heater branch 
+/// returns f64 which is python friendly
+///
 pub fn get_heater_branch_isothermal_hydrostatic_pressure_pascals(
     temperature_degrees_c: f64) -> f64 {
     //import necessary things...
@@ -519,8 +554,10 @@ pub fn get_heater_branch_isothermal_hydrostatic_pressure_pascals(
     return hydrostatic_pressure_change_total.get::<pascal>();
 }
 
-// get ctah branch pressure
 
+/// obtains pressure change over ctah branch
+/// returns f64 which is python friendly
+///
 pub fn get_ctah_branch_isothermal_pressure_change_pascals(
     mass_rate_kg_per_s: f64,
     temperature_degrees_c: f64,
