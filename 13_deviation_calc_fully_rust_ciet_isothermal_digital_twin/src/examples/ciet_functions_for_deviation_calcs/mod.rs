@@ -156,7 +156,12 @@ pub fn get_heater_branch_mass_flowrate(
 pub fn get_ctah_branch_mass_flowrate(
         pressure_change_pascals: f64,
         temperature_degrees_c: f64,
-        pump_pressure_pascals: f64) -> f64 {
+        pump_pressure_pascals: f64,
+        ctah_branch_valve_open: bool) -> f64 {
+
+    if ctah_branch_valve_open == false {
+        return 0.0;
+    }
 
     let upper_bound = MassRate::new::<kilogram_per_second>(1.0);
     let lower_bound = MassRate::new::<kilogram_per_second>(-1.0);
@@ -231,7 +236,8 @@ pub fn get_ciet_isothermal_mass_flowrate(
         pump_pressure_pascals: f64,
         temperature_degrees_c: f64,
         dhx_branch_valve_open: bool,
-        heater_branch_valve_open: bool) -> (f64,Pressure) {
+        heater_branch_valve_open: bool,
+        ctah_branch_valve_open: bool) -> (f64,Pressure) {
     //# the job of this function is to sum up the mass
     //# flowrate of the branches in ciet
     //# and solve for the value where the branch flowrates
@@ -256,7 +262,8 @@ pub fn get_ciet_isothermal_mass_flowrate(
         let ctah_branch_mass_flowrate = get_ctah_branch_mass_flowrate(
                 pressure_change_pascals,
                 temperature_degrees_c,
-                pump_pressure_pascals);
+                pump_pressure_pascals,
+                ctah_branch_valve_open);
 
         let total_mass_flowrate = 
             heater_branch_mass_flowrate
@@ -301,7 +308,8 @@ pub fn get_ciet_isothermal_mass_flowrate(
     let ctah_branch_mass_flowrate = get_ctah_branch_mass_flowrate(
             pressure_change_value,
             temperature_degrees_c,
-            pump_pressure_pascals);
+            pump_pressure_pascals,
+            ctah_branch_valve_open);
 
 
     return (ctah_branch_mass_flowrate,

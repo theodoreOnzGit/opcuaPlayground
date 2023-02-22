@@ -37,6 +37,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
     let heater_branch_valve_node = NodeId::new(ns, "heater_branch_valve_open");
     let dhx_branch_valve_node = NodeId::new(ns, "dhx_branch_valve_open");
+    let ctah_branch_valve_node = NodeId::new(ns, "ctah_branch_valve_open");
 
     // Here are an additional 3 variables for calculation time
     let calculation_time_node = NodeId::new(ns, "calculation_time");
@@ -158,6 +159,14 @@ pub fn construct_and_run_ciet_server(run_server: bool){
             .writable()
             .organized_by(&folder_id)
             .insert(&mut address_space);
+
+        VariableBuilder::new(&ctah_branch_valve_node,
+                             "ctah_branch_valve_open", "ctah_branch_valve_open")
+            .data_type(DataTypeId::Boolean)
+            .value(true as bool)
+            .writable()
+            .organized_by(&folder_id)
+            .insert(&mut address_space);
     }
 
 
@@ -208,7 +217,8 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let pump_pressure_value: f64 = pump_pressure_value.
             value.unwrap().as_f64().unwrap();
 
-        // now for heater valve and dhx valve
+        // now for heater valve, ctah valve and dhx valve
+        // control
         let heater_valve_open = address_space.
             get_variable_value(heater_branch_valve_node.clone()).unwrap();
         let heater_valve_open = 
@@ -236,6 +246,10 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let dhx_valve_open = address_space.
             get_variable_value(dhx_branch_valve_node.clone()).unwrap().value.unwrap();
         let dhx_valve_open:bool = match_true_false(dhx_valve_open);
+
+        let ctah_valve_open = address_space.
+            get_variable_value(ctah_branch_valve_node.clone()).unwrap().value.unwrap();
+        let ctah_valve_open:bool = match_true_false(ctah_valve_open);
         
 
         let ciet_temp_deg_c: f64 = 20.0;
@@ -247,7 +261,8 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                 pump_pressure_value,
                 ciet_temp_deg_c,
                 dhx_valve_open,
-                heater_valve_open
+                heater_valve_open,
+                ctah_valve_open
                 );
 
         let heater_branch_flowrate = 
