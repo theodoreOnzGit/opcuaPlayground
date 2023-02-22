@@ -211,15 +211,31 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         // now for heater valve and dhx valve
         let heater_valve_open = address_space.
             get_variable_value(heater_branch_valve_node.clone()).unwrap();
-        //let heater_valve_open: bool = 
-        //    heater_valve_open.value.unwrap().try_into::<bool>().unwrap();
-        let heater_valve_open = true;
+        let heater_valve_open = 
+            heater_valve_open.value.unwrap();
+
+        // this is an opcua Variant::Boolean 
+        // we can use a match statement to extract true or false values
+        // kind of a clunky way but it can work
+
+        fn match_true_false(opcua_bool: Variant) -> bool{
+
+            match opcua_bool {
+                Variant::Boolean(true) => return true,
+                Variant::Boolean(false) => return false,
+                // for all other types, throw an error,
+                _ => panic!("value must be true or false"),
+            }
+
+        }
+
+        let heater_valve_open: bool =
+            match_true_false(heater_valve_open);
+        
 
         let dhx_valve_open = address_space.
-            get_variable_value(dhx_branch_valve_node.clone()).unwrap();
-        //let dhx_valve_open: bool = 
-        //    dhx_valve_open.value.unwrap().try_into::<bool>().unwrap();
-        let dhx_valve_open = true;
+            get_variable_value(dhx_branch_valve_node.clone()).unwrap().value.unwrap();
+        let dhx_valve_open:bool = match_true_false(dhx_valve_open);
         
 
         let ciet_temp_deg_c: f64 = 20.0;
