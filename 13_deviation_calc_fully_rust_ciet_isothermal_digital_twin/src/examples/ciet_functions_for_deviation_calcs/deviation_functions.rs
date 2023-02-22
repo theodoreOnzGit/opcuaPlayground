@@ -5,7 +5,9 @@ use super::*;
 
 /// Loop pressure drop error due to 
 /// ctah and heater branch in one loop
-pub fn get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
+///
+/// this only works if DHX loop is closed
+pub fn get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater_specific(
     mass_flowrate: MassRate,
     ctah_pump_pressure: Pressure,
     error_fraction: f64) -> Pressure {
@@ -33,7 +35,7 @@ pub fn get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
     //
     // to make it go in a loop,
     // we need to make the mass flowrate be positive
-    // in one branch and negative in the other
+    ///// in one branch and negative in the other
     //
     // then to find the pressure drop after going through a loop
     // we need to trace from top to bottom of ctah branch
@@ -68,6 +70,78 @@ pub fn get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
     return Pressure::new::<pascal>(deviation_estimate_pascals);
 
 }
+
+/// Loop pressure drop error due only to CTAH loop and Heater Loop
+///
+/// This should work regardless of whether the DHX and Heater
+/// or CTAH is valved on or off
+pub fn get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
+    mass_flowrate: MassRate,
+    ctah_pump_pressure: Pressure,
+    error_fraction: f64) -> Pressure {
+
+
+    // convert to f64
+    let x_value = mass_flowrate.value;
+    let x_error = x_value*error_fraction;
+    let temperature_degrees_c: f64 = 20.0;
+    let pump_pressure_pascals = ctah_pump_pressure.value;
+
+
+    // first, we compute a finite difference 
+    // we use the ctah branch flowrate as the function with
+    // which to perform sensitivity analysis
+    //
+    // on the loop pressure drop
+    let x_upper = x_value + x_error;
+    let x_lower = x_value - x_error;
+
+    // loop pressure drop calcs
+    //
+    // we go from top to bottom of ctah and heater branch
+    // when calculating pressure chg
+    // flow goes top of branch to bottom
+    //
+    // to make it go in a loop,
+    // we need to make the mass flowrate be positive
+    ///// in one branch and negative in the other
+    //
+    // then to find the pressure drop after going through a loop
+    // we need to trace from top to bottom of ctah branch
+    // and bottom to top of heater branch
+    let y_upper  = 
+        get_ctah_branch_isothermal_pressure_change_pascals(
+            x_upper,
+            temperature_degrees_c,
+            pump_pressure_pascals) -
+        get_heater_branch_isothermal_pressure_change_pascals(
+            -x_upper,
+            temperature_degrees_c);
+
+
+
+    let y_lower = 
+        get_ctah_branch_isothermal_pressure_change_pascals(
+            x_lower,
+            temperature_degrees_c,
+            pump_pressure_pascals) -
+        get_heater_branch_isothermal_pressure_change_pascals(
+            -x_lower,
+            temperature_degrees_c);
+
+    let gradient_estimate = 
+        (y_upper - y_lower)/(x_upper - x_lower);
+
+    let deviation_estimate_pascals = 
+        x_error * gradient_estimate;
+
+    // now lets return the pressure error
+    return Pressure::new::<pascal>(deviation_estimate_pascals);
+
+}
+
+
+
 
 
 /// returns manometer reading error obtained
