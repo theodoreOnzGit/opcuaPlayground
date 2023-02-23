@@ -379,13 +379,13 @@ pub fn construct_and_run_ciet_server(run_server: bool){
                 0.10)
             * get_fldk_error_pascals_ctah_branch(
                 MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                0.10)
-            + get_fldk_error_pascals_heater_branch(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                0.10)
-            * get_fldk_error_pascals_heater_branch(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
                 0.10);
+            //+ get_fldk_error_pascals_heater_branch(
+            //    MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
+            //    0.10)
+            //* get_fldk_error_pascals_heater_branch(
+            //    MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
+            //    0.10);
 
         let fldk_error_pascals = 
             fldk_error_pascals_squared.sqrt();
