@@ -137,7 +137,7 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
 
         VariableBuilder::new(&ctah_pump_pressure_node, 
-                             "ctah_branch_pressure_pa", "ctah_branch_pressure_pa")
+                             "ctah_pump_pressure_pa", "ctah_pump_pressure_pa")
             .data_type(DataTypeId::Float)
             .value(0 as f64)
             .writable()
@@ -336,11 +336,22 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         // step 5, calculate errors and print
 
         //(1) 2\% flowrate error
+        //let two_percent_flowrate_error_ctah_heater_only_flow = 
+        //    get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
+        //        MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
+        //        Pressure::new::<pascal>(pump_pressure_value),
+        //        0.02);
+
         let two_percent_flowrate_error_ctah_heater_only_flow = 
-            get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
-                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-                Pressure::new::<pascal>(pump_pressure_value),
+            parameterically_estimate_ctah_loop_pressure_drop_error_due_to_flowrate(
+                MassRate::new::<kilogram_per_second>(ctah_branch_flowrate), 
+                Pressure::new::<pascal>(pump_pressure_value), 
+                heater_valve_open, 
+                dhx_valve_open, 
+                ctah_valve_open, 
+                20.0, // temperature degrees C
                 0.02);
+
 
         let now = DateTime::now();
         let _ = address_space.set_variable_value(

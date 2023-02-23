@@ -140,6 +140,213 @@ pub fn get_loop_pressure_drop_error_due_to_flowmeter_ctah_heater(
 
 }
 
+/// The algorithm here does a few things
+/// to help ctah obtain the estimated loop pressure drop
+/// regardless of parallel connections
+///
+/// Firstly, mass flowrate through CTAH is supplied,
+/// That will give a pressure change value across ctah branch
+///
+/// using this pressure change value, calculate mass flowrates
+/// across the DHX and Heater branch flow paths
+///
+/// after that, i can calculate the mass flowrate in the ctah branch
+/// simple addition.
+///
+/// Thereafter, i can calculate the pressure change across the ctah
+/// branch assuming ctah pump pressure or loop pressure drop equals zero
+/// 
+/// This will yield some pressure change
+/// The difference between this pressure change and the actual pressure
+/// change used to obtain the flowrates across the other two branches
+/// will become the ctah pump pressure at operating point
+///
+/// This will yield a mass flowrate through the ctah (m1) and a ctah
+/// pump pressure (p1). This p1 should equal the ctah pump pressure
+/// that was supplied
+///
+/// repeat this for another two data points sets by increasing and decreasing
+/// the loop pressure drop by some small value. eg 10 Pa or 50 Pa.
+///
+/// of course, if mass flowrate is zero or close to zero, then we 
+/// just return zero for the error. How close? Depends how far we deviate 
+/// pressure.
+///
+/// Otherwise, we will be having check valve behaviour issues
+/// The ideal amount for 10 Pa seems to be 0.0004 kg/s
+/// 
+/// I manually tested if it works compared to the code that
+/// works for single branch.
+///
+/// It works. (2:35pm 23 feb 2023);
+///
+pub fn parameterically_estimate_ctah_loop_pressure_drop_error_due_to_flowrate(
+    ctah_branch_mass_flowrate: MassRate,
+    ctah_pump_pressure: Pressure,
+    heater_branch_valve_open: bool,
+    dhx_branch_valve_open: bool,
+    ctah_branch_valve_open: bool,
+    temperature_degrees_c: f64,
+    error_fraction: f64) -> Pressure {
+
+    // check if mass flowrate value is less than 0.0004 kg/s 
+    // if so, return 0 Pa (negligible pressure error)
+    // this is the amount of deviation expected for 10 Pa
+    // of pressure 
+    //
+    // 10 Pa is the branch pressure change I will use 
+    // for finite differencing.
+    if ctah_branch_mass_flowrate.value.abs() <= 0.0004_f64 {
+        return Pressure::new::<pascal>(0.0);
+    }
+
+    if ctah_branch_valve_open == false {
+        return Pressure::new::<pascal>(0.0);
+    }
+    // now let me obtain the branch pressure change for the
+    // fixed ctah_branch_mass_flowrate
+
+    // now we get the standard ctah branch pressure change
+    let ctah_branch_pressure_change_pascals = 
+        get_ctah_branch_isothermal_pressure_change_pascals(
+            ctah_branch_mass_flowrate.value,
+            temperature_degrees_c,
+            ctah_pump_pressure.value);
+
+    // we can then apply this pressure change to other branches
+
+    let heater_branch_mass_flowrate: f64 =
+        get_heater_branch_mass_flowrate(
+            ctah_branch_pressure_change_pascals, 
+            temperature_degrees_c, 
+            heater_branch_valve_open);
+
+    let dhx_branch_mass_flowrate: f64 = 
+        get_dhx_branch_mass_flowrate(
+            ctah_branch_pressure_change_pascals, 
+            temperature_degrees_c, 
+            dhx_branch_valve_open);
+
+    let mass_conservation_error: f64 = 
+        ctah_branch_mass_flowrate.value
+        + heater_branch_mass_flowrate
+        + dhx_branch_mass_flowrate;
+
+    if mass_conservation_error >= 0.0004_f64 {
+        panic!("mass conservation not fulfilled for error measurement");
+    }
+    // the first part was merely validation, just wanted to check
+    // if the errors were within tolerance
+    // now we can vary the branch pressure parametrically
+
+    let branch_pressure_increased = 
+        ctah_branch_pressure_change_pascals + 10.0;
+
+    let branch_pressure_decreased = 
+        ctah_branch_pressure_change_pascals - 10.0;
+
+    // from the increased branch pressure, i want
+    // to obtain a set of data: mass flowrate through ctah
+    // and then the corresponding ctah_pump_pressure 
+    // i will just nest a function here
+
+    fn obtain_mass_flowrate_and_ctah_loop_pressure_drop_pair(
+        branch_pressure_change_pascals: f64,
+        temperature_degrees_c: f64,
+        heater_branch_valve_open: bool,
+        dhx_branch_valve_open: bool,
+        ctah_branch_valve_open: bool) -> (MassRate, Pressure) {
+        // step 1, obtain mass flowrate for dhx and heater branch
+
+        let heater_branch_flowrate_kg_per_s: f64
+            = get_heater_branch_mass_flowrate(
+                branch_pressure_change_pascals, 
+                temperature_degrees_c, 
+                heater_branch_valve_open);
+
+        let dhx_branch_mass_flowrate_kg_per_s: f64 
+            = get_dhx_branch_mass_flowrate(
+                branch_pressure_change_pascals, 
+                temperature_degrees_c, 
+                dhx_branch_valve_open);
+
+        // now obtain mass flowrate for ctah_branch
+        // normally 
+        // mass flowrate formula is like this
+        //
+        // ctah_mass_flow + dhx_mass_flow + heater_mass_flow = 0
+        // 
+        // so ctah_mass_flow = -(dhx_mass_flow + heater_mass_flow)
+
+        let ctah_branch_mass_flowrate_kg_per_s: f64
+            = -(heater_branch_flowrate_kg_per_s
+                + dhx_branch_mass_flowrate_kg_per_s);
+
+        // we can feed this into the ctah branch pressure change
+
+        // if ctah branch valve is closed, we should not be calling this function
+
+        if ctah_branch_valve_open == false {
+            panic!("ctah valve should be open for mass flow calcs");
+        }
+
+
+        let ctah_branch_pressure_change_without_pump_pascals: f64 
+            = get_ctah_branch_isothermal_pressure_change_pascals(
+                ctah_branch_mass_flowrate_kg_per_s, 
+                temperature_degrees_c, 
+                0.0);
+
+        // now we can estimate the loop pressure drop change using
+        // the actual ctah branch pressure change
+        // minus the pressure change without pump
+        //
+        // This is because
+        // pressure change = - pressure drop + hydrostatic pressure chg + pump pressure
+        //
+        // in the branch pressure case, the pump pressure term is included
+        // in the branch pressure change without pump, the pump pressure is not included
+        // or zero
+        //
+
+        let ctah_pump_pressure_pascals: f64 = 
+            branch_pressure_change_pascals 
+            - ctah_branch_pressure_change_without_pump_pascals;
+
+        let ctah_mass_flow = 
+            MassRate::new::<kilogram_per_second>(ctah_branch_mass_flowrate_kg_per_s);
+        let ctah_pump_pressure = 
+            Pressure::new::<pascal>(ctah_pump_pressure_pascals);
+
+        return (ctah_mass_flow,ctah_pump_pressure);
+
+    }
+
+    let (ctah_mass_flow_1, ctah_pump_pressure_1) = 
+        obtain_mass_flowrate_and_ctah_loop_pressure_drop_pair(
+            branch_pressure_increased, 
+            temperature_degrees_c, 
+            heater_branch_valve_open, 
+            dhx_branch_valve_open, 
+            ctah_branch_valve_open);
+
+    let (ctah_mass_flow_2, ctah_pump_pressure_2) = 
+        obtain_mass_flowrate_and_ctah_loop_pressure_drop_pair(
+            branch_pressure_decreased, 
+            temperature_degrees_c, 
+            heater_branch_valve_open, 
+            dhx_branch_valve_open, 
+            ctah_branch_valve_open);
+
+    let pressure_error_due_to_flowrate_error: Pressure = 
+        ctah_branch_mass_flowrate * 
+        error_fraction *
+        (ctah_pump_pressure_2 - ctah_pump_pressure_1)/
+        (ctah_mass_flow_2 - ctah_mass_flow_1);
+
+    return pressure_error_due_to_flowrate_error;
+}
+
 
 
 
