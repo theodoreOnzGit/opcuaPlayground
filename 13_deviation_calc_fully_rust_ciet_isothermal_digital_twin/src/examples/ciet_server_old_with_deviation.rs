@@ -76,14 +76,14 @@ pub fn construct_and_run_ciet_server(run_server: bool){
         let _ = address_space.add_variables(
             vec![
                 Variable::new(&ctah_branch_mass_flowrate_node, 
-                              "ctah_branch_mass_flowrate_kg_per_s", 
-                              "ctah_branch_mass_flowrate_kg_per_s", 0 as f64),
+                              "ctah_branch_mass_flowrate_kg_per_s_FM40", 
+                              "ctah_branch_mass_flowrate_kg_per_s_FM40", 0 as f64),
                 Variable::new(&heater_branch_mass_flowrate_node, 
                               "heater_branch_mass_flowrate_kg_per_s", 
                               "heater_branch_mass_flowrate_kg_per_s", 0 as f64),
                 Variable::new(&dhx_branch_mass_flowrate_node, 
-                              "dhx_branch_mass_flowrate_kg_per_s", 
-                              "dhx_branch_mass_flowrate_kg_per_s", 0 as f64),
+                              "dhx_branch_mass_flowrate_kg_per_s_FM20", 
+                              "dhx_branch_mass_flowrate_kg_per_s_FM20", 0 as f64),
                 Variable::new(&calculation_time_node, 
                               "calculation_time_ms", 
                               "calculation_time_ms", 0 as f64),

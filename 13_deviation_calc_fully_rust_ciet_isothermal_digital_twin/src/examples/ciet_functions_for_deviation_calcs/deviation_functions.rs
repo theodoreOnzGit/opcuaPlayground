@@ -200,7 +200,14 @@ pub fn parameterically_estimate_ctah_loop_pressure_drop_error_due_to_flowrate(
         return Pressure::new::<pascal>(0.0);
     }
 
+    // if ctah branch is closed, or if dhx and heater branch are
+    // both closed, return zero, prevents crashes
+    // or panics due to nonconvergence
     if ctah_branch_valve_open == false {
+        return Pressure::new::<pascal>(0.0);
+    }
+
+    if dhx_branch_valve_open && heater_branch_valve_open == false {
         return Pressure::new::<pascal>(0.0);
     }
     // now let me obtain the branch pressure change for the
