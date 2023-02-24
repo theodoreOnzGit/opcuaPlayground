@@ -546,3 +546,88 @@ pub fn get_fldk_error_pascals_heater_branch(mass_flowrate: MassRate,
     return pressure_deviation_heater_branch;
 }
 
+/// obtains the pressure loss coefficient errors due
+/// to deviation of correlation from experimental data for
+/// dhx branch
+pub fn get_fldk_error_pascals_dhx_branch(mass_flowrate: MassRate,
+    error_fraction: f64) -> Pressure {
+
+    //import necessary things...
+    use fluid_mechanics_rust::therminol_component::factory;
+    use fluid_mechanics_rust::prelude::*;
+    use fluid_mechanics_rust::therminol_component::CalcPressureChange;
+
+    let temperature_degrees_c: f64 = 20.0;
+    // for this, we are taking a blanket 10\% error
+    // but we can customise the error fraction
+    // for all components along the CTAH Heater loop
+    let fluid_temp = ThermodynamicTemperature::new::<
+        degree_celsius>(temperature_degrees_c);
+
+    let zero_mass_flow = 
+        MassRate::new::<kilogram_per_second>(0.0);
+
+
+
+    // static mixer 20 and 21
+    let mx20_23 = factory::StaticMixer20::get();
+    let mx21_25 = factory::StaticMixer21::get();
+
+    // flowmeter 21a (FM-20)
+    let flowmeter_20_21a = factory::Flowmeter20::get();
+
+    // now that we've gotten our items, we can
+    // then sum up the pressure change contributions
+    // given
+
+
+
+    // static mixer 20 and 21 pressure
+
+    let pressure_drop_mx20 = 
+        CalcPressureChange::from_mass_rate(
+            &mx20_23,
+            mass_flowrate,
+            fluid_temp) - 
+        CalcPressureChange::from_mass_rate(
+            &mx20_23,
+            zero_mass_flow,
+            fluid_temp);
+
+
+    let pressure_drop_mx21 = 
+        CalcPressureChange::from_mass_rate(
+            &mx21_25,
+            mass_flowrate,
+            fluid_temp) - 
+        CalcPressureChange::from_mass_rate(
+            &mx21_25,
+            zero_mass_flow,
+            fluid_temp);
+
+    // FM20
+
+
+    let pressure_drop_fm20 = 
+        CalcPressureChange::from_mass_rate(
+            &flowmeter_20_21a,
+            mass_flowrate,
+            fluid_temp) 
+        - CalcPressureChange::from_mass_rate(
+            &flowmeter_20_21a,
+            zero_mass_flow,
+            fluid_temp);
+
+
+    // now we calculate the sum of squares
+    let pressure_sq_deviation = 
+        (error_fraction * pressure_drop_fm20) * (error_fraction * pressure_drop_fm20)
+        + (error_fraction * pressure_drop_mx21) * (error_fraction * pressure_drop_mx21)
+        + (error_fraction * pressure_drop_mx20) * (error_fraction * pressure_drop_mx20);
+
+    let pressure_deviation_dhx_branch = 
+        pressure_sq_deviation.sqrt();
+
+    // convert the object to f64 and return
+    return pressure_deviation_dhx_branch;
+}
