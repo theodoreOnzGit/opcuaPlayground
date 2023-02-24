@@ -373,19 +373,37 @@ pub fn construct_and_run_ciet_server(run_server: bool){
 
         //(3) 10\% fldk error
 
-        let fldk_error_pascals_squared = 
+        let mut fldk_error_pascals_squared = 
             get_fldk_error_pascals_ctah_branch(
                 MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
                 0.10)
             * get_fldk_error_pascals_ctah_branch(
                 MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
                 0.10);
-            //+ get_fldk_error_pascals_heater_branch(
-            //    MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-            //    0.10)
-            //* get_fldk_error_pascals_heater_branch(
-            //    MassRate::new::<kilogram_per_second>(ctah_branch_flowrate),
-            //    0.10);
+
+        // if only CTAH and heater branch open add the heater branch error
+
+        if ctah_valve_open && heater_valve_open {
+            fldk_error_pascals_squared += get_fldk_error_pascals_heater_branch(
+                MassRate::new::<kilogram_per_second>(heater_branch_flowrate),
+                0.10)
+            * get_fldk_error_pascals_heater_branch(
+                MassRate::new::<kilogram_per_second>(heater_branch_flowrate),
+                0.10);
+
+        }
+        // if and only if ctah and dhx branch valve open,
+        // then add the dhx branch errors
+
+        if ctah_valve_open && dhx_valve_open {
+            fldk_error_pascals_squared += get_fldk_error_pascals_dhx_branch(
+                MassRate::new::<kilogram_per_second>(dhx_branch_flowrate),
+                0.10)
+            * get_fldk_error_pascals_dhx_branch(
+                MassRate::new::<kilogram_per_second>(dhx_branch_flowrate),
+                0.10);
+
+        }
 
         let fldk_error_pascals = 
             fldk_error_pascals_squared.sqrt();
