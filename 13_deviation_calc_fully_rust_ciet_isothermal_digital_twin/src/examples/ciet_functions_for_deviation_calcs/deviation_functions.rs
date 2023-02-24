@@ -207,7 +207,7 @@ pub fn parameterically_estimate_ctah_loop_pressure_drop_error_due_to_flowrate(
         return Pressure::new::<pascal>(0.0);
     }
 
-    if dhx_branch_valve_open && heater_branch_valve_open == false {
+    if !dhx_branch_valve_open && !heater_branch_valve_open == true {
         return Pressure::new::<pascal>(0.0);
     }
     // now let me obtain the branch pressure change for the
