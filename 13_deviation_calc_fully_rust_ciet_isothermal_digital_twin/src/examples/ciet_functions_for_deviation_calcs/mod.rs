@@ -273,6 +273,35 @@ pub fn get_ciet_isothermal_mass_flowrate(
     //# sum up to zero
     //# the convention is positive flowrate leaving the
     //# top and negative flowrate entering the top
+    //
+    // this particular algorithm may fail for heater branch
+    // closed, I'll need something to handle it
+    // if heater branch is closed, and pump pressure is positive
+    // return zero flow
+    //
+    // because of check valve behaviour
+
+    let pump_pressure_positive: bool = 
+        pump_pressure_pascals.is_sign_positive();
+
+    // if heater valve is closed AND
+    // pump pressure is positive,
+    // must return 0 ctah branch flowrate and
+    // pressure change value is just hydrostatic pressure
+    // plus the pump pressure at zero flow
+
+    if !heater_branch_valve_open && pump_pressure_positive {
+        let ctah_branch_mass_flowrate:  f64 = 0.0;
+
+        let ctah_branch_pressure_change: f64 
+            = get_ctah_branch_isothermal_pressure_change_pascals(
+                0.0, 
+                temperature_degrees_c, 
+                pump_pressure_pascals);
+
+        return (ctah_branch_mass_flowrate,
+                Pressure::new::<pascal>(ctah_branch_pressure_change));
+    }
 
     let pressure_change_root = |pressure_change_pascals: f64| -> f64 {
         //# both branches must be subject to the same
